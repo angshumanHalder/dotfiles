@@ -1,0 +1,39 @@
+local keymap = vim.keymap
+
+-- Increment/decrement
+keymap.set('n', '+', '<C-a>')
+keymap.set('n', '-', '<C-x>')
+
+-- I hate escape
+keymap.set('i', 'jk', '<Esc>')
+keymap.set('n', '<C-c>', '<Esc>')
+
+-- New tab
+keymap.set('n', 'te', ':tabedit<Return>', { silent = true })
+
+-- Split windows
+keymap.set('n', 'ss', ':split<Return><C-w>w', { silent = true })
+keymap.set('n', 'sv', ':vsplit<Return><C-w>w', { silent = true })
+keymap.set('n', '<Leader>d', ':bp | bd #<CR>', { silent = true })
+
+-- Better window navigation
+keymap.set("n", "<C-h>", "<C-w>h", { noremap = true, silent = true })
+keymap.set("n", "<C-j>", "<C-w>j", { noremap = true, silent = true })
+keymap.set("n", "<C-k>", "<C-w>k", { noremap = true, silent = true })
+keymap.set("n", "<C-l>", "<C-w>l", { noremap = true, silent = true })
+
+-- Resize window
+keymap.set("n", "<Space><left>", ":vertical resize -2<CR>", { noremap = true, silent = true })
+keymap.set("n", "<Space><right>", ":vertical resize +2<CR>", { noremap = true, silent = true })
+keymap.set("n", "<Space><up>", ":resize +2<CR>", { noremap = true, silent = true })
+keymap.set("n", "<Space><down>", ":resize -2<CR>", { noremap = true, silent = true })
+
+-- Nvim tree
+keymap.set("n", "<Leader>e", ":NvimTreeToggle<Return>", { noremap = true, silent = true })
+
+-- TAB completion
+vim.cmd([[ inoremap <expr><TAB> pumvisible() ? "<C-n>" : "<TAB>" ]])
+
+-- Stay in indent mode
+keymap.set("v", "<", "<gv")
+keymap.set("v", ">", ">gv")
