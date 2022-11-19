@@ -101,9 +101,42 @@ rust_tools.setup({
   }
 })
 
+nvim_lsp.emmet_ls.setup {
+  on_attach = on_attach,
+  capabilities = capabilities,
+  filetypes = { 'html', 'typescriptreact', 'javascriptreact', 'css', 'sass', 'scss', 'less' },
+  init_options = {
+    html = {
+      options = {
+        -- For possible options, see: https://github.com/emmetio/emmet/blob/master/src/config.ts#L79-L267
+        ["bem.enabled"] = true,
+      },
+    },
+  }
+}
+
 nvim_lsp.cssls.setup {
   on_attach = on_attach,
   capabilities = capabilities
+}
+
+
+nvim_lsp.html.setup {
+  on_attach = on_attach,
+  capabilities = capabilities,
+  settings = {
+    html = {
+      format = {
+        templating = true,
+        wrapLineLength = 120,
+        wrapAttributes = 'auto',
+      },
+      hover = {
+        documentation = true,
+        references = true,
+      },
+    }
+  }
 }
 
 nvim_lsp.gopls.setup {
@@ -111,11 +144,15 @@ nvim_lsp.gopls.setup {
   capabilities = capabilities,
   settings = {
     gopls = {
+      codelenses = { test = true },
       analyses = {
         unusedparams = true,
       },
       staticcheck = true,
     }
+  },
+  flags = {
+    debounce_text_changes = 200,
   }
 }
 
