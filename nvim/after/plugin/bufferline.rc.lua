@@ -12,7 +12,7 @@ bufferline.setup({
   },
 })
 
-vim.keymap.set('n', '<Space><Tab>', '<Cmd>BufferLineCycleNext<CR>', {})
+vim.keymap.set('n', '<Leader><Tab>', '<Cmd>BufferLineCycleNext<CR>', {})
 vim.keymap.set('n', '<S-Tab>', '<Cmd>BufferLineCyclePrev<CR>', {})
 
 -- tokyo night scheme

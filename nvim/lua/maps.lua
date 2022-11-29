@@ -23,10 +23,10 @@ keymap.set("n", "<C-k>", "<C-w>k", { noremap = true, silent = true })
 keymap.set("n", "<C-l>", "<C-w>l", { noremap = true, silent = true })
 
 -- Resize window
-keymap.set("n", "<Space><left>", ":vertical resize -2<CR>", { noremap = true, silent = true })
-keymap.set("n", "<Space><right>", ":vertical resize +2<CR>", { noremap = true, silent = true })
-keymap.set("n", "<Space><up>", ":resize +2<CR>", { noremap = true, silent = true })
-keymap.set("n", "<Space><down>", ":resize -2<CR>", { noremap = true, silent = true })
+keymap.set("n", "<Leader><left>", ":vertical resize -2<CR>", { noremap = true, silent = true })
+keymap.set("n", "<Leader><right>", ":vertical resize +2<CR>", { noremap = true, silent = true })
+keymap.set("n", "<Leader><up>", ":resize +2<CR>", { noremap = true, silent = true })
+keymap.set("n", "<Leader><down>", ":resize -2<CR>", { noremap = true, silent = true })
 
 -- Nvim tree
 keymap.set("n", "<Leader>e", ":NvimTreeToggle<Return>", { noremap = true, silent = true })
