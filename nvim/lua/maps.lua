@@ -37,3 +37,16 @@ vim.cmd([[ inoremap <expr><TAB> pumvisible() ? "<C-n>" : "<TAB>" ]])
 -- Stay in indent mode
 keymap.set("v", "<", "<gv")
 keymap.set("v", ">", ">gv")
+
+-- debuggin
+vim.keymap.set('n', "<F5>", ":lua require'dap'.continue()<CR>", { silent = true })
+vim.keymap.set('n', "<S-F5>", ":lua require'dap'.disconnect()<CR>", { silent = true })
+vim.keymap.set('n', "<F10>", ":lua require'dap'.step_over()<CR>", { silent = true })
+vim.keymap.set('n', "<F11>", ":lua require'dap'.step_into()<CR>", { silent = true })
+vim.keymap.set('n', "<F12>", ":lua require'dap'.step_out()<CR>", { silent = true })
+vim.keymap.set('n', "<Leader>b", ":lua require'dap'.toggle_breakpoint()<CR>", { silent = true })
+vim.keymap.set('n', "<Leader>B", ":lua require'dap'.set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>",
+  { silent = true })
+vim.keymap.set('n', "<Leader>lp", ":lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>",
+  { silent = true })
+vim.keymap.set('n', "<Leader>dr", ":lua require'dap'.repl.open()<CR>", { silent = true })

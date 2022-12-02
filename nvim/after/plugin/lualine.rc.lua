@@ -39,5 +39,5 @@ lualine.setup {
     lualine_z = {},
   },
   tabline = {},
-  extensions = { 'fugitive', 'nvim-tree' }
+  extensions = { 'fugitive', 'nvim-tree', 'nvim-dap-ui' }
 }

@@ -75,4 +75,10 @@ packer.startup(function(use)
   use { 'rafamadriz/friendly-snippets' }
   use 'glepnir/lspsaga.nvim'
   use { 'sindrets/diffview.nvim', requires = 'nvim-lua/plenary.nvim' }
+
+  -- Debugging
+  use 'mfussenegger/nvim-dap'
+  use 'leoluz/nvim-dap-go'
+  use { "rcarriga/nvim-dap-ui", requires = { "mfussenegger/nvim-dap" } }
+  use 'theHamsta/nvim-dap-virtual-text'
 end)

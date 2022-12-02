@@ -5,7 +5,6 @@ if (not status) then return end
 local rust_status, rust_tools = pcall(require, "rust-tools")
 if (not rust_status) then return end
 
-
 local protocol = require('vim.lsp.protocol')
 
 local augroup_format = vim.api.nvim_create_augroup("Format", { clear = true })
@@ -151,11 +150,11 @@ nvim_lsp.gopls.setup {
       staticcheck = true,
     }
   },
-  flags = {
-    debounce_text_changes = 200,
-  }
 }
 
+nvim_lsp.golangci_lint_ls.setup {
+  filetypes = { 'go', 'gomod' }
+}
 
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
   vim.lsp.diagnostic.on_publish_diagnostics, {
