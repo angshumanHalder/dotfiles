@@ -20,6 +20,7 @@ packer.startup(function(use)
   use 'windwp/nvim-ts-autotag' -- xml tags pair
   use 'nvim-lua/plenary.nvim' -- common utilities
   use 'nvim-telescope/telescope.nvim' -- file search with regex file
+  use { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' }
   use 'nvim-telescope/telescope-file-browser.nvim' -- needs to be included with telescope
   use 'kyazdani42/nvim-web-devicons' -- file icons
   use 'akinsho/nvim-bufferline.lua' -- buffer line for managing buffer with tabs
