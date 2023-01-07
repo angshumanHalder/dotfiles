@@ -48,9 +48,9 @@ packer.startup(function(use)
   use 'unblevable/quick-scope' -- highlight jumpt text
   use 'p00f/nvim-ts-rainbow'
 
-  use 'folke/tokyonight.nvim' -- coloscheme
   use 'ellisonleao/gruvbox.nvim' -- coloscheme,
   use "EdenEast/nightfox.nvim" -- colorscheme
+  use { "catppuccin/nvim", as = "catppuccin" }
 
   use 'hrsh7th/cmp-emoji'
   use 'nvim-treesitter/playground'
