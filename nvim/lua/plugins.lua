@@ -74,7 +74,7 @@ packer.startup(function(use)
   -- Snippets
   use { 'L3MON4D3/LuaSnip' }
   use { 'rafamadriz/friendly-snippets' }
-  use { "glepnir/lspsaga.nvim" }
+  use { "glepnir/lspsaga.nvim", commit = "2db894653bfbb97ce528ae15e5fb74363fa937ff" }
   use { 'sindrets/diffview.nvim', requires = 'nvim-lua/plenary.nvim' }
 
   -- Debugging
