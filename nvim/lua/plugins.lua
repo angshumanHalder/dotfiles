@@ -35,6 +35,7 @@ packer.startup(function(use)
     requires = {
       'nvim-tree/nvim-web-devicons', -- optional, for file icons
     },
+    commit = "3c4958ab3dd0e5fa470fb50b6b9cc6df48229a2e"
   }
   use 'lewis6991/impatient.nvim'
   use 'numToStr/Comment.nvim'
