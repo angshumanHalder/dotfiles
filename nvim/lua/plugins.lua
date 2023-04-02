@@ -79,8 +79,25 @@ packer.startup(function(use)
   use { 'sindrets/diffview.nvim', requires = 'nvim-lua/plenary.nvim' }
 
   -- Debugging
-  use 'mfussenegger/nvim-dap'
-  use 'leoluz/nvim-dap-go'
-  use { "rcarriga/nvim-dap-ui", requires = { "mfussenegger/nvim-dap" } }
-  use 'theHamsta/nvim-dap-virtual-text'
+  use {
+    "mfussenegger/nvim-dap",
+    opt = true,
+    module = { "dap" },
+    requires = {
+      { "theHamsta/nvim-dap-virtual-text", module = { "nvim-dap-virtual-text" } },
+      { "rcarriga/nvim-dap-ui", module = { "dapui" } },
+      { "leoluz/nvim-dap-go", module = "dap-go" },
+      { "mxsdev/nvim-dap-vscode-js", module = { "dap-vscode-js" } },
+      {
+        "microsoft/vscode-js-debug",
+        opt = true,
+        run = "npm install --legacy-peer-deps && npx gulp vsDebugServerBundle && mv dist out",
+        disable = false,
+      },
+    },
+    config = function()
+      require("config.dap").setup()
+    end,
+    disable = false,
+  }
 end)

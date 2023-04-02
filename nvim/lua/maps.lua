@@ -49,4 +49,23 @@ vim.keymap.set('n', "<Leader>B", ":lua require'dap'.set_breakpoint(vim.fn.input(
   { silent = true })
 vim.keymap.set('n', "<Leader>lp", ":lua require'dap'.set_breakpoint(nil, nil, vim.fn.input('Log point message: '))<CR>",
   { silent = true })
-vim.keymap.set('n', "<Leader>dr", ":lua require'dap'.repl.open()<CR>", { silent = true })
+vim.keymap.set('n', "<Leader>dr", ":lua require'dap'.repl.toggle()<CR>", { silent = true })
+
+-- future reference if required
+
+-- d = {
+--   name = "DAP",
+--   R = { "<cmd>lua require'dap'.run_to_cursor()<cr>", "Run to Cursor" },
+--   E = { "<cmd>lua require'dapui'.eval(vim.fn.input '[Expression] > ')<cr>", "Evaluate Input" },
+--   C = { "<cmd>lua require'dap'.set_breakpoint(vim.fn.input '[Condition] > ')<cr>", "Conditional Breakpoint" },
+--   U = { "<cmd>lua require'dapui'.toggle()<cr>", "Toggle UI" },
+--   b = { "<cmd>lua require'dap'.step_back()<cr>", "Step Back" },
+--   e = { "<cmd>lua require'dapui'.eval()<cr>", "Evaluate" },
+--   g = { "<cmd>lua require'dap'.session()<cr>", "Get Session" },
+--   h = { "<cmd>lua require'dap.ui.widgets'.hover()<cr>", "Hover Variables" },
+--   S = { "<cmd>lua require'dap.ui.widgets'.scopes()<cr>", "Scopes" },
+--   p = { "<cmd>lua require'dap'.pause.toggle()<cr>", "Pause" },
+--   q = { "<cmd>lua require'dap'.close()<cr>", "Quit" },
+--   s = { "<cmd>lua require'dap'.continue()<cr>", "Start" },
+--   x = { "<cmd>lua require'dap'.terminate()<cr>", "Terminate" },
+-- },
