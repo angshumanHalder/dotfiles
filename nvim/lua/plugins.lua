@@ -27,8 +27,8 @@ packer.startup(function(use)
   use 'norcalli/nvim-colorizer.lua'
   use 'jose-elias-alvarez/null-ls.nvim' -- Use Neovim as a language server to inject LSP diagnostics, code actions, and more via Lua
 
+  use 'tpope/vim-fugitive'
   use 'lewis6991/gitsigns.nvim'
-  use 'dinhhuy258/git.nvim'
 
   use {
     'nvim-tree/nvim-tree.lua',

@@ -134,11 +134,6 @@ _G.packer_plugins = {
     path = "/Users/angshumanhalder/.local/share/nvim/site/pack/packer/start/friendly-snippets",
     url = "https://github.com/rafamadriz/friendly-snippets"
   },
-  ["git.nvim"] = {
-    loaded = true,
-    path = "/Users/angshumanhalder/.local/share/nvim/site/pack/packer/start/git.nvim",
-    url = "https://github.com/dinhhuy258/git.nvim"
-  },
   ["gitsigns.nvim"] = {
     loaded = true,
     path = "/Users/angshumanhalder/.local/share/nvim/site/pack/packer/start/gitsigns.nvim",
@@ -215,7 +210,7 @@ _G.packer_plugins = {
     url = "https://github.com/norcalli/nvim-colorizer.lua"
   },
   ["nvim-dap"] = {
-    after = { "vscode-js-debug", "nvim-dap-vscode-js", "nvim-dap-go", "nvim-dap-ui", "nvim-dap-virtual-text" },
+    after = { "vscode-js-debug", "nvim-dap-vscode-js", "nvim-dap-go", "nvim-dap-virtual-text", "nvim-dap-ui" },
     config = { "\27LJ\2\n8\0\0\3\0\3\0\0066\0\0\0'\2\1\0B\0\2\0029\0\2\0B\0\1\1K\0\1\0\nsetup\15config.dap\frequire\0" },
     loaded = false,
     needs_bufread = false,
@@ -337,6 +332,11 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/angshumanhalder/.local/share/nvim/site/pack/packer/start/todo-comments.nvim",
     url = "https://github.com/folke/todo-comments.nvim"
+  },
+  ["vim-fugitive"] = {
+    loaded = true,
+    path = "/Users/angshumanhalder/.local/share/nvim/site/pack/packer/start/vim-fugitive",
+    url = "https://github.com/tpope/vim-fugitive"
   },
   ["vscode-js-debug"] = {
     load_after = {
