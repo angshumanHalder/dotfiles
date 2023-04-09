@@ -38,7 +38,7 @@ vim.cmd([[ inoremap <expr><TAB> pumvisible() ? "<C-n>" : "<TAB>" ]])
 keymap.set("v", "<", "<gv")
 keymap.set("v", ">", ">gv")
 
--- debuggin
+-- debugging
 vim.keymap.set('n', "<F5>", ":lua require'dap'.continue()<CR>", { silent = true })
 vim.keymap.set('n', "<S-F5>", ":lua require'dap'.disconnect()<CR>", { silent = true })
 vim.keymap.set('n', "<F10>", ":lua require'dap'.step_over()<CR>", { silent = true })
