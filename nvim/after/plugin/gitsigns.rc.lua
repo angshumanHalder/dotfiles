@@ -6,14 +6,14 @@ gitsigns.setup({
 
 })
 
-vim.keymap.set('n', ']c', function()
-  if vim.wo.diff then return ']c' end
+vim.keymap.set('n', '<leader>hc', function()
+  if vim.wo.diff then return '<leader>hc' end
   vim.schedule(function() gitsigns.next_hunk() end)
   return '<Ignore>'
 end, { expr = true })
 
-vim.keymap.set('n', '[c', function()
-  if vim.wo.diff then return '[c' end
+vim.keymap.set('n', '<leader>hc', function()
+  if vim.wo.diff then return '<leader>hc' end
   vim.schedule(function() gitsigns.prev_hunk() end)
   return '<Ignore>'
 end, { expr = true })
