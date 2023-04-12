@@ -1,5 +1,8 @@
 local status, lspkind = pcall(require, "lspkind")
-if (not status) then return end
+if (not status) then
+  print("failed to load lspkind")
+  return
+end
 
 lspkind.init({
   -- enables text annotations
@@ -15,7 +18,6 @@ lspkind.init({
   preset = 'codicons',
 
   -- override preset symbols
-  --
   -- default: {}
   symbol_map = {
     Text = "",

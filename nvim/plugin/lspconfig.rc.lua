@@ -1,9 +1,15 @@
 local status, nvim_lsp = pcall(require, "lspconfig")
-if (not status) then return end
+if (not status) then
+  print("failed to load lspconfig")
+  return
+end
 
 -- rust tool setup
 local rust_status, rust_tools = pcall(require, "rust-tools")
-if (not rust_status) then return end
+if (not rust_status) then
+  print("failed to load rust-tools")
+  return
+end
 
 local protocol = require('vim.lsp.protocol')
 
@@ -62,7 +68,12 @@ protocol.CompletionItemKind = {
 }
 
 -- Set up completion using nvim_cmp with LSP source
-local capabilities = require('cmp_nvim_lsp').default_capabilities()
+-- local capabilities = require('cmp_nvim_lsp').default_capabilities()
+local capabilities = vim.lsp.protocol.make_client_capabilities()
+capabilities.textDocument.foldingRange = {
+  dynamicRegistration = false,
+  lineFoldingOnly = true
+}
 
 
 nvim_lsp.tsserver.setup {

@@ -1,10 +1,12 @@
 local status_ok, nvim_tree = pcall(require, "nvim-tree")
 if not status_ok then
+  print("failed to load nvim-tree")
   return
 end
 
 local config_status_ok, nvim_tree_config = pcall(require, "nvim-tree.config")
 if not config_status_ok then
+  print("failed to load nvim-tree.config")
   return
 end
 
@@ -62,7 +64,6 @@ nvim_tree.setup {
         { key = "h", cb = tree_cb "close_node" },
         { key = "v", cb = tree_cb "vsplit" },
         { key = "s", cb = tree_cb "split" },
-        -- { key = "<enter>", action = "tabnew" }
       },
     },
   },

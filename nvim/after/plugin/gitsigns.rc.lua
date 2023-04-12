@@ -1,9 +1,11 @@
 local status, gitsigns = pcall(require, "gitsigns")
-if (not status) then return end
+if (not status) then
+  print("failed to load gitsigns")
+  return
+end
 
 gitsigns.setup({
   current_line_blame = true, -- Toggle with `:Gitsigns toggle_current_line_blame`
-
 })
 
 vim.keymap.set('n', '<leader>hc', function()
@@ -18,8 +20,8 @@ vim.keymap.set('n', '<leader>hc', function()
   return '<Ignore>'
 end, { expr = true })
 
-vim.keymap.set({ 'n', 'v' }, '<leader>hs', ':Gitsigns stage_hunk<CR>')
-vim.keymap.set({ 'n', 'v' }, '<leader>hr', ':Gitsigns reset_hunk<CR>')
+vim.keymap.set({ 'n', 'v' }, '<leader>hs', gitsigns.stage_hunk)
+vim.keymap.set({ 'n', 'v' }, '<leader>hr', gitsigns.reset_hunk)
 vim.keymap.set('n', '<leader>hS', gitsigns.stage_buffer)
 vim.keymap.set('n', '<leader>ha', gitsigns.stage_hunk)
 vim.keymap.set('n', '<leader>hu', gitsigns.undo_stage_hunk)

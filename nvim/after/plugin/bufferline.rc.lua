@@ -1,5 +1,8 @@
 local status, bufferline = pcall(require, "bufferline")
-if (not status) then return end
+if (not status) then
+  print("failed to load bufferline")
+  return
+end
 
 bufferline.setup({
   options = {
@@ -14,27 +17,3 @@ bufferline.setup({
 
 vim.keymap.set('n', '<Leader><Tab>', '<Cmd>BufferLineCycleNext<CR>', {})
 vim.keymap.set('n', '<S-Tab>', '<Cmd>BufferLineCyclePrev<CR>', {})
-
--- tokyo night scheme
---[[
-{
-    separator = {
-      fg = '#292e42',
-      bg = '#272d47',
-    },
-    separator_selected = {
-      fg = '#292e42',
-    },
-    background = {
-      fg = '#c0caf5',
-      bg = '#272d47'
-    },
-    buffer_selected = {
-      fg = '#9d7cd8',
-      bold = true,
-    },
-    fill = {
-      bg = '#292e42',
-    }
-  }
---]]
