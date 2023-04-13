@@ -13,18 +13,7 @@ ts.setup {
     enable = true,
     disable = {},
   },
-  ensure_installed = {
-    "tsx",
-    "toml",
-    "json",
-    "yaml",
-    "css",
-    "html",
-    "lua",
-    "go",
-    "rust",
-    "gomod"
-  },
+  ensure_installed = "all",
   autotag = {
     enable = true,
   },
