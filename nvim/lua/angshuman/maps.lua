@@ -4,6 +4,12 @@ local keymap = vim.keymap
 keymap.set('n', '+', '<C-a>')
 keymap.set('n', '-', '<C-x>')
 
+-- replace without yanking to default register
+keymap.set("x", "<leader>p", '"_dP')
+
+-- delete function without yanking
+vim.keymap.set({ "n", "v" }, "<leader>d", '"_d')
+
 -- I hate escape
 keymap.set('i', 'jk', '<Esc>')
 keymap.set('n', '<C-c>', '<Esc>')
@@ -14,7 +20,6 @@ keymap.set('n', 'te', ':tabedit<Return>', { silent = true })
 -- Split windows
 keymap.set('n', 'ss', ':split<Return><C-w>w', { silent = true })
 keymap.set('n', 'sv', ':vsplit<Return><C-w>w', { silent = true })
-keymap.set('n', '<Leader>d', ':bp | bd #<CR>', { silent = true })
 
 -- Better window navigation
 keymap.set("n", "<C-h>", "<C-w>h", { noremap = true, silent = true })

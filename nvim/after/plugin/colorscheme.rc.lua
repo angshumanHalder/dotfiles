@@ -4,5 +4,8 @@ if (not status) then
   return
 end
 
-catppuccin.setup({});
+catppuccin.setup({
+  transparent_background = true,
+});
+
 vim.cmd [[colorscheme catppuccin-frappe]]
