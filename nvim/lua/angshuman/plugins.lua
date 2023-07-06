@@ -37,7 +37,6 @@ packer.startup(function(use)
     },
     commit = "3c4958ab3dd0e5fa470fb50b6b9cc6df48229a2e"
   }
-  use 'lewis6991/impatient.nvim'
   use 'numToStr/Comment.nvim'
 
   use 'simrat39/rust-tools.nvim'
@@ -47,7 +46,6 @@ packer.startup(function(use)
   } -- todo comments highlighter_only
 
   use 'unblevable/quick-scope' -- highlight jumpt text
-  use 'p00f/nvim-ts-rainbow'
 
   use 'ellisonleao/gruvbox.nvim' -- coloscheme,
   use "EdenEast/nightfox.nvim" -- colorscheme

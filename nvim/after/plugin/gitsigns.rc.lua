@@ -9,7 +9,7 @@ gitsigns.setup({
 })
 
 vim.keymap.set('n', '<leader>]c', function()
-  if vim.wo.diff then return '<leader>hc' end
+  if vim.wo.diff then return '<leader>hn' end
   vim.schedule(function() gitsigns.next_hunk() end)
   return '<Ignore>'
 end, { expr = true })
