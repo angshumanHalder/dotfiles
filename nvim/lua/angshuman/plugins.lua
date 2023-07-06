@@ -99,4 +99,5 @@ packer.startup(function(use)
     "kevinhwang91/nvim-ufo",
     requires = 'kevinhwang91/promise-async'
   }
+  use { "folke/trouble.nvim" }
 end)
