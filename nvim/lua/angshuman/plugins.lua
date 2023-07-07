@@ -98,4 +98,6 @@ packer.startup(function(use)
     requires = 'kevinhwang91/promise-async'
   }
   use { "folke/trouble.nvim" }
+  use { "j-hui/fidget.nvim", tag = "legacy", config = true, requires = { "neovim/nvim-lspconfig" } }
+  use { "HiPhish/rainbow-delimiters.nvim" }
 end)
