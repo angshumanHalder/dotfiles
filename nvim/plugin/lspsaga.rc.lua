@@ -4,6 +4,12 @@ if (not status) then return end
 saga.setup({
   server_filetype_map = {
     typescript = 'typescript',
+  },
+  finder = {
+    keys = {
+      vsplit = 'v',
+      split = 's',
+    }
   }
 })
 
