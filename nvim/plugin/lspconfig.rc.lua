@@ -1,3 +1,32 @@
+-- Mason setup
+local mason_status, mason = pcall(require, "mason")
+if (not mason_status) then
+  print("failed to load mason")
+  return
+end
+
+local mason_lspconfig_status, mason_lspconfig = pcall(require, "mason-lspconfig")
+if (not mason_lspconfig_status) then
+  print("failed to load mason-lspconfig")
+  return
+end
+
+mason.setup()
+mason_lspconfig.setup()
+
+mason_lspconfig.setup {
+  automatic_installation = true
+}
+
+local mason_registry = require("mason-registry")
+local codelldb = mason_registry.get_package("codelldb")
+local ext_path = codelldb:get_install_path() .. "/extension/"
+local codelldb_path = ext_path .. "adapter/codelldb"
+local liblldb_path = ext_path .. "lldb/lib/liblldb.dylib"
+
+
+-- LSP config set starts
+
 local status, nvim_lsp = pcall(require, "lspconfig")
 if (not status) then
   print("failed to load lspconfig")
@@ -150,6 +179,14 @@ rust_tools.setup({
       on_attach(client, bufnr)
       enable_format_on_save(client, bufnr)
     end,
+  },
+  tools = {
+    hover_actions = {
+      auto_focus = true,
+    }
+  },
+  dap = {
+    adapter = require("rust-tools.dap").get_codelldb_adapter(codelldb_path, liblldb_path),
   }
 })
 
@@ -211,11 +248,11 @@ nvim_lsp.golangci_lint_ls.setup {
 
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
   vim.lsp.diagnostic.on_publish_diagnostics, {
-  underline = true,
-  update_in_insert = false,
-  virtual_text = { spacing = 4, prefix = "●" },
-  severity_sort = true,
-}
+    underline = true,
+    update_in_insert = false,
+    virtual_text = { spacing = 4, prefix = "●" },
+    severity_sort = true,
+  }
 )
 
 -- Diagnostic symbols in the sign column (gutter)
