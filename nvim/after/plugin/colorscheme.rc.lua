@@ -6,6 +6,13 @@ end
 
 catppuccin.setup({
   transparent_background = true,
+  highlight_overrides = {
+    frappe = function(frappe)
+      return {
+        LineNr = { fg = frappe.surface2 }
+      }
+    end
+  }
 });
 
-vim.cmd [[colorscheme catppuccin-frappe]]
+vim.cmd [[colorscheme  catppuccin-frappe]]
