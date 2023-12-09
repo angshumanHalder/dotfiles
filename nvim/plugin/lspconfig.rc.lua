@@ -14,9 +14,9 @@ end
 mason.setup()
 mason_lspconfig.setup()
 
-mason_lspconfig.setup {
+mason_lspconfig.setup({
   automatic_installation = true
-}
+})
 
 local mason_registry = require("mason-registry")
 local codelldb = mason_registry.get_package("codelldb")
@@ -105,14 +105,14 @@ capabilities.textDocument.foldingRange = {
 }
 
 
-nvim_lsp.tsserver.setup {
+nvim_lsp.tsserver.setup({
   on_attach = on_attach,
   filetypes = { "typescript", "typescriptreact", "typescript.tsx", "javascript", "javascriptreact", "javascriptjsx" },
   cmd = { "typescript-language-server", "--stdio" },
   capabilities = capabilities
-}
+})
 
-nvim_lsp.eslint.setup {
+nvim_lsp.eslint.setup({
   on_attach = function(_, bufnr)
     vim.api.nvim_create_autocmd("BufWritePre", {
       buffer = bufnr,
@@ -152,9 +152,9 @@ nvim_lsp.eslint.setup {
       mode = "location"
     }
   },
-}
+})
 
-nvim_lsp.lua_ls.setup {
+nvim_lsp.lua_ls.setup({
   capabilities = capabilities,
   on_attach = function(client, bufnr)
     on_attach(client, bufnr)
@@ -171,7 +171,7 @@ nvim_lsp.lua_ls.setup {
       },
     },
   },
-}
+})
 
 rust_tools.setup({
   server = {
@@ -190,7 +190,7 @@ rust_tools.setup({
   }
 })
 
-nvim_lsp.emmet_ls.setup {
+nvim_lsp.emmet_ls.setup({
   on_attach = on_attach,
   capabilities = capabilities,
   filetypes = { 'html', 'typescriptreact', 'javascriptreact', 'css', 'sass', 'scss', 'less' },
@@ -202,15 +202,15 @@ nvim_lsp.emmet_ls.setup {
       },
     },
   }
-}
+})
 
-nvim_lsp.cssls.setup {
+nvim_lsp.cssls.setup({
   on_attach = on_attach,
   capabilities = capabilities
-}
+})
 
 
-nvim_lsp.html.setup {
+nvim_lsp.html.setup({
   on_attach = on_attach,
   capabilities = capabilities,
   settings = {
@@ -226,9 +226,9 @@ nvim_lsp.html.setup {
       },
     }
   }
-}
+})
 
-nvim_lsp.gopls.setup {
+nvim_lsp.gopls.setup({
   on_attach = on_attach,
   capabilities = capabilities,
   settings = {
@@ -240,11 +240,11 @@ nvim_lsp.gopls.setup {
       staticcheck = true,
     }
   },
-}
+})
 
-nvim_lsp.golangci_lint_ls.setup {
+nvim_lsp.golangci_lint_ls.setup({
   filetypes = { 'go', 'gomod' }
-}
+})
 
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(
   vim.lsp.diagnostic.on_publish_diagnostics, {

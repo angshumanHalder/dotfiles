@@ -18,7 +18,7 @@ local lsp_formatting = function(bufnr)
   })
 end
 
-null_ls.setup {
+null_ls.setup({
   sources = sources,
   on_attach = function(client, bufnr)
     if client.supports_method("textDocument/formatting") then
@@ -32,7 +32,7 @@ null_ls.setup {
       })
     end
   end
-}
+})
 
 vim.api.nvim_create_user_command(
   'DisableLspFormatting',

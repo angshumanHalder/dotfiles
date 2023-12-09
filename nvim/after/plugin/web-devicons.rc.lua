@@ -4,7 +4,7 @@ if (not status) then
   return
 end
 
-icons.setup {
+icons.setup({
   override = {},
   default = true
-}
+})

@@ -7,7 +7,7 @@ end
 local actions = require('telescope.actions')
 local builtin = require("telescope.builtin")
 
-telescope.setup {
+telescope.setup({
   defaults = {
     prompt_prefix = " ",
     selection_caret = " ",
@@ -33,9 +33,8 @@ telescope.setup {
   },
   extensions = {
   },
-}
+})
 
-telescope.load_extension("file_browser")
 telescope.load_extension("fzf")
 
 vim.keymap.set('n', 'FF',

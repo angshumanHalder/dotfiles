@@ -4,7 +4,7 @@ if (not status) then
   return
 end
 
-lualine.setup {
+lualine.setup({
   options = {
     icons_enabled = true,
     theme = 'catppuccin',
@@ -17,8 +17,16 @@ lualine.setup {
     lualine_b = { 'branch' },
     lualine_c = {},
     lualine_x = {
-      { 'diagnostics', sources = { 'nvim_diagnostic' }, symbols = { error = ' ', warn = ' ', info = ' ',
-        hint = ' ' } },
+      {
+        'diagnostics',
+        sources = { 'nvim_diagnostic' },
+        symbols = {
+          error = ' ',
+          warn = ' ',
+          info = ' ',
+          hint = ' '
+        }
+      },
       'encoding',
       'filetype',
     },
@@ -35,4 +43,4 @@ lualine.setup {
   },
   tabline = {},
   extensions = { 'nvim-tree', 'nvim-dap-ui', }
-}
+})

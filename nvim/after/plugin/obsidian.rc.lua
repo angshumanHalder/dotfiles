@@ -7,6 +7,6 @@ end
 obsidian.setup({
   dir = "~/Documents/Notes",
   mappings = {
-    ["<leader>gf"] = require("obsidian.mapping").gf_passthrough(),
+    ["<leader>gf"] = obsidian.util.gf_passthrough(),
   }
 })
