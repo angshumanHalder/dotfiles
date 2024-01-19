@@ -197,6 +197,9 @@ return {
   {
     "nvim-neo-tree/neo-tree.nvim",
     cmd = "Neotree",
+    keys = {
+      { "<Leader>e", "<Cmd>Neotree toggle<CR>" },
+    },
     opts = {
       filesystem = {
         filtered_items = {
