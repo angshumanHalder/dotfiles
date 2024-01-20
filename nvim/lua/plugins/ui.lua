@@ -10,7 +10,7 @@ return {
       options = {
         mode = "tabs",
         always_show_bufferline = false,
-        show_buffer_close_icons = true,
+        show_buffer_close_icons = false,
         show_close_icon = true,
         color_icons = true,
         offsets = { { filetype = "neo-tree", text = "", padding = 1 } },
@@ -65,6 +65,12 @@ return {
     enabled = false,
   },
   {
+    "rcarriga/nvim-notify",
+    opts = {
+      timeout = 5000,
+    },
+  },
+  {
     "folke/noice.nvim",
     opts = function(_, opts)
       table.insert(opts.routes, {
@@ -116,6 +122,10 @@ return {
           opts = { enter = true, format = "details" },
           filter = {},
         },
+      }
+
+      opts.cmdline = {
+        view = "cmdline",
       }
 
       vim.api.nvim_create_autocmd("FileType", {

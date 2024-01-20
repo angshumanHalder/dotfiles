@@ -67,12 +67,7 @@ return {
     dependencies = { "nvim-lua/plenary.nvim" },
     keys = {
       { "<leader>dv", "<cmd>DiffviewOpen<cr>", silent = true, noremap = true },
-      {
-        "<leader>dc",
-        "<cmd>set hidden<cr> <cmd>DiffviewClose<cr> <cmd>set nohidden<cr>",
-        silent = true,
-        noremap = true,
-      },
+      { "<leader>dc", "<cmd>DiffviewClose<cr>", silent = true, noremap = true },
     },
   },
   { "folke/flash.nvim", enabled = false },
@@ -232,8 +227,9 @@ return {
       window = {
         mappings = {
           ["o"] = "open",
-          ["<cr>"] = "open_with_window_picker",
-          ["l"] = "open_with_window_picker",
+          ["<cr>"] = "open",
+          ["l"] = "open",
+          ["w"] = "open_with_window_picker",
           ["h"] = "close_node",
           ["s"] = "open_split",
           ["v"] = "open_vsplit",
