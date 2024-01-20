@@ -62,7 +62,19 @@ return {
     },
   },
   "tpope/vim-fugitive",
-  { "sindrets/diffview.nvim", dependencies = { "nvim-lua/plenary.nvim" } },
+  {
+    "sindrets/diffview.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    keys = {
+      { "<leader>dv", "<cmd>DiffviewOpen<cr>", silent = true, noremap = true },
+      {
+        "<leader>dc",
+        "<cmd>set hidden<cr> <cmd>DiffviewClose<cr> <cmd>set nohidden<cr>",
+        silent = true,
+        noremap = true,
+      },
+    },
+  },
   { "folke/flash.nvim", enabled = false },
   { "RRethy/vim-illuminate", enabled = false },
   { "echasnovski/mini.bufremove", enabled = false },

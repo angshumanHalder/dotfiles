@@ -33,7 +33,7 @@ vim.opt.wrap = false -- No wrap lines
 vim.opt.backspace = { "start", "eol", "indent" }
 vim.opt.path:append({ "**" }) -- Finding files - Search down into subfolders
 vim.opt.wildignore:append({ "*/node_modules/*" })
-vim.g.mapleader = " "
+
 -- folding
 vim.opt.foldcolumn = "1"
 vim.opt.foldlevel = 99
