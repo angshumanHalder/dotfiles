@@ -122,6 +122,19 @@ return {
   },
   {
     "neovim/nvim-lspconfig",
+    init = function()
+      local keys = require("lazyvim.plugins.lsp.keymaps").get()
+      keys[#keys + 1] = { "<space>e", false }
+      keys[#keys + 1] = { "[d", false }
+      keys[#keys + 1] = { "]d", false }
+      keys[#keys + 1] = { "<space>q", false }
+      keys[#keys + 1] = { "K", false }
+      keys[#keys + 1] = { "gi", false }
+      keys[#keys + 1] = { "<space>rn", false }
+      keys[#keys + 1] = { "<space>ca", false }
+      keys[#keys + 1] = { "gr", false }
+      keys[#keys + 1] = { "gd", false }
+    end,
     opts = {
       server = {
         tsserver = {
