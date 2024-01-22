@@ -204,38 +204,86 @@ return {
     end,
   },
   {
-    "nvim-neo-tree/neo-tree.nvim",
-    cmd = "Neotree",
+    "nvim-tree/nvim-tree.lua",
+    dependencies = {
+      "nvim-tree/nvim-web-devicons", -- optional, for file icons
+    },
     keys = {
-      { "<Leader>e", "<Cmd>Neotree toggle<CR>" },
+      { "<leader>e", "<cmd>NvimTreeToggle<cr>", noremap = true, silent = true, { desc = "Toggle NvimTree" } },
     },
-    opts = {
-      filesystem = {
-        filtered_items = {
-          visible = true,
-          show_hidden_count = true,
-          hide_dotfiles = false,
-          hide_gitignored = true,
-          hide_by_name = {
-            -- '.git',
-            -- '.DS_Store',
-            -- 'thumbs.db',
+    config = function()
+      local function my_on_attach(bufnr)
+        local api = require("nvim-tree.api")
+
+        local function opts(desc)
+          return { desc = "nvim-tree: " .. desc, buffer = bufnr, noremap = true, silent = true, nowait = true }
+        end
+
+        -- default mappings
+        api.config.mappings.default_on_attach(bufnr)
+
+        -- custom mappings
+        vim.keymap.set("n", "l", api.node.open.edit, opts("Open"))
+        vim.keymap.set("n", "o", api.node.open.edit, opts("Open"))
+        vim.keymap.set("n", "h", api.node.navigate.parent_close, opts("Close Directory"))
+        vim.keymap.set("n", "v", api.node.open.vertical, opts("Open: Vertical Split"))
+        vim.keymap.set("n", "s", api.node.open.horizontal, opts("Open: Horizontal Split"))
+      end
+
+      require("nvim-tree").setup({
+        on_attach = my_on_attach,
+        update_focused_file = {
+          enable = true,
+          update_cwd = true,
+        },
+        renderer = {
+          root_folder_modifier = ":t",
+          icons = {
+            glyphs = {
+              default = "",
+              symlink = "",
+              folder = {
+                arrow_open = "",
+                arrow_closed = "",
+                default = "",
+                open = "",
+                empty = "",
+                empty_open = "",
+                symlink = "",
+                symlink_open = "",
+              },
+              git = {
+                unstaged = "",
+                staged = "S",
+                unmerged = "",
+                renamed = "➜",
+                untracked = "U",
+                deleted = "",
+                ignored = "◌",
+              },
+            },
           },
-          never_show = {},
         },
-      },
-      window = {
-        mappings = {
-          ["o"] = "open",
-          ["<cr>"] = "open",
-          ["l"] = "open",
-          ["w"] = "open_with_window_picker",
-          ["h"] = "close_node",
-          ["s"] = "open_split",
-          ["v"] = "open_vsplit",
+        diagnostics = {
+          enable = true,
+          show_on_dirs = true,
+          icons = {
+            hint = "",
+            info = "",
+            warning = "",
+            error = "",
+          },
         },
-      },
-    },
+        view = {
+          width = 30,
+          side = "left",
+        },
+      })
+    end,
+  },
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    enabled = false,
   },
   {
     "folke/trouble.nvim",
