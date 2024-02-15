@@ -9,6 +9,27 @@ return {
   { "echasnovski/mini.surround", enabled = false },
   { "JoosepAlviste/nvim-ts-context-commentstring", enabled = false },
   {
+    "L3MON4D3/LuaSnip",
+    keys = {
+      {
+        "\\<tab>",
+        function()
+          return require("luasnip").jumpable(1) and "<Plug>luasnip-jump-next"
+        end,
+        expr = true,
+        silent = true,
+        mode = "i",
+      },
+      {
+        "\\<tab>",
+        function()
+          require("luasnip").jump(1)
+        end,
+        mode = "s",
+      },
+    },
+  },
+  {
     "hrsh7th/nvim-cmp",
     opts = function()
       vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })

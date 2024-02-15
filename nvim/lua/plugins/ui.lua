@@ -2,10 +2,6 @@ return {
   {
     "akinsho/bufferline.nvim",
     event = "VeryLazy",
-    keys = {
-      { "<Leader><Tab>", "<Cmd>BufferLineCycleNext<CR>", desc = "Next tab" },
-      { "<S-Tab>", "<Cmd>BufferLineCyclePrev<CR>", desc = "Prev tab" },
-    },
     opts = {
       options = {
         mode = "tabs",
@@ -67,7 +63,7 @@ return {
   {
     "rcarriga/nvim-notify",
     opts = {
-      timeout = 5000,
+      timeout = 3000,
     },
   },
   {
@@ -141,7 +137,6 @@ return {
     end,
   },
   { "stevearc/dressing.nvim", enabled = false },
-  { "nvimdev/dashboard-nvim", enabled = false },
   { "goolord/alpha-nvim", enabled = false },
   {
     "norcalli/nvim-colorizer.lua",

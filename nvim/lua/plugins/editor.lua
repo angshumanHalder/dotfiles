@@ -16,7 +16,6 @@ return {
           map({ "n", "v" }, "<leader>hs", gs.stage_hunk)
           map({ "n", "v" }, "<leader>hr", gs.reset_hunk)
           map("n", "<leader>hS", gs.stage_buffer)
-          map("n", "<leader>ha", gs.stage_hunk)
           map("n", "<leader>hu", gs.undo_stage_hunk)
           map("n", "<leader>hR", gs.reset_buffer)
           map("n", "<leader>hp", gs.preview_hunk)
@@ -88,6 +87,7 @@ return {
         "nvim-telescope/telescope-fzf-native.nvim",
         build = "make",
       },
+      "debugloop/telescope-undo.nvim",
       "nvim-telescope/telescope-file-browser.nvim",
     },
     keys = {
@@ -126,6 +126,7 @@ return {
           require("telescope.builtin").diagnostics()
         end,
       },
+      { "Fu", "<cmd>Telescope undo<cr>", desc = "undo history" },
       {
         "<Leader>Fg",
         "<Cmd>Telescope git_status<CR>",
@@ -144,6 +145,7 @@ return {
         selection_caret = " ",
         path_display = { "smart" },
         wrap_results = true,
+        file_ignore_patterns = { ".git/" },
         layout_strategy = "horizontal",
         layout_config = { prompt_position = "top" },
         sorting_strategy = "ascending",
@@ -188,19 +190,8 @@ return {
       telescope.setup(opts)
       require("telescope").load_extension("fzf")
       require("telescope").load_extension("file_browser")
+      require("telescope").load_extension("undo")
       telescope.load_extension("fzf")
-    end,
-  },
-  {
-    "s1n7ax/nvim-window-picker",
-    name = "window-picker",
-    event = "VeryLazy",
-    config = function()
-      require("window-picker").setup({
-        selection_chars = "ABCDEFG;CMRUEIWOQP",
-        show_prompt = false,
-        hint = "floating-big-letter",
-      })
     end,
   },
   {
@@ -302,6 +293,23 @@ return {
     dependencies = { "nvim-lua/plenary.nvim" },
     keys = {
       { "<leader>Ft", "<Cmd>TodoTelescope<CR>", noremap = true, silent = true },
+    },
+  },
+  {
+    "epwalsh/obsidian.nvim",
+    version = "*",
+    lazy = true,
+    ft = "markdown",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    opts = {
+      workspaces = {
+        {
+          name = "notes",
+          path = "~/Documents/Notes/",
+        },
+      },
     },
   },
 }
