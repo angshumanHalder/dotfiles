@@ -120,8 +120,34 @@ return {
         },
       }
 
-      opts.cmdline = {
-        view = "cmdline",
+      opts.presets = {
+        command_palette = {
+          views = {
+            cmdline_popup = {
+              position = {
+                row = 25,
+                col = "50%",
+              },
+              size = {
+                min_width = 60,
+                width = "auto",
+                height = "auto",
+              },
+            },
+            cmdline_popupmenu = {
+              relative = "editor",
+              position = {
+                row = 28,
+                col = "50%",
+              },
+              size = {
+                width = 60,
+                height = "auto",
+                max_height = 15,
+              },
+            },
+          },
+        },
       }
 
       vim.api.nvim_create_autocmd("FileType", {

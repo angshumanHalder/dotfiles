@@ -32,3 +32,4 @@ vim.opt.winblend = 0
 vim.opt.wildoptions = "pum"
 vim.opt.background = "dark"
 vim.opt.hlsearch = false
+vim.opt.conceallevel = 2
