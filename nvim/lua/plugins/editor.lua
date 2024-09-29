@@ -280,12 +280,10 @@ return {
     "folke/trouble.nvim",
     cmd = { "TroubleToggle", "Trouble" },
     keys = {
-      { "<leader>xx", "<cmd>TroubleToggle<cr>", silent = true, noremap = true },
-      { "<leader>xw", "<cmd>TroubleToggle workspace_diagnostics<cr>", silent = true, noremap = true },
-      { "<leader>xd", "<cmd>TroubleToggle document_diagnostics<cr>", silent = true, noremap = true },
-      { "<leader>xl", "<cmd>TroubleToggle loclist<cr>", silent = true, noremap = true },
-      { "<leader>xq", "<cmd>TroubleToggle quickfix<cr>", silent = true, noremap = true },
-      { "gR", "<cmd>TroubleToggle lsp_references<cr>", silent = true, noremap = true },
+      { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", silent = true, noremap = true },
+      { "<leader>xd", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", silent = true, noremap = true },
+      { "<leader>xl", "<cmd>Trouble loclist toggle<cr>", silent = true, noremap = true },
+      { "<leader>xq", "<cmd>Trouble qflist toggle<cr>", silent = true, noremap = true },
     },
   },
   {

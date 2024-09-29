@@ -4,9 +4,6 @@ return {
     lazy = false,
     config = function()
       require("lspsaga").setup({
-        server_filetype_map = {
-          typescript = "typescript",
-        },
         finder = {
           keys = {
             vsplit = "v",
@@ -16,15 +13,9 @@ return {
       })
     end,
     keys = {
-      { "<Leader>ca", "<cmd>Lspsaga code_action<CR>", silent = true, noremap = true },
-      { "<Leader>dj", "<Cmd>Lspsaga diagnostic_jump_next<CR>", silent = true, noremap = true },
-      { "<Leader>dk", "<Cmd>Lspsaga diagnostic_jump_prev<CR>", silent = true, noremap = true },
       { "<leader>o", "<cmd>Lspsaga outline<CR>", silent = true, noremap = true },
       { "K", "<Cmd>Lspsaga hover_doc<CR>", silent = true, noremap = true },
-      { "gf", "<Cmd>Lspsaga finder<CR>", silent = true, noremap = true },
-      { "gd", "<cmd>Lspsaga goto_definition<CR>", silent = true, noremap = true },
       { "gp", "<Cmd>Lspsaga peek_definition<CR>", silent = true, noremap = true },
-      { "gr", "<Cmd>Lspsaga rename<CR>", silent = true, noremap = true },
     },
   },
   {
@@ -109,7 +100,6 @@ return {
       vim.list_extend(opts.ensure_installed, {
         "luacheck",
         "shfmt",
-        "typescript-language-server",
         "css-lsp",
         "gopls",
         "goimports",
@@ -124,16 +114,9 @@ return {
     "neovim/nvim-lspconfig",
     init = function()
       local keys = require("lazyvim.plugins.lsp.keymaps").get()
-      keys[#keys + 1] = { "<space>e", false }
-      keys[#keys + 1] = { "[d", false }
-      keys[#keys + 1] = { "]d", false }
-      keys[#keys + 1] = { "<space>q", false }
       keys[#keys + 1] = { "K", false }
       keys[#keys + 1] = { "gi", false }
       keys[#keys + 1] = { "<space>rn", false }
-      keys[#keys + 1] = { "<space>ca", false }
-      keys[#keys + 1] = { "gr", false }
-      keys[#keys + 1] = { "gd", false }
     end,
     opts = {
       server = {
