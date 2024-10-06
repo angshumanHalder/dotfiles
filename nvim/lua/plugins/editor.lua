@@ -91,42 +91,7 @@ return {
       "nvim-telescope/telescope-file-browser.nvim",
     },
     keys = {
-      {
-        "FF",
-        function()
-          require("telescope.builtin").find_files({
-            no_ignore = false,
-            hidden = true,
-          })
-        end,
-        desc = "Lists files in your current working directory, respects .gitignore",
-      },
-      {
-        "Fg",
-        function()
-          require("telescope.builtin").live_grep()
-        end,
-      },
-      {
-        "Fb",
-        function()
-          require("telescope.builtin").buffers()
-        end,
-        desc = "Lists open buffers",
-      },
-      {
-        "FT",
-        function()
-          require("telescope.builtin").help_tags()
-        end,
-      },
-      {
-        "Fe",
-        function()
-          require("telescope.builtin").diagnostics()
-        end,
-      },
-      { "Fu", "<cmd>Telescope undo<cr>", desc = "undo history" },
+      { "<leader>u", "<cmd>Telescope undo<cr>", desc = "undo history" },
       {
         "<Leader>Fg",
         "<Cmd>Telescope git_status<CR>",
