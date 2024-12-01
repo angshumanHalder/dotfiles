@@ -22,6 +22,7 @@ return {
         section_separators = { left = "", right = "" },
         component_separators = { left = "", right = "" },
         disabled_filetypes = {},
+        globalstatus = false,
       },
       sections = {
         lualine_a = { "mode" },
@@ -53,7 +54,7 @@ return {
         lualine_z = {},
       },
       tabline = {},
-      extensions = { "nvim-dap-ui" },
+      extensions = { "nvim-dap-ui", "nvim-tree" },
     },
   },
   {

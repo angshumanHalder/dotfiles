@@ -119,6 +119,10 @@ return {
       keys[#keys + 1] = { "<space>rn", false }
     end,
     opts = {
+      inlay_hints = {
+        enabled = { true },
+        exclude = { "rust" },
+      },
       server = {
         tsserver = {
           root_dir = function(...)
