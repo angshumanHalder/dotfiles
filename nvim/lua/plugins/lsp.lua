@@ -123,7 +123,7 @@ return {
         enabled = { true },
         exclude = { "rust" },
       },
-      server = {
+      servers = {
         tsserver = {
           root_dir = function(...)
             return require("lspconfig.util").root_pattern(".git")(...)
