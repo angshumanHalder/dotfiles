@@ -1,5 +1,5 @@
 return {
-  { "folke/which-key.nvim", enabled = false },
+  { "folke/which-key.nvim", enabled = true },
   {
     "epwalsh/obsidian.nvim",
     version = "*", -- recommended, use latest release instead of latest commit
@@ -90,13 +90,13 @@ return {
     "sindrets/diffview.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
     keys = {
-      { "<leader>dv", "<cmd>DiffviewOpen<cr>", silent = true, noremap = true },
-      { "<leader>dc", "<cmd>DiffviewClose<cr>", silent = true, noremap = true },
+      { "<leader>xd", "<cmd>DiffviewOpen<cr>", silent = true, noremap = true },
+      { "<leader>xc", "<cmd>DiffviewClose<cr>", silent = true, noremap = true },
     },
   },
   { "folke/flash.nvim", enabled = false },
   { "RRethy/vim-illuminate", enabled = false },
-  { "echasnovski/mini.bufremove", enabled = false },
+  { "nvim-mini/mini.bufremove", enabled = false },
   {
     "unblevable/quick-scope",
     config = function()
@@ -106,76 +106,26 @@ return {
   },
   { "nvim-pack/nvim-spectre", enabled = false },
   {
-    "nvim-telescope/telescope.nvim",
-    dependencies = {
-      {
-        "nvim-telescope/telescope-fzf-native.nvim",
-        build = "make",
-      },
-      "debugloop/telescope-undo.nvim",
-      "nvim-telescope/telescope-file-browser.nvim",
-    },
-    keys = {
-      { "<leader>u", "<cmd>Telescope undo<cr>", desc = "undo history" },
-      { "<Leader>dl", "<Cmd>Telescope diagnostics<CR>" },
-    },
-    config = function(_, opts)
-      local telescope = require("telescope")
-      local actions = require("telescope.actions")
-      local fb_actions = require("telescope").extensions.file_browser.actions
-
-      opts.defaults = vim.tbl_deep_extend("force", opts.defaults, {
-        prompt_prefix = " ",
-        selection_caret = " ",
-        path_display = { "smart" },
-        wrap_results = true,
-        file_ignore_patterns = { ".git/" },
-        layout_strategy = "horizontal",
-        layout_config = { prompt_position = "top" },
-        sorting_strategy = "ascending",
-        winblend = 0,
-        mappings = {
-          i = {
-            ["<C-j>"] = actions.move_selection_next,
-            ["<C-k>"] = actions.move_selection_previous,
-          },
-          n = {
-            ["N"] = fb_actions.create,
-            ["h"] = fb_actions.goto_parent_dir,
-            ["q"] = actions.close,
-
-            ["j"] = actions.move_selection_next,
-            ["k"] = actions.move_selection_previous,
-            ["H"] = actions.move_to_top,
-            ["M"] = actions.move_to_middle,
-            ["L"] = actions.move_to_bottom,
-
-            ["gg"] = actions.move_to_top,
-            ["G"] = actions.move_to_bottom,
+    "ibhagwan/fzf-lua",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    opts = function(_, _)
+      local fzf = require("fzf-lua")
+      local actions = fzf.actions
+      return {
+        files = {
+          cwd_prompt = false,
+          actions = {
+            ["ctrl-i"] = { actions.toggle_ignore },
+            ["ctrl-h"] = { actions.toggle_hidden },
           },
         },
-      })
-      opts.pickers = {
-        diagnostics = {
-          theme = "ivy",
-          initial_mode = "normal",
-          layout_config = {
-            preview_cutoff = 9999,
+        grep = {
+          actions = {
+            ["ctrl-i"] = { actions.toggle_ignore },
+            ["ctrl-h"] = { actions.toggle_hidden },
           },
         },
       }
-      opts.extensions = {
-        file_browser = {
-          theme = "dropdown",
-          -- disables netrw and use telescope-file-browser in its place
-          hijack_netrw = true,
-        },
-      }
-      telescope.setup(opts)
-      require("telescope").load_extension("fzf")
-      require("telescope").load_extension("file_browser")
-      require("telescope").load_extension("undo")
-      telescope.load_extension("fzf")
     end,
   },
   {
@@ -258,22 +208,5 @@ return {
   {
     "nvim-neo-tree/neo-tree.nvim",
     enabled = false,
-  },
-  {
-    "folke/trouble.nvim",
-    cmd = { "TroubleToggle", "Trouble" },
-    keys = {
-      { "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", silent = true, noremap = true },
-      { "<leader>xd", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", silent = true, noremap = true },
-      { "<leader>xl", "<cmd>Trouble loclist toggle<cr>", silent = true, noremap = true },
-      { "<leader>xq", "<cmd>Trouble qflist toggle<cr>", silent = true, noremap = true },
-    },
-  },
-  {
-    "folke/todo-comments.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    keys = {
-      { "<leader>Ft", "<Cmd>TodoTelescope<CR>", noremap = true, silent = true },
-    },
   },
 }

@@ -5,8 +5,8 @@ return {
       require("Comment").setup()
     end,
   },
-  { "echasnovski/mini.comment", enabled = false },
-  { "echasnovski/mini.surround", enabled = false },
+  { "nvim-mini/mini.comment", enabled = false },
+  { "nvim-mini/mini.surround", enabled = false },
   { "JoosepAlviste/nvim-ts-context-commentstring", enabled = false },
   {
     "L3MON4D3/LuaSnip",
@@ -73,7 +73,6 @@ return {
             if icons[item.kind] then
               item.kind = icons[item.kind] .. item.kind
             end
-            return item
           end,
         },
         sorting = defaults.sorting,

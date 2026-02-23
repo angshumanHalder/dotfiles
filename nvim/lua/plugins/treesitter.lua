@@ -1,6 +1,4 @@
 return {
   { "nvim-treesitter/playground", cmd = "TSPlaygroundToggle" },
-  { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate", opts = {
-    ensure_installed = "all",
-  } },
+  { "nvim-treesitter/nvim-treesitter", lazy = false, build = ":TSUpdate" },
 }

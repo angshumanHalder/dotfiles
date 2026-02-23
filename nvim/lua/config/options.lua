@@ -4,6 +4,7 @@
 vim.g.mapleader = " "
 vim.g.qs_highlight_on_keys = { "f", "F", "t", "T" }
 vim.g.qs_max_chars = 150
+vim.g.snacks_animate = false
 
 vim.scriptencoding = "utf-8"
 vim.opt.encoding = "utf-8"
@@ -33,3 +34,4 @@ vim.opt.wildoptions = "pum"
 vim.opt.background = "dark"
 vim.opt.hlsearch = false
 vim.opt.conceallevel = 2
+vim.opt.clipboard = "unnamedplus"
