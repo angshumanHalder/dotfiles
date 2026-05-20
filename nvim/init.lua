@@ -101,11 +101,18 @@ require("kanagawa").setup({
   undercurl   = true,
   transparent = true,
   theme       = "dragon",
+  overrides = function(colors)
+    return {
+      BlinkCmpMenu = { bg = colors.palette.dragonBlack3 },
+      BlinkCmpLabelDetail = { bg = colors.palette.dragonBlack3 },
+      BlinkCmpMenuSelection = { bg = colors.palette.dragonBlue },
+    }
+  end,
 })
 vim.cmd.colorscheme("kanagawa")
-vim.api.nvim_set_hl(0, "Normal",     { bg = "none" })
-vim.api.nvim_set_hl(0, "NormalNC",   { bg = "none" })
-vim.api.nvim_set_hl(0, "NormalFloat",{ bg = "none" })
+-- vim.api.nvim_set_hl(0, "Normal",      { bg = "none" })
+-- vim.api.nvim_set_hl(0, "NormalNC",    { bg = "none" })
+-- vim.api.nvim_set_hl(0, "FloatBorder", { fg = "#C9B87C" })
 
 -- ============================================================================
 -- MINI.NVIM
@@ -251,9 +258,16 @@ if not pcall(require, "blink.lib") then
 end
 
 require("blink.cmp").setup({
-  keymap     = { preset = "default" },
+  keymap     = { 
+    preset = "none",
+    ["<C-Space>"] = { "show", "hide" },
+		["<CR>"] = { "accept", "fallback" },
+		["<C-n>"] = { "select_next", "fallback" },
+		["<C-p>"] = { "select_prev", "fallback" },
+		["<Tab>"] = { "snippet_forward", "fallback" },
+		["<S-Tab>"] = { "snippet_backward", "fallback" },
+  },
   appearance = {
-    use_nvim_cmp_as_default = false,
     nerd_font_variant       = "mono",
   },
   sources  = { default = { "lsp", "path", "snippets", "buffer" } },
@@ -299,7 +313,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     lmap("n", "gD",         vim.lsp.buf.declaration,                            "Go to Declaration")
     lmap("n", "gr",         vim.lsp.buf.references,                             "References")
     lmap("n", "gi",         vim.lsp.buf.implementation,                         "Implementation")
-    lmap("n", "K",          vim.lsp.buf.hover,                                  "Hover")
+    lmap("n", "K",          function () vim.lsp.buf.hover({ border = "single" }) end,                                  "Hover")
     lmap("n", "<leader>lr", vim.lsp.buf.rename,                                 "Rename")
     lmap("n", "<leader>la", vim.lsp.buf.code_action,                            "Code Action")
     lmap("n", "<leader>lf", function() vim.lsp.buf.format({ async = true }) end, "Format")
