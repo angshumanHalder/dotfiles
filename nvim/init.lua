@@ -96,6 +96,7 @@ vim.pack.add({
   "https://github.com/creativenull/efmls-configs-nvim",
   "https://github.com/folke/which-key.nvim",
   "https://github.com/folke/todo-comments.nvim",
+  "https://github.com/lukas-reineke/indent-blankline.nvim",
 })
 
 -- ============================================================================
@@ -150,6 +151,15 @@ require("which-key").setup()
 
 require("todo-comments").setup()
 map("n", "<leader>ft", "<cmd>TodoFzfLua<cr>", { desc = "Todo Comments" })
+
+-- ============================================================================
+-- INDENT GUIDES: indent-blankline
+-- ============================================================================
+
+require("ibl").setup({
+  indent = { char = "│" },
+  scope  = { enabled = false },
+})
 
 -- ============================================================================
 -- FILE TREE: nvim-tree
@@ -232,7 +242,7 @@ map("n", "<leader>gc", "<cmd>DiffviewClose<cr>",       { desc = "Close Diff" })
 -- ============================================================================
 -- FUZZY FINDER: fzf-lua
 -- <leader>ff  files   <leader>fg  grep    <leader>fb  buffers
--- <leader>fh  help    <leader>fd  diag    <leader>fr  recent
+-- <leader>fh  help    <leader>fd  diag    <leader>fr  recent   <leader>fs  symbols
 -- ============================================================================
 
 require("fzf-lua").setup({
@@ -251,6 +261,7 @@ map("n", "<leader>fb", "<cmd>FzfLua buffers<cr>",              { desc = "Buffers
 map("n", "<leader>fh", "<cmd>FzfLua help_tags<cr>",            { desc = "Help" })
 map("n", "<leader>fd", "<cmd>FzfLua diagnostics_document<cr>", { desc = "Diagnostics" })
 map("n", "<leader>fr", "<cmd>FzfLua oldfiles<cr>",             { desc = "Recent Files" })
+map("n", "<leader>fs", "<cmd>FzfLua lsp_document_symbols<cr>", { desc = "Symbols" })
 
 -- ============================================================================
 -- SNIPPETS: luasnip + friendly-snippets
