@@ -93,6 +93,8 @@ vim.pack.add({
   "https://github.com/williamboman/mason.nvim",
   "https://github.com/neovim/nvim-lspconfig",
   "https://github.com/creativenull/efmls-configs-nvim",
+  "https://github.com/folke/which-key.nvim",
+  "https://github.com/folke/todo-comments.nvim",
 })
 
 -- ============================================================================
@@ -133,6 +135,20 @@ require("mini.bufremove").setup()
 map("n", "<leader>bd", function()
   require("mini.bufremove").delete()
 end, { desc = "Delete buffer" })
+
+-- ============================================================================
+-- WHICH-KEY: keybinding hints
+-- ============================================================================
+
+require("which-key").setup()
+
+-- ============================================================================
+-- TODO COMMENTS
+-- <leader>ft  search todos
+-- ============================================================================
+
+require("todo-comments").setup()
+map("n", "<leader>ft", "<cmd>TodoFzfLua<cr>", { desc = "Todo Comments" })
 
 -- ============================================================================
 -- FILE TREE: nvim-tree
