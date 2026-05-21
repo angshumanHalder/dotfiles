@@ -37,6 +37,9 @@ opt.pumheight      = 10
 opt.completeopt    = "menu,menuone,noselect"
 opt.fileencoding   = "utf-8"
 opt.guifont        = "JetBrainsMono Nerd Font Mono:h13"
+opt.winborder      = "single"
+
+require("vim._core.ui2").enable({})
 
 -- ============================================================================
 -- KEYMAPS
@@ -110,9 +113,6 @@ require("kanagawa").setup({
   end,
 })
 vim.cmd.colorscheme("kanagawa")
--- vim.api.nvim_set_hl(0, "Normal",      { bg = "none" })
--- vim.api.nvim_set_hl(0, "NormalNC",    { bg = "none" })
--- vim.api.nvim_set_hl(0, "FloatBorder", { fg = "#C9B87C" })
 
 -- ============================================================================
 -- MINI.NVIM
@@ -180,6 +180,7 @@ vim.api.nvim_create_autocmd("FileType", {
 -- ============================================================================
 
 require("gitsigns").setup({
+  preview_config = { border = "single" },
   signs = {
     add          = { text = "▎" },
     change       = { text = "▎" },
@@ -258,7 +259,7 @@ if not pcall(require, "blink.lib") then
 end
 
 require("blink.cmp").setup({
-  keymap     = { 
+  keymap     = {
     preset = "none",
     ["<C-Space>"] = { "show", "hide" },
 		["<CR>"] = { "accept", "fallback" },
@@ -313,7 +314,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     lmap("n", "gD",         vim.lsp.buf.declaration,                            "Go to Declaration")
     lmap("n", "gr",         vim.lsp.buf.references,                             "References")
     lmap("n", "gi",         vim.lsp.buf.implementation,                         "Implementation")
-    lmap("n", "K",          function () vim.lsp.buf.hover({ border = "single" }) end,                                  "Hover")
+    lmap("n", "K",          vim.lsp.buf.hover,                                       "Hover")
     lmap("n", "<leader>lr", vim.lsp.buf.rename,                                 "Rename")
     lmap("n", "<leader>la", vim.lsp.buf.code_action,                            "Code Action")
     lmap("n", "<leader>lf", function() vim.lsp.buf.format({ async = true }) end, "Format")
@@ -338,7 +339,7 @@ vim.diagnostic.config({
   signs            = true,
   underline        = true,
   update_in_insert = false,
-  float            = { border = "rounded", source = "always" },
+  float            = { source = "always" },
 })
 
 -- ============================================================================
@@ -348,10 +349,12 @@ vim.diagnostic.config({
 -- ============================================================================
 
 local languages = {
-  lua        = { require("efmls-configs.formatters.stylua") },
-  python     = { require("efmls-configs.formatters.black"),      require("efmls-configs.linters.flake8") },
-  javascript = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
-  typescript = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
+  lua             = { require("efmls-configs.formatters.stylua") },
+  python          = { require("efmls-configs.formatters.black"),      require("efmls-configs.linters.flake8") },
+  javascript      = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
+  typescript      = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
+  typescriptreact = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
+  go              = { require("efmls-configs.formatters.goimports") },
 }
 
 vim.lsp.config("efm", {
