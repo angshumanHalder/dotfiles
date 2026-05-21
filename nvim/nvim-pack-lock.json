@@ -48,6 +48,14 @@
       "rev": "264b5c8fc6e82212af0dc5c345145cfa916efeb6",
       "src": "https://github.com/echasnovski/mini.nvim"
     },
+    "neovim": {
+      "rev": "ff483051a47e27d84bdef47703538df1ed9f4a47",
+      "src": "https://github.com/rose-pine/neovim"
+    },
+    "nightfox.nvim": {
+      "rev": "26b61b1f856ec37cae3cb64f5690adb955f246a1",
+      "src": "https://github.com/EdenEast/nightfox.nvim"
+    },
     "nvim-lspconfig": {
       "rev": "246572944c2a1e2a646c2e7609ff619b0fe74c18",
       "src": "https://github.com/neovim/nvim-lspconfig"

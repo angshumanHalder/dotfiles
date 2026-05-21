@@ -80,7 +80,7 @@ map("n", "<leader>ld", vim.diagnostic.open_float)
 -- ============================================================================
 
 vim.pack.add({
-  "https://github.com/rebelot/kanagawa.nvim",
+  "https://github.com/EdenEast/nightfox.nvim",
   "https://github.com/echasnovski/mini.nvim",
   "https://github.com/nvim-tree/nvim-tree.lua",
   "https://github.com/romus204/tree-sitter-manager.nvim",
@@ -94,29 +94,18 @@ vim.pack.add({
   "https://github.com/williamboman/mason.nvim",
   "https://github.com/neovim/nvim-lspconfig",
   "https://github.com/creativenull/efmls-configs-nvim",
-  "https://github.com/folke/which-key.nvim",
   "https://github.com/folke/todo-comments.nvim",
   "https://github.com/lukas-reineke/indent-blankline.nvim",
 })
 
 -- ============================================================================
--- THEME: kanagawa
+-- THEME: nordfox
 -- ============================================================================
 
-require("kanagawa").setup({
-  compile     = false,
-  undercurl   = true,
-  transparent = true,
-  theme       = "dragon",
-  overrides = function(colors)
-    return {
-      BlinkCmpMenu = { bg = colors.palette.dragonBlack3 },
-      BlinkCmpLabelDetail = { bg = colors.palette.dragonBlack3 },
-      BlinkCmpMenuSelection = { bg = colors.palette.dragonBlue },
-    }
-  end,
+require("nightfox").setup({
+  options = { transparent = true },
 })
-vim.cmd.colorscheme("kanagawa")
+vim.cmd.colorscheme("nordfox")
 
 -- ============================================================================
 -- MINI.NVIM
@@ -137,12 +126,6 @@ require("mini.bufremove").setup()
 map("n", "<leader>bd", function()
   require("mini.bufremove").delete()
 end, { desc = "Delete buffer" })
-
--- ============================================================================
--- WHICH-KEY: keybinding hints
--- ============================================================================
-
-require("which-key").setup()
 
 -- ============================================================================
 -- TODO COMMENTS
@@ -262,6 +245,7 @@ map("n", "<leader>fh", "<cmd>FzfLua help_tags<cr>",            { desc = "Help" }
 map("n", "<leader>fd", "<cmd>FzfLua diagnostics_document<cr>", { desc = "Diagnostics" })
 map("n", "<leader>fr", "<cmd>FzfLua oldfiles<cr>",             { desc = "Recent Files" })
 map("n", "<leader>fs", "<cmd>FzfLua lsp_document_symbols<cr>", { desc = "Symbols" })
+map("n", "<leader>?",  "<cmd>FzfLua keymaps<cr>",             { desc = "Keymaps" })
 
 -- ============================================================================
 -- SNIPPETS: luasnip + friendly-snippets
@@ -341,10 +325,15 @@ vim.api.nvim_create_autocmd("LspAttach", {
     lmap("n", "gd",         "<cmd>FzfLua lsp_definitions<cr>",     "Go to Definition")
     lmap("n", "gD",         vim.lsp.buf.declaration,               "Go to Declaration")
     lmap("n", "gr",         "<cmd>FzfLua lsp_references<cr>",      "References")
+    lmap("n", "grr",        "<cmd>FzfLua lsp_references<cr>",      "References")
     lmap("n", "gi",         "<cmd>FzfLua lsp_implementations<cr>", "Implementation")
+    lmap("n", "gri",        "<cmd>FzfLua lsp_implementations<cr>", "Implementation")
+    lmap("n", "gO",         "<cmd>FzfLua lsp_document_symbols<cr>","Symbols")
     lmap("n", "K",          function() vim.lsp.buf.hover({ border = "single" }) end, "Hover")
     lmap("n", "<leader>lr", vim.lsp.buf.rename,                                 "Rename")
+    lmap("n", "grn",        vim.lsp.buf.rename,                                 "Rename")
     lmap("n", "<leader>la", vim.lsp.buf.code_action,                            "Code Action")
+    lmap("n", "gra",        vim.lsp.buf.code_action,                            "Code Action")
     lmap("n", "<leader>lf", function() vim.lsp.buf.format({ async = true }) end, "Format")
   end,
 })
