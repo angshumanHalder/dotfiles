@@ -37,7 +37,6 @@ opt.pumheight      = 10
 opt.completeopt    = "menu,menuone,noselect"
 opt.fileencoding   = "utf-8"
 opt.guifont        = "JetBrainsMono Nerd Font Mono:h13"
-opt.winborder      = "single"
 
 require("vim._core.ui2").enable({})
 
@@ -66,6 +65,8 @@ map("n", "<leader>sh", "<cmd>split<CR>")
 
 map("n", "<S-h>", "<cmd>bprev<CR>")
 map("n", "<S-l>", "<cmd>bnext<CR>")
+
+map("n", "<leader>qq", "<cmd>qa<CR>",  { desc = "Quit Neovim" })
 
 map("n", "[d",         vim.diagnostic.goto_prev)
 map("n", "]d",         vim.diagnostic.goto_next)
@@ -279,8 +280,8 @@ require("blink.cmp").setup({
     preset = "none",
     ["<C-Space>"] = { "show", "hide" },
 		["<CR>"] = { "accept", "fallback" },
-		["<C-n>"] = { "select_next", "fallback" },
-		["<C-p>"] = { "select_prev", "fallback" },
+		["<C-j>"] = { "select_next", "fallback" },
+		["<C-k>"] = { "select_prev", "fallback" },
 		["<Tab>"] = { "snippet_forward", "fallback" },
 		["<S-Tab>"] = { "snippet_backward", "fallback" },
   },
@@ -326,11 +327,11 @@ vim.api.nvim_create_autocmd("LspAttach", {
     local lmap = function(mode, lhs, rhs, desc)
       vim.keymap.set(mode, lhs, rhs, { buffer = buffer, desc = desc })
     end
-    lmap("n", "gd",         vim.lsp.buf.definition,                             "Go to Definition")
-    lmap("n", "gD",         vim.lsp.buf.declaration,                            "Go to Declaration")
-    lmap("n", "gr",         vim.lsp.buf.references,                             "References")
-    lmap("n", "gi",         vim.lsp.buf.implementation,                         "Implementation")
-    lmap("n", "K",          vim.lsp.buf.hover,                                       "Hover")
+    lmap("n", "gd",         "<cmd>FzfLua lsp_definitions<cr>",     "Go to Definition")
+    lmap("n", "gD",         vim.lsp.buf.declaration,               "Go to Declaration")
+    lmap("n", "gr",         "<cmd>FzfLua lsp_references<cr>",      "References")
+    lmap("n", "gi",         "<cmd>FzfLua lsp_implementations<cr>", "Implementation")
+    lmap("n", "K",          function() vim.lsp.buf.hover({ border = "single" }) end, "Hover")
     lmap("n", "<leader>lr", vim.lsp.buf.rename,                                 "Rename")
     lmap("n", "<leader>la", vim.lsp.buf.code_action,                            "Code Action")
     lmap("n", "<leader>lf", function() vim.lsp.buf.format({ async = true }) end, "Format")
