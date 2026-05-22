@@ -237,6 +237,12 @@ require("fzf-lua").setup({
   defaults = {
     header  = false,
   },
+  files = {
+    fd_opts = "--color=never --type f --hidden --follow --no-ignore",
+  },
+  grep = {
+    rg_opts = "--column --line-number --no-heading --color=always --smart-case --no-ignore",
+  },
 })
 map("n", "<leader>ff", "<cmd>FzfLua files<cr>",                { desc = "Files" })
 map("n", "<leader>fg", "<cmd>FzfLua live_grep<cr>",            { desc = "Live Grep" })
