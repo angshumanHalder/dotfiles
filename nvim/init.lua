@@ -37,6 +37,10 @@ opt.pumheight      = 10
 opt.completeopt    = "menu,menuone,noselect"
 opt.fileencoding   = "utf-8"
 opt.guifont        = "JetBrainsMono Nerd Font Mono:h13"
+opt.inccommand     = "split"
+opt.confirm        = true
+opt.virtualedit    = "block"
+opt.laststatus     = 3
 
 require("vim._core.ui2").enable({})
 
@@ -72,6 +76,14 @@ map("n", "[d",         vim.diagnostic.goto_prev)
 map("n", "]d",         vim.diagnostic.goto_next)
 map("n", "<leader>ld", vim.diagnostic.open_float)
 
+map("n", "<leader>w",  "<cmd>w<CR>",          { desc = "Save" })
+map("n", "]q",         "<cmd>cnext<CR>",       { desc = "Next Quickfix" })
+map("n", "[q",         "<cmd>cprev<CR>",       { desc = "Prev Quickfix" })
+map("n", "<C-d>",      "<C-d>zz")
+map("n", "<C-u>",      "<C-u>zz")
+map("n", "n",          "nzzzv")
+map("n", "N",          "Nzzzv")
+
 -- ============================================================================
 -- PLUGINS
 -- vim.pack: no lazy loading, no build hooks, no config callbacks.
@@ -95,7 +107,6 @@ vim.pack.add({
   "https://github.com/neovim/nvim-lspconfig",
   "https://github.com/creativenull/efmls-configs-nvim",
   "https://github.com/folke/todo-comments.nvim",
-  "https://github.com/lukas-reineke/indent-blankline.nvim",
 })
 
 -- ============================================================================
@@ -134,15 +145,6 @@ end, { desc = "Delete buffer" })
 
 require("todo-comments").setup()
 map("n", "<leader>ft", "<cmd>TodoFzfLua<cr>", { desc = "Todo Comments" })
-
--- ============================================================================
--- INDENT GUIDES: indent-blankline
--- ============================================================================
-
-require("ibl").setup({
-  indent = { char = "│" },
-  scope  = { enabled = false },
-})
 
 -- ============================================================================
 -- FILE TREE: nvim-tree
@@ -238,10 +240,12 @@ require("fzf-lua").setup({
     header  = false,
   },
   files = {
-    fd_opts = "--color=never --type f --hidden --follow --no-ignore",
+    fd_opts = "--color=never --type f --hidden --follow --exclude .git",
+    actions = { ["ctrl-i"] = { require("fzf-lua").actions.toggle_ignore } },
   },
   grep = {
-    rg_opts = "--column --line-number --no-heading --color=always --smart-case --no-ignore",
+    rg_opts = "--column --line-number --no-heading --color=always --smart-case",
+    actions = { ["ctrl-i"] = { require("fzf-lua").actions.toggle_ignore } },
   },
 })
 map("n", "<leader>ff", "<cmd>FzfLua files<cr>",                { desc = "Files" })
@@ -341,6 +345,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
     lmap("n", "<leader>la", vim.lsp.buf.code_action,                            "Code Action")
     lmap("n", "gra",        vim.lsp.buf.code_action,                            "Code Action")
     lmap("n", "<leader>lf", function() vim.lsp.buf.format({ async = true }) end, "Format")
+    local client = vim.lsp.get_client_by_id(args.data.client_id)
+    if client and client:supports_method("textDocument/inlayHint") then
+      vim.lsp.inlay_hint.enable(true, { bufnr = buffer })
+    end
   end,
 })
 
