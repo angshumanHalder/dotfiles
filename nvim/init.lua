@@ -2,45 +2,45 @@
 -- OPTIONS
 -- ============================================================================
 
-vim.g.mapleader          = " "
-vim.g.maplocalleader     = " "
-vim.g.loaded_netrw       = 1
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
 local opt = vim.opt
-opt.number         = true
+opt.number = true
 opt.relativenumber = true
-opt.tabstop        = 2
-opt.shiftwidth     = 2
-opt.expandtab      = true
-opt.smartindent    = true
-opt.wrap           = false
-opt.cursorline     = true
-opt.termguicolors  = true
-opt.signcolumn     = "yes"
-opt.updatetime     = 250
-opt.timeoutlen     = 300
-opt.undofile       = true
-opt.swapfile       = false
-opt.backup         = false
-opt.splitbelow     = true
-opt.splitright     = true
-opt.scrolloff      = 8
-opt.sidescrolloff  = 8
-opt.ignorecase     = true
-opt.smartcase      = true
-opt.hlsearch       = true
-opt.clipboard      = "unnamedplus"
-opt.mouse          = "a"
-opt.showmode       = false
-opt.pumheight      = 10
-opt.completeopt    = "menu,menuone,noselect"
-opt.fileencoding   = "utf-8"
-opt.guifont        = "JetBrainsMono Nerd Font Mono:h13"
-opt.inccommand     = "split"
-opt.confirm        = true
-opt.virtualedit    = "block"
-opt.laststatus     = 3
+opt.tabstop = 2
+opt.shiftwidth = 2
+opt.expandtab = true
+opt.smartindent = true
+opt.wrap = false
+opt.cursorline = true
+opt.termguicolors = true
+opt.signcolumn = "yes"
+opt.updatetime = 250
+opt.timeoutlen = 300
+opt.undofile = true
+opt.swapfile = false
+opt.backup = false
+opt.splitbelow = true
+opt.splitright = true
+opt.scrolloff = 8
+opt.sidescrolloff = 8
+opt.ignorecase = true
+opt.smartcase = true
+opt.hlsearch = true
+opt.clipboard = "unnamedplus"
+opt.mouse = "a"
+opt.showmode = false
+opt.pumheight = 10
+opt.completeopt = "menu,menuone,noselect"
+opt.fileencoding = "utf-8"
+opt.guifont = "JetBrainsMono Nerd Font Mono:h13"
+opt.inccommand = "split"
+opt.confirm = true
+opt.virtualedit = "block"
+opt.laststatus = 3
 
 require("vim._core.ui2").enable({})
 
@@ -56,8 +56,8 @@ map("n", "<C-k>", "<C-w>k")
 map("n", "<C-l>", "<C-w>l")
 
 map("n", "<Esc>", "<cmd>noh<CR>")
-map("v", "<",     "<gv")
-map("v", ">",     ">gv")
+map("v", "<", "<gv")
+map("v", ">", ">gv")
 
 map("n", "<A-j>", "<cmd>m .+1<CR>==")
 map("n", "<A-k>", "<cmd>m .-2<CR>==")
@@ -70,19 +70,19 @@ map("n", "<leader>sh", "<cmd>split<CR>")
 map("n", "<S-h>", "<cmd>bprev<CR>")
 map("n", "<S-l>", "<cmd>bnext<CR>")
 
-map("n", "<leader>qq", "<cmd>qa<CR>",  { desc = "Quit Neovim" })
+map("n", "<leader>qq", "<cmd>qa<CR>", { desc = "Quit Neovim" })
 
-map("n", "[d",         vim.diagnostic.goto_prev)
-map("n", "]d",         vim.diagnostic.goto_next)
+map("n", "[d", vim.diagnostic.goto_prev)
+map("n", "]d", vim.diagnostic.goto_next)
 map("n", "<leader>ld", vim.diagnostic.open_float)
 
-map("n", "<leader>w",  "<cmd>w<CR>",          { desc = "Save" })
-map("n", "]q",         "<cmd>cnext<CR>",       { desc = "Next Quickfix" })
-map("n", "[q",         "<cmd>cprev<CR>",       { desc = "Prev Quickfix" })
-map("n", "<C-d>",      "<C-d>zz")
-map("n", "<C-u>",      "<C-u>zz")
-map("n", "n",          "nzzzv")
-map("n", "N",          "Nzzzv")
+map("n", "<leader>w", "<cmd>w<CR>", { desc = "Save" })
+map("n", "]q", "<cmd>cnext<CR>", { desc = "Next Quickfix" })
+map("n", "[q", "<cmd>cprev<CR>", { desc = "Prev Quickfix" })
+map("n", "<C-d>", "<C-d>zz")
+map("n", "<C-u>", "<C-u>zz")
+map("n", "n", "nzzzv")
+map("n", "N", "Nzzzv")
 
 -- ============================================================================
 -- PLUGINS
@@ -130,7 +130,7 @@ require("mini.pairs").setup()
 require("mini.comment").setup()
 require("mini.surround").setup()
 require("mini.indentscope").setup({
-  symbol  = "│",
+  symbol = "│",
   options = { try_as_border = true },
 })
 require("mini.bufremove").setup()
@@ -144,7 +144,16 @@ end, { desc = "Delete buffer" })
 -- ============================================================================
 
 require("todo-comments").setup()
-map("n", "<leader>ft", "<cmd>TodoFzfLua<cr>", { desc = "Todo Comments" })
+map("n", "<leader>ft", function()
+  require("todo-comments.fzf").todo({
+    prompt = "Todo comments> ",
+    -- This sets the initial query for ripgrep but keeps it out of the prompt
+    search =
+    [[\b(TODO|HACK|WARNING|WARN|XXX|PERF|OPTIM|PERFORMANCE|OPTIMIZE|NOTE|INFO|TEST|TESTING|PASSED|FAILED|FIX|FIXME|BUG|FIXIT|ISSUE)\b]],
+    no_esc = true, -- Prevents fzf-lua from escaping the regex syntax
+    no_header_i = true,
+  })
+end, { desc = "Todo Comments" })
 
 -- ============================================================================
 -- FILE TREE: nvim-tree
@@ -160,6 +169,13 @@ require("nvim-tree").setup({
   filters  = { dotfiles = false },
   git      = { enable = true },
   actions  = { open_file = { quit_on_open = false } },
+  on_attach = function(bufnr)
+    local api = require("nvim-tree.api")
+    api.config.mappings.default_on_attach(bufnr)
+    vim.keymap.del("n", "s", { buffer = bufnr })
+    vim.keymap.set("n", "s", api.node.open.horizontal,  { buffer = bufnr, desc = "Open: Horizontal Split" })
+    vim.keymap.set("n", "v", api.node.open.vertical,    { buffer = bufnr, desc = "Open: Vertical Split" })
+  end,
 })
 map("n", "<leader>e", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file tree" })
 
@@ -174,9 +190,22 @@ map("n", "<leader>e", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file tree" })
 
 require("tree-sitter-manager").setup({
   parsers = {
-    "lua", "python", "javascript", "typescript", "tsx",
-    "rust", "go", "c", "cpp", "bash",
-    "json", "yaml", "toml", "markdown", "html", "css",
+    "lua",
+    "python",
+    "javascript",
+    "typescript",
+    "tsx",
+    "rust",
+    "go",
+    "c",
+    "cpp",
+    "bash",
+    "json",
+    "yaml",
+    "toml",
+    "markdown",
+    "html",
+    "css",
   },
 })
 vim.api.nvim_create_autocmd("FileType", {
@@ -194,23 +223,23 @@ vim.api.nvim_create_autocmd("FileType", {
 require("gitsigns").setup({
   preview_config = { border = "single" },
   signs = {
-    add          = { text = "▎" },
-    change       = { text = "▎" },
-    delete       = { text = "" },
-    topdelete    = { text = "" },
+    add = { text = "▎" },
+    change = { text = "▎" },
+    delete = { text = "" },
+    topdelete = { text = "" },
     changedelete = { text = "▎" },
   },
   on_attach = function(buffer)
-    local gs   = package.loaded.gitsigns
+    local gs = package.loaded.gitsigns
     local gmap = function(mode, l, r, desc)
       vim.keymap.set(mode, l, r, { buffer = buffer, desc = desc })
     end
-    gmap("n", "]h",         gs.next_hunk,    "Next Hunk")
-    gmap("n", "[h",         gs.prev_hunk,    "Prev Hunk")
+    gmap("n", "]h", gs.next_hunk, "Next Hunk")
+    gmap("n", "[h", gs.prev_hunk, "Prev Hunk")
     gmap("n", "<leader>gp", gs.preview_hunk, "Preview Hunk")
-    gmap("n", "<leader>gs", gs.stage_hunk,   "Stage Hunk")
-    gmap("n", "<leader>gr", gs.reset_hunk,   "Reset Hunk")
-    gmap("n", "<leader>gb", gs.blame_line,   "Blame Line")
+    gmap("n", "<leader>gs", gs.stage_hunk, "Stage Hunk")
+    gmap("n", "<leader>gr", gs.reset_hunk, "Reset Hunk")
+    gmap("n", "<leader>gb", gs.blame_line, "Blame Line")
   end,
 })
 
@@ -220,9 +249,9 @@ require("gitsigns").setup({
 -- ============================================================================
 
 require("diffview").setup()
-map("n", "<leader>gd", "<cmd>DiffviewOpen<cr>",        { desc = "Diff View" })
+map("n", "<leader>gd", "<cmd>DiffviewOpen<cr>", { desc = "Diff View" })
 map("n", "<leader>gh", "<cmd>DiffviewFileHistory<cr>", { desc = "File History" })
-map("n", "<leader>gc", "<cmd>DiffviewClose<cr>",       { desc = "Close Diff" })
+map("n", "<leader>gc", "<cmd>DiffviewClose<cr>", { desc = "Close Diff" })
 
 -- ============================================================================
 -- FUZZY FINDER: fzf-lua
@@ -232,12 +261,12 @@ map("n", "<leader>gc", "<cmd>DiffviewClose<cr>",       { desc = "Close Diff" })
 
 require("fzf-lua").setup({
   winopts = {
-    height  = 0.85,
-    width   = 0.85,
+    height = 0.85,
+    width = 0.85,
     preview = { layout = "horizontal", ratio = 0.5 },
   },
   defaults = {
-    header  = false,
+    header = false,
   },
   files = {
     fd_opts = "--color=never --type f --hidden --follow --exclude .git",
@@ -248,14 +277,14 @@ require("fzf-lua").setup({
     actions = { ["ctrl-i"] = { require("fzf-lua").actions.toggle_ignore } },
   },
 })
-map("n", "<leader>ff", "<cmd>FzfLua files<cr>",                { desc = "Files" })
-map("n", "<leader>fg", "<cmd>FzfLua live_grep<cr>",            { desc = "Live Grep" })
-map("n", "<leader>fb", "<cmd>FzfLua buffers<cr>",              { desc = "Buffers" })
-map("n", "<leader>fh", "<cmd>FzfLua help_tags<cr>",            { desc = "Help" })
+map("n", "<leader>ff", "<cmd>FzfLua files<cr>", { desc = "Files" })
+map("n", "<leader>fg", "<cmd>FzfLua live_grep<cr>", { desc = "Live Grep" })
+map("n", "<leader>fb", "<cmd>FzfLua buffers<cr>", { desc = "Buffers" })
+map("n", "<leader>fh", "<cmd>FzfLua help_tags<cr>", { desc = "Help" })
 map("n", "<leader>fd", "<cmd>FzfLua diagnostics_document<cr>", { desc = "Diagnostics" })
-map("n", "<leader>fr", "<cmd>FzfLua oldfiles<cr>",             { desc = "Recent Files" })
+map("n", "<leader>fr", "<cmd>FzfLua oldfiles<cr>", { desc = "Recent Files" })
 map("n", "<leader>fs", "<cmd>FzfLua lsp_document_symbols<cr>", { desc = "Symbols" })
-map("n", "<leader>?",  "<cmd>FzfLua keymaps<cr>",             { desc = "Keymaps" })
+map("n", "<leader>?", "<cmd>FzfLua keymaps<cr>", { desc = "Keymaps" })
 
 -- ============================================================================
 -- SNIPPETS: luasnip + friendly-snippets
@@ -281,19 +310,19 @@ if not pcall(require, "blink.lib") then
 end
 
 require("blink.cmp").setup({
-  keymap     = {
+  keymap = {
     preset = "none",
     ["<C-Space>"] = { "show", "hide" },
-		["<CR>"] = { "accept", "fallback" },
-		["<C-n>"] = { "select_next", "fallback" },
-		["<C-p>"] = { "select_prev", "fallback" },
-		["<Tab>"] = { "snippet_forward", "fallback" },
-		["<S-Tab>"] = { "snippet_backward", "fallback" },
+    ["<CR>"] = { "accept", "fallback" },
+    ["<C-n>"] = { "select_next", "fallback" },
+    ["<C-p>"] = { "select_prev", "fallback" },
+    ["<Tab>"] = { "snippet_forward", "fallback" },
+    ["<S-Tab>"] = { "snippet_backward", "fallback" },
   },
   appearance = {
-    nerd_font_variant       = "mono",
+    nerd_font_variant = "mono",
   },
-  sources  = { default = { "lsp", "path", "snippets", "buffer" } },
+  sources = { default = { "lsp", "path", "snippets", "buffer" } },
   snippets = { preset = "luasnip" },
   signature = { enabled = true },
 })
@@ -307,8 +336,8 @@ require("blink.cmp").setup({
 require("mason").setup({
   ui = {
     icons = {
-      package_installed   = "✓",
-      package_pending     = "➜",
+      package_installed = "✓",
+      package_pending = "➜",
       package_uninstalled = "✗",
     },
   },
@@ -332,23 +361,23 @@ vim.api.nvim_create_autocmd("LspAttach", {
     local lmap = function(mode, lhs, rhs, desc)
       vim.keymap.set(mode, lhs, rhs, { buffer = buffer, desc = desc })
     end
-    lmap("n", "gd",         "<cmd>FzfLua lsp_definitions<cr>",     "Go to Definition")
-    lmap("n", "gD",         vim.lsp.buf.declaration,               "Go to Declaration")
-    lmap("n", "gr",         "<cmd>FzfLua lsp_references<cr>",      "References")
-    lmap("n", "grr",        "<cmd>FzfLua lsp_references<cr>",      "References")
-    lmap("n", "gi",         "<cmd>FzfLua lsp_implementations<cr>", "Implementation")
-    lmap("n", "gri",        "<cmd>FzfLua lsp_implementations<cr>", "Implementation")
-    lmap("n", "gO",         "<cmd>FzfLua lsp_document_symbols<cr>","Symbols")
-    lmap("n", "K",          function() vim.lsp.buf.hover({ border = "single" }) end, "Hover")
-    lmap("n", "<leader>lr", vim.lsp.buf.rename,                                 "Rename")
-    lmap("n", "grn",        vim.lsp.buf.rename,                                 "Rename")
-    lmap("n", "<leader>la", vim.lsp.buf.code_action,                            "Code Action")
-    lmap("n", "gra",        vim.lsp.buf.code_action,                            "Code Action")
-    lmap("n", "<leader>lf", function() vim.lsp.buf.format({ async = true }) end, "Format")
-    local client = vim.lsp.get_client_by_id(args.data.client_id)
-    if client and client:supports_method("textDocument/inlayHint") then
-      vim.lsp.inlay_hint.enable(true, { bufnr = buffer })
-    end
+    lmap("n", "gd", "<cmd>FzfLua lsp_definitions<cr>", "Go to Definition")
+    lmap("n", "gD", vim.lsp.buf.declaration, "Go to Declaration")
+    lmap("n", "gr", "<cmd>FzfLua lsp_references<cr>", "References")
+    lmap("n", "grr", "<cmd>FzfLua lsp_references<cr>", "References")
+    lmap("n", "gi", "<cmd>FzfLua lsp_implementations<cr>", "Implementation")
+    lmap("n", "gri", "<cmd>FzfLua lsp_implementations<cr>", "Implementation")
+    lmap("n", "gO", "<cmd>FzfLua lsp_document_symbols<cr>", "Symbols")
+    lmap("n", "K", function()
+      vim.lsp.buf.hover({ border = "single" })
+    end, "Hover")
+    lmap("n", "<leader>lr", vim.lsp.buf.rename, "Rename")
+    lmap("n", "grn", vim.lsp.buf.rename, "Rename")
+    lmap("n", "<leader>la", vim.lsp.buf.code_action, "Code Action")
+    lmap("n", "gra", vim.lsp.buf.code_action, "Code Action")
+    lmap("n", "<leader>lf", function()
+      vim.lsp.buf.format({ async = true })
+    end, "Format")
   end,
 })
 
@@ -362,8 +391,8 @@ vim.lsp.config("lua_ls", {
   settings = {
     Lua = {
       diagnostics = { globals = { "vim" } },
-      workspace   = { checkThirdParty = false },
-      telemetry   = { enable = false },
+      workspace = { checkThirdParty = false },
+      telemetry = { enable = false },
     },
   },
 })
@@ -372,11 +401,11 @@ vim.lsp.config("lua_ls", {
 vim.lsp.enable({ "lua_ls", "pyright", "ts_ls", "rust_analyzer", "gopls" })
 
 vim.diagnostic.config({
-  virtual_text     = { prefix = "●" },
-  signs            = true,
-  underline        = true,
+  virtual_text = { prefix = "●" },
+  signs = true,
+  underline = true,
   update_in_insert = false,
-  float            = { source = "always" },
+  float = { source = "always" },
 })
 
 -- ============================================================================
@@ -386,22 +415,22 @@ vim.diagnostic.config({
 -- ============================================================================
 
 local languages = {
-  lua             = { require("efmls-configs.formatters.stylua") },
-  python          = { require("efmls-configs.formatters.black"),      require("efmls-configs.linters.flake8") },
-  javascript      = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
-  typescript      = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
+  lua = { require("efmls-configs.formatters.stylua") },
+  python = { require("efmls-configs.formatters.black"), require("efmls-configs.linters.flake8") },
+  javascript = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
+  typescript = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
   typescriptreact = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
-  go              = { require("efmls-configs.formatters.goimports") },
+  go = { require("efmls-configs.formatters.goimports") },
 }
 
 vim.lsp.config("efm", {
   filetypes = vim.tbl_keys(languages),
-  settings  = {
+  settings = {
     rootMarkers = { ".git/" },
-    languages   = languages,
+    languages = languages,
   },
   init_options = {
-    documentFormatting      = true,
+    documentFormatting = true,
     documentRangeFormatting = true,
   },
 })
