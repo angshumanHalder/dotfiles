@@ -107,6 +107,7 @@ vim.pack.add({
   "https://github.com/neovim/nvim-lspconfig",
   "https://github.com/creativenull/efmls-configs-nvim",
   "https://github.com/folke/todo-comments.nvim",
+  "https://github.com/karb94/neoscroll.nvim",
 })
 
 -- ============================================================================
@@ -137,6 +138,12 @@ require("mini.bufremove").setup()
 map("n", "<leader>bd", function()
   require("mini.bufremove").delete()
 end, { desc = "Delete buffer" })
+
+-- ============================================================================
+-- SMOOTH SCROLL
+-- ============================================================================
+
+require("neoscroll").setup({ duration_multiplier = 0.6 })
 
 -- ============================================================================
 -- TODO COMMENTS
