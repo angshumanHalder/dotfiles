@@ -168,20 +168,20 @@ end, { desc = "Todo Comments" })
 -- ============================================================================
 
 require("nvim-tree").setup({
-  view     = { width = 30 },
+  view = { width = 30 },
   renderer = {
     group_empty = true,
-    icons       = { show = { git = true } },
+    icons = { show = { git = true } },
   },
-  filters  = { dotfiles = false },
-  git      = { enable = true },
-  actions  = { open_file = { quit_on_open = false } },
+  filters = { dotfiles = false },
+  git = { enable = true },
+  actions = { open_file = { quit_on_open = false } },
   on_attach = function(bufnr)
     local api = require("nvim-tree.api")
     api.config.mappings.default_on_attach(bufnr)
     vim.keymap.del("n", "s", { buffer = bufnr })
-    vim.keymap.set("n", "s", api.node.open.horizontal,  { buffer = bufnr, desc = "Open: Horizontal Split" })
-    vim.keymap.set("n", "v", api.node.open.vertical,    { buffer = bufnr, desc = "Open: Vertical Split" })
+    vim.keymap.set("n", "s", api.node.open.horizontal, { buffer = bufnr, desc = "Open: Horizontal Split" })
+    vim.keymap.set("n", "v", api.node.open.vertical, { buffer = bufnr, desc = "Open: Vertical Split" })
   end,
 })
 map("n", "<leader>e", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file tree" })
@@ -289,6 +289,7 @@ map("n", "<leader>fg", "<cmd>FzfLua live_grep<cr>", { desc = "Live Grep" })
 map("n", "<leader>fb", "<cmd>FzfLua buffers<cr>", { desc = "Buffers" })
 map("n", "<leader>fh", "<cmd>FzfLua help_tags<cr>", { desc = "Help" })
 map("n", "<leader>fd", "<cmd>FzfLua diagnostics_document<cr>", { desc = "Diagnostics" })
+map("n", "<leader>fD", "<cmd>FzfLua diagnostics_workspace<cr>", { desc = "Workspace Diagnostics" })
 map("n", "<leader>fr", "<cmd>FzfLua oldfiles<cr>", { desc = "Recent Files" })
 map("n", "<leader>fs", "<cmd>FzfLua lsp_document_symbols<cr>", { desc = "Symbols" })
 map("n", "<leader>?", "<cmd>FzfLua keymaps<cr>", { desc = "Keymaps" })
