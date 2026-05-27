@@ -9,7 +9,7 @@
   {
     "context": "Workspace",
     "bindings": {
-      "shift shift": "file_finder::Toggle",
+      "space f f": "file_finder::Toggle",
     },
   },
   {
@@ -18,4 +18,21 @@
       "space e": "project_panel::Toggle",
     },
   },
+  {
+    "context": "VimControl && !menu",
+    "bindings": {
+      "space f s": "outline::Toggle"
+    }
+  },
+  {
+    "context": "VimControl && !menu",
+    "unbind": {
+      "g shift-o": "outline::Toggle"
+    }
+  },
+  {
+    "bindings": {
+      "space f d": "editor::ToggleDiagnostics"
+    }
+  }
 ]

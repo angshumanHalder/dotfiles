@@ -12,12 +12,12 @@
     "show_other_hints": false,
     "show_type_hints": false,
     "show_parameter_hints": false,
-    "enabled": true
+    "enabled": true,
   },
   "relative_line_numbers": "enabled",
   "terminal": {
     "shell": {
-      "program": "/bin/zsh"
+      "program": "/bin/zsh",
     },
     "font_family": "JetBrainsMono Nerd Font",
     "font_weight": 700.0,
@@ -63,6 +63,6 @@
   "theme": {
     "mode": "dark",
     "light": "One Light",
-    "dark": "Kanagawa Dragon"
+    "dark": "Nordfox - opaque",
   },
 }
