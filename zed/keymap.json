@@ -7,7 +7,7 @@
 // from the command palette.
 [
   {
-    "context": "Workspace",
+    "context": "VimControl && vim_mode == normal",
     "bindings": {
       "space f f": "file_finder::Toggle",
     },
@@ -21,18 +21,109 @@
   {
     "context": "VimControl && !menu",
     "bindings": {
-      "space f s": "outline::Toggle"
+      "space f s": "outline::Toggle",
+    },
+  },
+  {
+    "context": "VimControl && !menu",
+    "unbind": {
+      "g shift-o": "outline::Toggle",
+    },
+  },
+  {
+    "context": "VimControl && vim_mode == normal",
+    "bindings": {
+      "space f d": "diagnostics::Deploy",
+    },
+  },
+  {
+    "context": "Editor && !agent_diff && !AgentPanel && (vim_mode == normal || vim_mode == visual)",
+    "bindings": {
+      "space h s": "git::ToggleStaged"
+    }
+  },
+  {
+    "context": "Editor && !agent_diff && !AgentPanel",
+    "unbind": {
+      "alt-cmd-y": "git::ToggleStaged"
+    }
+  },
+  {
+    "context": "Editor && !agent_diff && !AgentPanel && (vim_mode == normal || vim_mode == visual)",
+    "bindings": {
+      "space g s": "git::StageAndNext"
+    }
+  },
+  {
+    "context": "Editor && !agent_diff && !AgentPanel",
+    "unbind": {
+      "cmd-y": "git::StageAndNext"
+    }
+  },
+  {
+    "context": "(vim_mode == helix_normal || vim_mode == helix_select) && !menu",
+    "unbind": {
+      "g r": "editor::FindAllReferences"
+    }
+  },
+  {
+    "context": "VimControl && !menu",
+    "bindings": {
+      "g r": "editor::FindAllReferences"
     }
   },
   {
     "context": "VimControl && !menu",
     "unbind": {
-      "g shift-o": "outline::Toggle"
+      "g r r": "editor::FindAllReferences"
     }
   },
   {
+    "context": "Editor && multibuffer && vim_mode == normal",
     "bindings": {
-      "space f d": "editor::ToggleDiagnostics"
+      "ctrl-n": "editor::MoveToStartOfNextExcerpt"
+    }
+  },
+  {
+    "context": "Editor && multibuffer",
+    "unbind": {
+      "cmd-down": "editor::MoveToStartOfNextExcerpt"
+    }
+  },
+  {
+    "context": "Editor && multibuffer",
+    "unbind": {
+      "cmd-up": "editor::MoveToStartOfExcerpt"
+    }
+  },
+  {
+    "context": "Editor && multibuffer && vim_mode == normal",
+    "bindings": {
+      "ctrl-p": "editor::MoveToEndOfPreviousExcerpt"
+    }
+  },
+  {
+    "context": "Editor && !agent_diff && !AgentPanel && vim_mode != insert",
+    "bindings": {
+      "space h r": "git::Restore"
+    }
+  },
+  {
+    "context": "Editor && !agent_diff && !AgentPanel",
+    "unbind": {
+      "alt-cmd-z": "git::Restore"
+    }
+  },
+  {
+    "context": "Editor && vim_mode == normal",
+    "bindings": {
+      "space p s": "project_symbols::Toggle"
+    }
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "cmd-t": "project_symbols::Toggle"
     }
   }
 ]
