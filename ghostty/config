@@ -1,0 +1,37 @@
+font-family = JetBrainsMono Nerd Font Mono
+font-size = 12
+font-style = Regular
+font-thicken = true
+font-feature = calt
+font-feature = liga
+font-feature = ss01
+background-blur = true
+background-opacity = 0.8
+
+
+cursor-style = block
+cursor-style-blink = false
+shell-integration-features = no-cursor
+theme = kanagawa-dragon
+macos-titlebar-style = tabs
+
+macos-option-as-alt = true
+
+# Use Ctrl+A as a leader sequence for splits (like tmux)
+keybind = ctrl+a>d=new_split:right
+keybind = ctrl+a>shift+d=new_split:down
+
+# Move focus between panes using Vim directions
+keybind = ctrl+a>h=goto_split:left
+keybind = ctrl+a>l=goto_split:right
+keybind = ctrl+a>j=goto_split:bottom
+keybind = ctrl+a>k=goto_split:top
+
+# Zoom a pane completely (tmux prefix + z)
+keybind = ctrl+a>z=toggle_split_zoom
+
+# Resize splits using Option (Alt) + Arrow keys
+keybind = alt+left=resize_split:left,20
+keybind = alt+right=resize_split:right,20
+keybind = alt+up=resize_split:up,20
+keybind = alt+down=resize_split:down,20

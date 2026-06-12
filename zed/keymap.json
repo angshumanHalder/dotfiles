@@ -7,13 +7,13 @@
 // from the command palette.
 [
   {
-    "context": "VimControl && vim_mode == normal",
+    "context": "(VimControl && vim_mode == normal) || (Workspace && !Editor && !menu)",
     "bindings": {
       "space f f": "file_finder::Toggle",
     },
   },
   {
-    "context": "vim_mode == normal || (ProjectPanel && not_editing)",
+    "context": "vim_mode == normal || (Workspace && !Editor) || (ProjectPanel && not_editing)",
     "bindings": {
       "space e": "project_panel::Toggle",
     },
@@ -39,91 +39,115 @@
   {
     "context": "Editor && !agent_diff && !AgentPanel && (vim_mode == normal || vim_mode == visual)",
     "bindings": {
-      "space h s": "git::ToggleStaged"
-    }
+      "space h s": "git::ToggleStaged",
+    },
   },
   {
     "context": "Editor && !agent_diff && !AgentPanel",
     "unbind": {
-      "alt-cmd-y": "git::ToggleStaged"
-    }
+      "alt-cmd-y": "git::ToggleStaged",
+    },
   },
   {
     "context": "Editor && !agent_diff && !AgentPanel && (vim_mode == normal || vim_mode == visual)",
     "bindings": {
-      "space g s": "git::StageAndNext"
-    }
+      "space g s": "git::StageAndNext",
+    },
   },
   {
     "context": "Editor && !agent_diff && !AgentPanel",
     "unbind": {
-      "cmd-y": "git::StageAndNext"
-    }
+      "cmd-y": "git::StageAndNext",
+    },
   },
   {
     "context": "(vim_mode == helix_normal || vim_mode == helix_select) && !menu",
     "unbind": {
-      "g r": "editor::FindAllReferences"
-    }
+      "g r": "editor::FindAllReferences",
+    },
   },
   {
     "context": "VimControl && !menu",
     "bindings": {
-      "g r": "editor::FindAllReferences"
-    }
+      "g r": "editor::FindAllReferences",
+    },
   },
   {
     "context": "VimControl && !menu",
     "unbind": {
-      "g r r": "editor::FindAllReferences"
-    }
+      "g r r": "editor::FindAllReferences",
+    },
   },
   {
     "context": "Editor && multibuffer && vim_mode == normal",
     "bindings": {
-      "ctrl-n": "editor::MoveToStartOfNextExcerpt"
-    }
+      "ctrl-n": "editor::MoveToStartOfNextExcerpt",
+    },
   },
   {
     "context": "Editor && multibuffer",
     "unbind": {
-      "cmd-down": "editor::MoveToStartOfNextExcerpt"
-    }
+      "cmd-down": "editor::MoveToStartOfNextExcerpt",
+    },
   },
   {
     "context": "Editor && multibuffer",
     "unbind": {
-      "cmd-up": "editor::MoveToStartOfExcerpt"
-    }
+      "cmd-up": "editor::MoveToStartOfExcerpt",
+    },
   },
   {
     "context": "Editor && multibuffer && vim_mode == normal",
     "bindings": {
-      "ctrl-p": "editor::MoveToEndOfPreviousExcerpt"
-    }
+      "ctrl-p": "editor::MoveToEndOfPreviousExcerpt",
+    },
   },
   {
     "context": "Editor && !agent_diff && !AgentPanel && vim_mode != insert",
     "bindings": {
-      "space h r": "git::Restore"
-    }
+      "space h r": "git::Restore",
+    },
   },
   {
     "context": "Editor && !agent_diff && !AgentPanel",
     "unbind": {
-      "alt-cmd-z": "git::Restore"
-    }
+      "alt-cmd-z": "git::Restore",
+    },
   },
   {
     "context": "Editor && vim_mode == normal",
     "bindings": {
-      "space p s": "project_symbols::Toggle"
-    }
+      "space p s": "project_symbols::Toggle",
+    },
   },
   {
     "context": "Workspace",
     "unbind": {
-      "cmd-t": "project_symbols::Toggle"
-    }
-  }
+      "cmd-t": "project_symbols::Toggle",
+    },
+  },
+  {
+    "context": "VimControl && !menu && Editor",
+    "bindings": {
+      "g r n": "editor::Rename",
+    },
+  },
+  {
+    "context": "Editor && VimControl && vim_mode == normal && !menu",
+    "bindings": {
+      "space f o": "outline_panel::ToggleFocus",
+    },
+  },
+  {
+    "context": "OutlinePanel",
+    "bindings": {
+      "space f o": "workspace::ToggleLeftDock",
+    },
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "cmd-shift-b": "outline_panel::ToggleFocus",
+    },
+  },
 ]
