@@ -128,6 +128,28 @@ vim.cmd.colorscheme("kanagawa-dragon")
 require("mini.icons").setup()
 require("mini.icons").mock_nvim_web_devicons()
 require("mini.statusline").setup({ use_icons = true })
+
+local function apply_kanagawa_statusline()
+  local ok, colors = pcall(require, "kanagawa.colors")
+  if not ok then
+    return
+  end
+  local p = colors.setup({ theme = "dragon" }).palette
+  vim.api.nvim_set_hl(0, "MiniStatuslineModeNormal", { fg = p.sumiInk0, bg = p.dragonBlue2, bold = true })
+  vim.api.nvim_set_hl(0, "MiniStatuslineModeInsert", { fg = p.sumiInk0, bg = p.dragonGreen2, bold = true })
+  vim.api.nvim_set_hl(0, "MiniStatuslineModeVisual", { fg = p.sumiInk0, bg = p.dragonViolet, bold = true })
+  vim.api.nvim_set_hl(0, "MiniStatuslineModeReplace", { fg = p.sumiInk0, bg = p.dragonRed, bold = true })
+  vim.api.nvim_set_hl(0, "MiniStatuslineModeCommand", { fg = p.sumiInk0, bg = p.dragonOrange, bold = true })
+  vim.api.nvim_set_hl(0, "MiniStatuslineModeOther", { fg = p.sumiInk0, bg = p.dragonAsh, bold = true })
+  vim.api.nvim_set_hl(0, "MiniStatuslineDevinfo", { fg = p.oldWhite, bg = p.dragonBlack4 })
+  vim.api.nvim_set_hl(0, "MiniStatuslineFilename", { fg = p.fujiWhite, bg = p.dragonBlack4 })
+  vim.api.nvim_set_hl(0, "MiniStatuslineFileinfo", { fg = p.oldWhite, bg = p.dragonBlack4 })
+  vim.api.nvim_set_hl(0, "MiniStatuslineInactive", { fg = p.dragonAsh, bg = p.dragonBlack3 })
+end
+
+apply_kanagawa_statusline()
+vim.api.nvim_create_autocmd("ColorScheme", { callback = apply_kanagawa_statusline })
+
 require("mini.pairs").setup()
 require("mini.comment").setup()
 require("mini.surround").setup()
@@ -179,7 +201,7 @@ require("nvim-tree").setup({
   actions = { open_file = { quit_on_open = false } },
   on_attach = function(bufnr)
     local api = require("nvim-tree.api")
-    api.config.mappings.default_on_attach(bufnr)
+    api.map.on_attach.default(bufnr)
     vim.keymap.del("n", "s", { buffer = bufnr })
     vim.keymap.set("n", "s", api.node.open.horizontal, { buffer = bufnr, desc = "Open: Horizontal Split" })
     vim.keymap.set("n", "v", api.node.open.vertical, { buffer = bufnr, desc = "Open: Vertical Split" })
@@ -400,7 +422,10 @@ vim.lsp.config("lua_ls", {
   settings = {
     Lua = {
       diagnostics = { globals = { "vim" } },
-      workspace = { checkThirdParty = false },
+      workspace = {
+        checkThirdParty = false,
+        library = vim.api.nvim_get_runtime_file("", true),
+      },
       telemetry = { enable = false },
     },
   },
