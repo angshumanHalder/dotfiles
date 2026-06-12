@@ -92,7 +92,7 @@ map("n", "N", "Nzzzv")
 -- ============================================================================
 
 vim.pack.add({
-  "https://github.com/EdenEast/nightfox.nvim",
+  "https://github.com/rebelot/kanagawa.nvim",
   "https://github.com/echasnovski/mini.nvim",
   "https://github.com/nvim-tree/nvim-tree.lua",
   "https://github.com/romus204/tree-sitter-manager.nvim",
@@ -111,13 +111,14 @@ vim.pack.add({
 })
 
 -- ============================================================================
--- THEME: nordfox
+-- THEME: kanagawa-dragon
 -- ============================================================================
 
-require("nightfox").setup({
-  options = { transparent = true },
+require("kanagawa").setup({
+  theme = "dragon",
+  transparent = true,
 })
-vim.cmd.colorscheme("nordfox")
+vim.cmd.colorscheme("kanagawa-dragon")
 
 -- ============================================================================
 -- MINI.NVIM
