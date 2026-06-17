@@ -7,19 +7,19 @@
 // from the command palette.
 [
   {
-    "context": "(VimControl && vim_mode == normal) || (Workspace && !Editor && !menu)",
+    "context": "(VimControl && vim_mode == normal && !Terminal) || (Workspace && !Editor && !menu && !Terminal)",
     "bindings": {
       "space f f": "file_finder::Toggle",
     },
   },
   {
-    "context": "vim_mode == normal || (Workspace && !Editor) || (ProjectPanel && not_editing)",
+    "context": "vim_mode == normal || (Workspace && !Editor && !Terminal) || (ProjectPanel && not_editing)",
     "bindings": {
       "space e": "project_panel::Toggle",
     },
   },
   {
-    "context": "VimControl && !menu",
+    "context": "VimControl && !menu && !Terminal",
     "bindings": {
       "space f s": "outline::Toggle",
     },

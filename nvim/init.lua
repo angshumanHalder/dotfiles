@@ -72,8 +72,12 @@ map("n", "<S-l>", "<cmd>bnext<CR>")
 
 map("n", "<leader>qq", "<cmd>qa<CR>", { desc = "Quit Neovim" })
 
-map("n", "[d", vim.diagnostic.goto_prev)
-map("n", "]d", vim.diagnostic.goto_next)
+map("n", "[d", function()
+  vim.diagnostic.jump({ count = -1 })
+end)
+map("n", "]d", function()
+  vim.diagnostic.jump({ count = 1 })
+end)
 map("n", "<leader>ld", vim.diagnostic.open_float)
 
 map("n", "<leader>w", "<cmd>w<CR>", { desc = "Save" })
@@ -108,6 +112,10 @@ vim.pack.add({
   "https://github.com/creativenull/efmls-configs-nvim",
   "https://github.com/folke/todo-comments.nvim",
   "https://github.com/karb94/neoscroll.nvim",
+  "https://github.com/nvim-lua/plenary.nvim",
+  "https://github.com/MunifTanjim/nui.nvim",
+  "https://github.com/olimorris/codecompanion.nvim",
+  "https://github.com/MagicDuck/grug-far.nvim",
 })
 
 -- ============================================================================
@@ -184,6 +192,22 @@ map("n", "<leader>ft", function()
     no_header_i = true,
   })
 end, { desc = "Todo Comments" })
+
+-- ============================================================================
+-- FIND & REPLACE: grug-far
+-- <leader>sr  open (current word)   <leader>sR  open (empty)
+-- ============================================================================
+
+require("grug-far").setup()
+map("n", "<leader>sr", function()
+  require("grug-far").open({ prefills = { search = vim.fn.expand("<cword>") } })
+end, { desc = "Find & Replace (word)" })
+map("n", "<leader>sR", function()
+  require("grug-far").open()
+end, { desc = "Find & Replace" })
+map("v", "<leader>sr", function()
+  require("grug-far").with_visual_selection()
+end, { desc = "Find & Replace (selection)" })
 
 -- ============================================================================
 -- FILE TREE: nvim-tree
@@ -395,17 +419,13 @@ vim.api.nvim_create_autocmd("LspAttach", {
     lmap("n", "gd", "<cmd>FzfLua lsp_definitions<cr>", "Go to Definition")
     lmap("n", "gD", vim.lsp.buf.declaration, "Go to Declaration")
     lmap("n", "gr", "<cmd>FzfLua lsp_references<cr>", "References")
-    lmap("n", "grr", "<cmd>FzfLua lsp_references<cr>", "References")
     lmap("n", "gi", "<cmd>FzfLua lsp_implementations<cr>", "Implementation")
-    lmap("n", "gri", "<cmd>FzfLua lsp_implementations<cr>", "Implementation")
     lmap("n", "gO", "<cmd>FzfLua lsp_document_symbols<cr>", "Symbols")
     lmap("n", "K", function()
       vim.lsp.buf.hover({ border = "single" })
     end, "Hover")
     lmap("n", "<leader>lr", vim.lsp.buf.rename, "Rename")
-    lmap("n", "grn", vim.lsp.buf.rename, "Rename")
     lmap("n", "<leader>la", vim.lsp.buf.code_action, "Code Action")
-    lmap("n", "gra", vim.lsp.buf.code_action, "Code Action")
     lmap("n", "<leader>lf", function()
       vim.lsp.buf.format({ async = true })
     end, "Format")
@@ -432,14 +452,14 @@ vim.lsp.config("lua_ls", {
 })
 
 -- Add/remove servers to match what you install via Mason
-vim.lsp.enable({ "lua_ls", "pyright", "ts_ls", "rust_analyzer", "gopls" })
+vim.lsp.enable({ "lua_ls", "pyright", "ts_ls", "rust_analyzer", "gopls", "dockerls" })
 
 vim.diagnostic.config({
   virtual_text = { prefix = "●" },
   signs = true,
   underline = true,
   update_in_insert = false,
-  float = { source = "always" },
+  float = { source = true },
 })
 
 -- ============================================================================
@@ -469,3 +489,26 @@ vim.lsp.config("efm", {
   },
 })
 vim.lsp.enable("efm")
+
+-- ============================================================================
+-- CODECOMPANION
+-- <leader>cc  toggle chat   ga  accept inline edit   gr  reject inline edit
+-- ============================================================================
+
+require("codecompanion").setup({
+  strategies = {
+    chat = { adapter = "claude_code" },
+    inline = {
+      adapter = "claude_code",
+      keymaps = {
+        accept_change = { modes = { n = "ga" }, description = "Accept inline edit" },
+        reject_change = { modes = { n = "gR" }, description = "Reject inline edit" },
+      },
+    },
+  },
+  display = {
+    chat = { window = { layout = "vertical", width = 0.35 } },
+  },
+})
+
+map("n", "<leader>cc", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "Toggle CodeCompanion" })
