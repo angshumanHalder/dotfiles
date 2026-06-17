@@ -5,9 +5,9 @@ font-thicken = true
 font-feature = calt
 font-feature = liga
 font-feature = ss01
-background-blur = true
-background-opacity = 0.8
 
+background-opacity = 0.8
+background-blur = true
 
 cursor-style = block
 cursor-style-blink = false
