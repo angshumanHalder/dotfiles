@@ -497,7 +497,12 @@ vim.lsp.enable("efm")
 
 require("codecompanion").setup({
   strategies = {
-    chat = { adapter = "claude_code" },
+    chat = {
+      adapter = "claude_code",
+      keymaps = {
+        close = { modes = { n = "<leader>q", i = "<leader>q" } },
+      },
+    },
     inline = {
       adapter = "claude_code",
       keymaps = {
@@ -507,8 +512,18 @@ require("codecompanion").setup({
     },
   },
   display = {
-    chat = { window = { layout = "vertical", width = 0.35 } },
+    chat = {
+      window = { layout = "vertical", width = 0.35 },
+      render_headers = false,
+    },
   },
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "codecompanion" },
+  callback = function()
+    vim.b.miniindentscope_disable = true
+  end,
 })
 
 map("n", "<leader>cc", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "Toggle CodeCompanion" })
