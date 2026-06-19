@@ -30,6 +30,9 @@ keybind = ctrl+a>k=goto_split:top
 # Zoom a pane completely (tmux prefix + z)
 keybind = ctrl+a>z=toggle_split_zoom
 
+# New tab
+keybind = ctrl+a>c=new_tab
+
 # Switch tabs (tmux prefix + number)
 keybind = ctrl+a>1=goto_tab:1
 keybind = ctrl+a>2=goto_tab:2

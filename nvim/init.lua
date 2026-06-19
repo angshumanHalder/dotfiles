@@ -116,6 +116,7 @@ vim.pack.add({
   "https://github.com/MunifTanjim/nui.nvim",
   "https://github.com/olimorris/codecompanion.nvim",
   "https://github.com/MagicDuck/grug-far.nvim",
+  "https://github.com/s1n7ax/nvim-window-picker",
 })
 
 -- ============================================================================
@@ -214,6 +215,28 @@ end, { desc = "Find & Replace (selection)" })
 -- <leader>e  toggle
 -- ============================================================================
 
+local _ok, _kc = pcall(require, "kanagawa.colors")
+local _p = _ok and _kc.setup({ theme = "dragon" }).palette or {}
+require("window-picker").setup({
+  hint = "statusline-winbar",
+  selection_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  filter_rules = {
+    include_current_win = false,
+    autoselect_one = true,
+    bo = { filetype = { "NvimTree" }, buftype = {} },
+  },
+  highlights = {
+    statusline = {
+      focused = { fg = _p.sumiInk0, bg = _p.dragonGreen2, bold = true },
+      unfocused = { fg = _p.sumiInk0, bg = _p.dragonGreen2 },
+    },
+    winbar = {
+      focused = { fg = _p.sumiInk0, bg = _p.dragonGreen2, bold = true },
+      unfocused = { fg = _p.sumiInk0, bg = _p.dragonGreen2 },
+    },
+  },
+})
+
 require("nvim-tree").setup({
   view = { width = 30 },
   renderer = {
@@ -222,7 +245,33 @@ require("nvim-tree").setup({
   },
   filters = { dotfiles = false },
   git = { enable = true },
-  actions = { open_file = { quit_on_open = false } },
+  actions = {
+    open_file = {
+      quit_on_open = false,
+      window_picker = {
+        enable = true,
+        picker = function()
+          local cur = vim.api.nvim_get_current_win()
+          local has_target = vim.iter(vim.api.nvim_list_wins()):any(function(w)
+            if w == cur then
+              return false
+            end
+            local ft = vim.bo[vim.api.nvim_win_get_buf(w)].filetype
+            return ft ~= "NvimTree" and vim.api.nvim_win_get_config(w).relative == ""
+          end)
+          if not has_target then
+            vim.cmd("vsplit")
+            return vim.api.nvim_get_current_win()
+          end
+          local picked = require("window-picker").pick_window()
+          vim.schedule(function()
+            vim.cmd("echo ''")
+          end)
+          return picked
+        end,
+      },
+    },
+  },
   on_attach = function(bufnr)
     local api = require("nvim-tree.api")
     api.map.on_attach.default(bufnr)
@@ -338,7 +387,6 @@ map("n", "<leader>fh", "<cmd>FzfLua help_tags<cr>", { desc = "Help" })
 map("n", "<leader>fd", "<cmd>FzfLua diagnostics_document<cr>", { desc = "Diagnostics" })
 map("n", "<leader>fD", "<cmd>FzfLua diagnostics_workspace<cr>", { desc = "Workspace Diagnostics" })
 map("n", "<leader>fr", "<cmd>FzfLua oldfiles<cr>", { desc = "Recent Files" })
-map("n", "<leader>fs", "<cmd>FzfLua lsp_document_symbols<cr>", { desc = "Symbols" })
 map("n", "<leader>?", "<cmd>FzfLua keymaps<cr>", { desc = "Keymaps" })
 
 -- ============================================================================
@@ -385,7 +433,7 @@ require("blink.cmp").setup({
 -- ============================================================================
 -- MASON: LSP/tool installer  (:Mason to open UI)
 -- Install servers: lua_ls, pyright, ts_ls, rust_analyzer, gopls, efm
--- Install tools:   stylua, black, flake8, prettier, eslint_d
+-- Install tools:   stylua, ruff, prettier, eslint_d
 -- ============================================================================
 
 require("mason").setup({
@@ -470,7 +518,7 @@ vim.diagnostic.config({
 
 local languages = {
   lua = { require("efmls-configs.formatters.stylua") },
-  python = { require("efmls-configs.formatters.black"), require("efmls-configs.linters.flake8") },
+  python = { require("efmls-configs.formatters.ruff"), require("efmls-configs.linters.ruff") },
   javascript = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
   typescript = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
   typescriptreact = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
