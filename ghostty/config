@@ -17,35 +17,5 @@ macos-titlebar-style = hidden
 
 macos-option-as-alt = true
 
-# Use Ctrl+A as a leader sequence for splits (like tmux)
-keybind = ctrl+a>d=new_split:right
-keybind = ctrl+a>shift+d=new_split:down
 
-# Move focus between panes using Vim directions
-keybind = ctrl+a>h=goto_split:left
-keybind = ctrl+a>l=goto_split:right
-keybind = ctrl+a>j=goto_split:bottom
-keybind = ctrl+a>k=goto_split:top
-
-# Zoom a pane completely (tmux prefix + z)
-keybind = ctrl+a>z=toggle_split_zoom
-
-# New tab
-keybind = ctrl+a>c=new_tab
-
-# Switch tabs (tmux prefix + number)
-keybind = ctrl+a>1=goto_tab:1
-keybind = ctrl+a>2=goto_tab:2
-keybind = ctrl+a>3=goto_tab:3
-keybind = ctrl+a>4=goto_tab:4
-keybind = ctrl+a>5=goto_tab:5
-keybind = ctrl+a>6=goto_tab:6
-keybind = ctrl+a>7=goto_tab:7
-keybind = ctrl+a>8=goto_tab:8
-keybind = ctrl+a>9=goto_tab:9
-
-# Resize splits using Option (Alt) + Arrow keys
-keybind = alt+left=resize_split:left,20
-keybind = alt+right=resize_split:right,20
-keybind = alt+up=resize_split:up,20
-keybind = alt+down=resize_split:down,20
+keybind = ctrl+a=unbind
