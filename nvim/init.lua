@@ -78,7 +78,12 @@ end)
 map("n", "]d", function()
   vim.diagnostic.jump({ count = 1 })
 end)
-map("n", "<leader>ld", vim.diagnostic.open_float)
+map("n", "<leader>ld", function()
+  local _, winid = vim.diagnostic.open_float({ focusable = true })
+  if winid then
+    vim.api.nvim_set_current_win(winid)
+  end
+end)
 
 map("n", "<leader>w", "<cmd>w<CR>", { desc = "Save" })
 map("n", "]q", "<cmd>cnext<CR>", { desc = "Next Quickfix" })
