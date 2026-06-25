@@ -117,6 +117,7 @@ vim.pack.add({
   "https://github.com/olimorris/codecompanion.nvim",
   "https://github.com/MagicDuck/grug-far.nvim",
   "https://github.com/s1n7ax/nvim-window-picker",
+  "https://github.com/rachartier/tiny-cmdline.nvim",
 })
 
 -- ============================================================================
@@ -431,8 +432,16 @@ require("blink.cmp").setup({
 })
 
 -- ============================================================================
+-- TINY-CMDLINE: centered floating cmdline via ui2
+-- ============================================================================
+
+require("tiny-cmdline").setup({
+  on_reposition = require("tiny-cmdline").adapters.blink,
+})
+
+-- ============================================================================
 -- MASON: LSP/tool installer  (:Mason to open UI)
--- Install servers: lua_ls, pyright, ts_ls, rust_analyzer, gopls, efm
+-- Install servers: lua_ls, pyright, vtsls, rust_analyzer, gopls, efm
 -- Install tools:   stylua, ruff, prettier, eslint_d
 -- ============================================================================
 
@@ -499,8 +508,33 @@ vim.lsp.config("lua_ls", {
   },
 })
 
+vim.lsp.config("vtsls", {
+  init_options = {
+    autoUseWorkspaceTsdk = false,
+  },
+  settings = {
+    vtsls = {
+      autoUseWorkspaceTsdk = false,
+    },
+    typescript = {
+      tsserver = {
+        implicitProjectConfig = {
+          jsx = "react-jsx",
+        },
+      },
+    },
+    javascript = {
+      tsserver = {
+        implicitProjectConfig = {
+          jsx = "react-jsx",
+        },
+      },
+    },
+  },
+})
+
 -- Add/remove servers to match what you install via Mason
-vim.lsp.enable({ "lua_ls", "pyright", "ts_ls", "rust_analyzer", "gopls", "dockerls" })
+vim.lsp.enable({ "lua_ls", "pyright", "vtsls", "rust_analyzer", "gopls", "dockerls", "yamlls" })
 
 vim.diagnostic.config({
   virtual_text = { prefix = "●" },

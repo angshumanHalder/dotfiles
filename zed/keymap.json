@@ -6,10 +6,18 @@
 // To see the default key bindings run `zed: open default keymap`
 // from the command palette.
 [
+  // ============================================================================
+  // GLOBAL — file finder, project panel, diagnostics, search, workspace ops
+  // ============================================================================
   {
     "context": "(VimControl && vim_mode == normal && !Terminal) || (Workspace && !Editor && !menu && !Terminal)",
     "bindings": {
       "space f f": "file_finder::Toggle",
+      "space f g": "pane::DeploySearch",
+      "space f b": "tab_switcher::Toggle",
+      "space f r": "projects::OpenRecent",
+      "space q q": "zed::Quit",
+      "space b d": "pane::CloseActiveItem",
     },
   },
   {
@@ -19,11 +27,28 @@
     },
   },
   {
-    "context": "VimControl && !menu && !Terminal",
+    "context": "VimControl && vim_mode == normal",
     "bindings": {
-      "space f s": "outline::Toggle",
+      "space f d": "diagnostics::Deploy",
     },
   },
+  {
+    "context": "VimControl && vim_mode == normal && !Terminal",
+    "bindings": {
+      "space s v": "pane::SplitRight",
+      "space s h": "pane::SplitDown",
+    },
+  },
+  {
+    "context": "VimControl && !menu && !Terminal",
+    "bindings": {
+      "space g o": "outline::Toggle",
+    },
+  },
+
+  // ============================================================================
+  // UNBINDS
+  // ============================================================================
   {
     "context": "VimControl && !menu",
     "unbind": {
@@ -31,123 +56,149 @@
     },
   },
   {
-    "context": "VimControl && vim_mode == normal",
-    "bindings": {
-      "space f d": "diagnostics::Deploy",
-    },
-  },
-  {
-    "context": "Editor && !agent_diff && !AgentPanel && (vim_mode == normal || vim_mode == visual)",
-    "bindings": {
-      "space h s": "git::ToggleStaged",
-    },
-  },
-  {
     "context": "Editor && !agent_diff && !AgentPanel",
     "unbind": {
       "alt-cmd-y": "git::ToggleStaged",
-    },
-  },
-  {
-    "context": "Editor && !agent_diff && !AgentPanel && (vim_mode == normal || vim_mode == visual)",
-    "bindings": {
-      "space g s": "git::StageAndNext",
-    },
-  },
-  {
-    "context": "Editor && !agent_diff && !AgentPanel",
-    "unbind": {
       "cmd-y": "git::StageAndNext",
-    },
-  },
-  {
-    "context": "(vim_mode == helix_normal || vim_mode == helix_select) && !menu",
-    "unbind": {
-      "g r": "editor::FindAllReferences",
-    },
-  },
-  {
-    "context": "VimControl && !menu",
-    "bindings": {
-      "g r": "editor::FindAllReferences",
-    },
-  },
-  {
-    "context": "VimControl && !menu",
-    "unbind": {
-      "g r r": "editor::FindAllReferences",
-    },
-  },
-  {
-    "context": "Editor && multibuffer && vim_mode == normal",
-    "bindings": {
-      "ctrl-n": "editor::MoveToStartOfNextExcerpt",
+      "alt-cmd-z": "git::Restore",
     },
   },
   {
     "context": "Editor && multibuffer",
     "unbind": {
       "cmd-down": "editor::MoveToStartOfNextExcerpt",
-    },
-  },
-  {
-    "context": "Editor && multibuffer",
-    "unbind": {
       "cmd-up": "editor::MoveToStartOfExcerpt",
-    },
-  },
-  {
-    "context": "Editor && multibuffer && vim_mode == normal",
-    "bindings": {
-      "ctrl-p": "editor::MoveToEndOfPreviousExcerpt",
-    },
-  },
-  {
-    "context": "Editor && !agent_diff && !AgentPanel && vim_mode != insert",
-    "bindings": {
-      "space h r": "git::Restore",
-    },
-  },
-  {
-    "context": "Editor && !agent_diff && !AgentPanel",
-    "unbind": {
-      "alt-cmd-z": "git::Restore",
-    },
-  },
-  {
-    "context": "Editor && vim_mode == normal",
-    "bindings": {
-      "space p s": "project_symbols::Toggle",
     },
   },
   {
     "context": "Workspace",
     "unbind": {
       "cmd-t": "project_symbols::Toggle",
+      "cmd-shift-b": "outline_panel::ToggleFocus",
     },
   },
+
+  // ============================================================================
+  // EDITOR — vim normal mode
+  // ============================================================================
   {
-    "context": "VimControl && !menu && Editor",
+    "context": "Editor && vim_mode == normal",
     "bindings": {
-      "g r n": "editor::Rename",
+      // pane navigation
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      // buffer navigation
+      "shift-h": "pane::ActivatePreviousItem",
+      "shift-l": "pane::ActivateNextItem",
+      // misc
+      "space p s": "project_symbols::Toggle",
     },
   },
   {
     "context": "Editor && VimControl && vim_mode == normal && !menu",
     "bindings": {
+      // outline
       "space f o": "outline_panel::ToggleFocus",
+      // LSP
+      "space l a": "editor::ToggleCodeActions",
+      "space l f": "editor::Format",
+      "space l r": "editor::Rename",
+      "space l d": "editor::Hover",
+      // diagnostics
+      "] d": "editor::GoToDiagnostic",
+      "[ d": "editor::GoToPreviousDiagnostic",
+      // git hunks + blame
+      "] h": "editor::GoToHunk",
+      "[ h": "editor::GoToPreviousHunk",
+      "space g b": "git::Blame",
+    },
+  },
+  {
+    "context": "VimControl && !menu",
+    "bindings": {
+      "g r": "editor::FindAllReferences",
+    },
+  },
+
+  // ============================================================================
+  // EDITOR — git staging
+  // ============================================================================
+  {
+    "context": "Editor && !agent_diff && !AgentPanel && (vim_mode == normal || vim_mode == visual)",
+    "bindings": {
+      "space h s": "git::ToggleStaged",
+      "space g s": "git::StageAndNext",
+    },
+  },
+  {
+    "context": "Editor && !agent_diff && !AgentPanel && vim_mode == normal",
+    "bindings": {
+      "space h r": "git::Restore",
+    },
+  },
+
+  // ============================================================================
+  // EDITOR — multibuffer
+  // ============================================================================
+  {
+    "context": "Editor && multibuffer && vim_mode == normal",
+    "bindings": {
+      "ctrl-n": "editor::MoveToStartOfNextExcerpt",
+      "ctrl-p": "editor::MoveToEndOfPreviousExcerpt",
+    },
+  },
+
+  // ============================================================================
+  // EDITOR — line move (normal + visual)
+  // ============================================================================
+  {
+    "context": "Editor && (vim_mode == normal || vim_mode == visual)",
+    "bindings": {
+      "alt-j": "editor::MoveLineDown",
+      "alt-k": "editor::MoveLineUp",
+    },
+  },
+
+  // ============================================================================
+  // PANELS — pane navigation
+  // ============================================================================
+  {
+    "context": "Terminal",
+    "bindings": {
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-k": "workspace::ActivatePaneUp",
+    },
+  },
+  {
+    "context": "ProjectPanel",
+    "bindings": {
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-k": "workspace::ActivatePaneUp",
     },
   },
   {
     "context": "OutlinePanel",
     "bindings": {
       "space f o": "workspace::ToggleLeftDock",
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-k": "workspace::ActivatePaneUp",
     },
   },
   {
-    "context": "Workspace",
-    "unbind": {
-      "cmd-shift-b": "outline_panel::ToggleFocus",
+    "context": "GitPanel",
+    "bindings": {
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-k": "workspace::ActivatePaneUp",
     },
   },
 ]

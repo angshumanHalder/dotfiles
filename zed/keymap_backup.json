@@ -1,0 +1,254 @@
+// Zed keymap
+//
+// For information on binding keys, see the Zed
+// documentation: https://zed.dev/docs/key-bindings
+//
+// To see the default key bindings run `zed: open default keymap`
+// from the command palette.
+[
+  {
+    "context": "(VimControl && vim_mode == normal && !Terminal) || (Workspace && !Editor && !menu && !Terminal)",
+    "bindings": {
+      "space f f": "file_finder::Toggle",
+    },
+  },
+  {
+    "context": "vim_mode == normal || (Workspace && !Editor && !Terminal) || (ProjectPanel && not_editing)",
+    "bindings": {
+      "space e": "project_panel::Toggle",
+    },
+  },
+  {
+    "context": "VimControl && !menu && !Terminal",
+    "bindings": {
+      "space f s": "outline::Toggle",
+    },
+  },
+  {
+    "context": "VimControl && !menu",
+    "unbind": {
+      "g shift-o": "outline::Toggle",
+    },
+  },
+  {
+    "context": "VimControl && vim_mode == normal",
+    "bindings": {
+      "space f d": "diagnostics::Deploy",
+    },
+  },
+  {
+    "context": "Editor && !agent_diff && !AgentPanel && (vim_mode == normal || vim_mode == visual)",
+    "bindings": {
+      "space h s": "git::ToggleStaged",
+    },
+  },
+  {
+    "context": "Editor && !agent_diff && !AgentPanel",
+    "unbind": {
+      "alt-cmd-y": "git::ToggleStaged",
+    },
+  },
+  {
+    "context": "Editor && !agent_diff && !AgentPanel && (vim_mode == normal || vim_mode == visual)",
+    "bindings": {
+      "space g s": "git::StageAndNext",
+    },
+  },
+  {
+    "context": "Editor && !agent_diff && !AgentPanel",
+    "unbind": {
+      "cmd-y": "git::StageAndNext",
+    },
+  },
+  {
+    "context": "(vim_mode == helix_normal || vim_mode == helix_select) && !menu",
+    "unbind": {
+      "g r": "editor::FindAllReferences",
+    },
+  },
+  {
+    "context": "VimControl && !menu",
+    "bindings": {
+      "g r": "editor::FindAllReferences",
+    },
+  },
+  {
+    "context": "VimControl && !menu",
+    "unbind": {
+      "g r r": "editor::FindAllReferences",
+    },
+  },
+  {
+    "context": "Editor && multibuffer && vim_mode == normal",
+    "bindings": {
+      "ctrl-n": "editor::MoveToStartOfNextExcerpt",
+    },
+  },
+  {
+    "context": "Editor && multibuffer",
+    "unbind": {
+      "cmd-down": "editor::MoveToStartOfNextExcerpt",
+    },
+  },
+  {
+    "context": "Editor && multibuffer",
+    "unbind": {
+      "cmd-up": "editor::MoveToStartOfExcerpt",
+    },
+  },
+  {
+    "context": "Editor && multibuffer && vim_mode == normal",
+    "bindings": {
+      "ctrl-p": "editor::MoveToEndOfPreviousExcerpt",
+    },
+  },
+  {
+    "context": "Editor && !agent_diff && !AgentPanel && vim_mode != insert",
+    "bindings": {
+      "space h r": "git::Restore",
+    },
+  },
+  {
+    "context": "Editor && !agent_diff && !AgentPanel",
+    "unbind": {
+      "alt-cmd-z": "git::Restore",
+    },
+  },
+  {
+    "context": "Editor && vim_mode == normal",
+    "bindings": {
+      "space p s": "project_symbols::Toggle",
+    },
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "cmd-t": "project_symbols::Toggle",
+    },
+  },
+  {
+    "context": "VimControl && !menu && Editor",
+    "bindings": {
+      "g r n": "editor::Rename",
+    },
+  },
+  {
+    "context": "Editor && VimControl && vim_mode == normal && !menu",
+    "bindings": {
+      "space f o": "outline_panel::ToggleFocus",
+    },
+  },
+  {
+    "context": "OutlinePanel",
+    "bindings": {
+      "space f o": "workspace::ToggleLeftDock",
+    },
+  },
+  {
+    "context": "Workspace",
+    "unbind": {
+      "cmd-shift-b": "outline_panel::ToggleFocus",
+    },
+    "bindings": {
+      // Neovim-style directional navigation across ALL panels
+      "ctrl-h": "workspace::FocusLeftDock",
+      "ctrl-l": "workspace::FocusRightDock",
+      "ctrl-j": "workspace::FocusBottomDock",
+      "ctrl-k": "workspace::FocusActivePane",
+    },
+  },
+
+  // ============================================================================
+  // BUFFER NAVIGATION — Shift-h/l like nvim's <S-h>/<S-l>
+  // ============================================================================
+  {
+    "context": "Editor && vim_mode == normal",
+    "bindings": {
+      "shift-h": "pane::ActivatePrevItem",
+      "shift-l": "pane::ActivateNextItem",
+    },
+  },
+
+  // ============================================================================
+  // SPLITS — <leader>sv / <leader>sh
+  // ============================================================================
+  {
+    "context": "VimControl && vim_mode == normal && !Terminal",
+    "bindings": {
+      "space s v": "pane::SplitRight",
+      "space s h": "pane::SplitDown",
+    },
+  },
+
+  // ============================================================================
+  // WORKSPACE — save, quit, close buffer
+  // ============================================================================
+  {
+    "context": "(VimControl && vim_mode == normal && !Terminal) || (Workspace && !Editor && !menu && !Terminal)",
+    "bindings": {
+      "space w": "workspace::Save",
+      "space q q": "zed::Quit",
+      "space b d": "pane::CloseActiveItem",
+    },
+  },
+
+  // ============================================================================
+  // LSP — code actions, format, rename, hover/diagnostic float
+  // ============================================================================
+  {
+    "context": "Editor && VimControl && vim_mode == normal && !menu",
+    "bindings": {
+      "space l a": "editor::ToggleCodeActions",
+      "g r a": "editor::ToggleCodeActions",
+      "space l f": "editor::Format",
+      "space l r": "editor::Rename",
+      "space l d": "editor::Hover",
+    },
+  },
+
+  // ============================================================================
+  // DIAGNOSTICS — ]d / [d like nvim
+  // ============================================================================
+  {
+    "context": "Editor && VimControl && vim_mode == normal",
+    "bindings": {
+      "] d": "editor::GoToDiagnostic",
+      "[ d": "editor::GoToPrevDiagnostic",
+    },
+  },
+
+  // ============================================================================
+  // GIT HUNKS — ]h / [h, blame  (<leader>gb)
+  // ============================================================================
+  {
+    "context": "Editor && VimControl && vim_mode == normal",
+    "bindings": {
+      "] h": "editor::GoToHunk",
+      "[ h": "editor::GoToPrevHunk",
+      "space g b": "editor::ToggleGitBlame",
+    },
+  },
+
+  // ============================================================================
+  // FIND / SEARCH — live grep, buffers, recent files
+  // ============================================================================
+  {
+    "context": "(VimControl && vim_mode == normal && !Terminal) || (Workspace && !Editor && !menu && !Terminal)",
+    "bindings": {
+      "space f g": "workspace::NewSearch",
+      "space f b": "tab_switcher::Toggle",
+      "space f r": "workspace::OpenRecent",
+    },
+  },
+
+  // ============================================================================
+  // LINE MOVE — <A-j> / <A-k> in normal and visual
+  // ============================================================================
+  {
+    "context": "Editor && (vim_mode == normal || vim_mode == visual)",
+    "bindings": {
+      "alt-j": "editor::MoveLineDown",
+      "alt-k": "editor::MoveLineUp",
+    },
+  },
+]
