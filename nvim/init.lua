@@ -121,6 +121,9 @@ vim.pack.add({
 	"https://github.com/s1n7ax/nvim-window-picker",
 	"https://github.com/kdheepak/lazygit.nvim",
 	"https://github.com/nvim-orgmode/orgmode",
+	"https://github.com/kkharji/sqlite.lua",
+	"https://github.com/chipsenkbeil/org-roam.nvim",
+	"https://github.com/hamidi-dev/org-super-agenda.nvim",
 	"https://github.com/michaelb/sniprun",
 })
 
@@ -642,6 +645,33 @@ map("n", "<leader>cc", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "Toggle Cod
 require("orgmode").setup({
 	org_agenda_files = { "~/org/**/*" },
 	org_default_notes_file = "~/org/inbox.org",
+	org_todo_keywords = { "TODO", "NEXT", "WAITING", "|", "DONE", "CANCELLED" },
+	org_agenda_span = "week",
+	org_deadline_warning_days = 3,
+	org_agenda_start_on_weekday = 1,
+	org_capture_templates = {
+		t = {
+			description = "Task",
+			template = "* TODO %?\n  SCHEDULED: %t",
+			target = "~/org/inbox.org",
+		},
+		n = {
+			description = "Note",
+			template = "* %?\n  :PROPERTIES:\n  :CREATED: %T\n  :END:",
+			target = "~/org/notes.org",
+		},
+		m = {
+			description = "Meeting",
+			template = "* %? :meeting:\n  %t\n** Attendees\n** Notes\n** Actions",
+			target = "~/org/meetings.org",
+		},
+		j = {
+			description = "Journal",
+			template = "\n** %<%H:%M> %?\n",
+			target = "~/org/journal.org",
+			datetree = { active = false },
+		},
+	},
 })
 
 -- ============================================================================
@@ -714,6 +744,109 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 		orgcal_run("sync", nil)
 	end,
 })
+
+-- ============================================================================
+-- ORG-ROAM: notes with backlinks
+-- <leader>nf  find/open note   <leader>ni  insert link   <leader>nc  capture note
+-- <leader>nb  backlinks buffer  <leader>nd  today's daily note
+-- Notes in ~/org/roam/   Daily notes in ~/org/daily/
+-- ============================================================================
+
+require("org-roam").setup({
+	directory = "~/org/roam",
+	extensions = {
+		dailies = {
+			directory = "~/org/daily",
+		},
+	},
+})
+
+map("n", "<leader>nf", "<cmd>OrgRoamFindNode<cr>", { desc = "Find Note" })
+map("n", "<leader>ni", "<cmd>OrgRoamInsertNode<cr>", { desc = "Insert Link" })
+map("n", "<leader>nc", "<cmd>OrgRoamCaptureNode<cr>", { desc = "Capture Note" })
+map("n", "<leader>nb", "<cmd>OrgRoamToggleRoamBuffer<cr>", { desc = "Backlinks" })
+map("n", "<leader>nd", "<cmd>OrgRoamDailiesGotoToday<cr>", { desc = "Today's Daily Note" })
+
+-- ============================================================================
+-- ORG-SUPER-AGENDA
+-- <leader>oA  open super agenda
+-- ============================================================================
+
+require("org-super-agenda").setup({
+	org_directories = { "~/org" },
+	todo_states = {
+		{ name = "TODO", keymap = "ot", color = "#FF5555", strike_through = false },
+		{ name = "NEXT", keymap = "on", color = "#FFAA00", strike_through = false },
+		{ name = "WAITING", keymap = "ow", color = "#BD93F9", strike_through = false },
+		{ name = "DONE", keymap = "od", color = "#50FA7B", strike_through = true },
+		{ name = "CANCELLED", keymap = "oc", color = "#6272A4", strike_through = true },
+	},
+	groups = {
+		{
+			name = "Overdue",
+			matcher = function(i)
+				return i.todo_state ~= "DONE"
+					and i.todo_state ~= "CANCELLED"
+					and ((i.deadline and i.deadline:is_past()) or (i.scheduled and i.scheduled:is_past()))
+			end,
+			sort = { by = "date_nearest", order = "asc" },
+		},
+		{
+			name = "Today",
+			matcher = function(i)
+				return i.scheduled and i.scheduled:is_today()
+			end,
+			sort = { by = "scheduled_time", order = "asc" },
+		},
+		{
+			name = "Tomorrow",
+			matcher = function(i)
+				return i.scheduled and i.scheduled:days_from_today() == 1
+			end,
+			sort = { by = "scheduled_time", order = "asc" },
+		},
+		{
+			name = "Deadlines",
+			matcher = function(i)
+				return i.deadline and i.todo_state ~= "DONE" and i.todo_state ~= "CANCELLED"
+			end,
+			sort = { by = "deadline", order = "asc" },
+		},
+		{
+			name = "Next",
+			matcher = function(i)
+				return i.todo_state == "NEXT"
+			end,
+		},
+		{
+			name = "Waiting",
+			matcher = function(i)
+				return i.todo_state == "WAITING"
+			end,
+		},
+		{
+			name = "Upcoming",
+			matcher = function(i)
+				local d1 = i.deadline and i.deadline:days_from_today()
+				local d2 = i.scheduled and i.scheduled:days_from_today()
+				return (d1 and d1 >= 0 and d1 <= 14) or (d2 and d2 >= 0 and d2 <= 14)
+			end,
+			sort = { by = "date_nearest", order = "asc" },
+		},
+	},
+	hide_empty_groups = true,
+	allow_duplicates = false,
+	show_tags = true,
+	show_filename = true,
+	window = {
+		width = 0.85,
+		height = 0.8,
+		border = "single",
+		title = "Agenda",
+		title_pos = "center",
+	},
+})
+map("n", "<leader>oA", "<cmd>OrgSuperAgenda<cr>", { desc = "Super Agenda" })
 
 -- ============================================================================
 -- SNIPRUN: execute code snippets in any language
