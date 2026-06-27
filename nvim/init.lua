@@ -73,16 +73,13 @@ map("n", "<S-l>", "<cmd>bnext<CR>")
 map("n", "<leader>qq", "<cmd>qa<CR>", { desc = "Quit Neovim" })
 
 map("n", "[d", function()
-  vim.diagnostic.jump({ count = -1 })
+	vim.diagnostic.jump({ count = -1 })
 end)
 map("n", "]d", function()
-  vim.diagnostic.jump({ count = 1 })
+	vim.diagnostic.jump({ count = 1 })
 end)
 map("n", "<leader>ld", function()
-  local _, winid = vim.diagnostic.open_float({ focusable = true })
-  if winid then
-    vim.api.nvim_set_current_win(winid)
-  end
+	vim.diagnostic.open_float({ focusable = true })
 end)
 
 map("n", "<leader>w", "<cmd>w<CR>", { desc = "Save" })
@@ -101,28 +98,30 @@ map("n", "N", "Nzzzv")
 -- ============================================================================
 
 vim.pack.add({
-  "https://github.com/rebelot/kanagawa.nvim",
-  "https://github.com/echasnovski/mini.nvim",
-  "https://github.com/nvim-tree/nvim-tree.lua",
-  "https://github.com/romus204/tree-sitter-manager.nvim",
-  "https://github.com/lewis6991/gitsigns.nvim",
-  "https://github.com/sindrets/diffview.nvim",
-  "https://github.com/ibhagwan/fzf-lua",
-  "https://github.com/rafamadriz/friendly-snippets",
-  "https://github.com/L3MON4D3/LuaSnip",
-  "https://github.com/saghen/blink.lib",
-  "https://github.com/saghen/blink.cmp",
-  "https://github.com/williamboman/mason.nvim",
-  "https://github.com/neovim/nvim-lspconfig",
-  "https://github.com/creativenull/efmls-configs-nvim",
-  "https://github.com/folke/todo-comments.nvim",
-  "https://github.com/karb94/neoscroll.nvim",
-  "https://github.com/nvim-lua/plenary.nvim",
-  "https://github.com/MunifTanjim/nui.nvim",
-  "https://github.com/olimorris/codecompanion.nvim",
-  "https://github.com/MagicDuck/grug-far.nvim",
-  "https://github.com/s1n7ax/nvim-window-picker",
-  "https://github.com/rachartier/tiny-cmdline.nvim",
+	"https://github.com/rebelot/kanagawa.nvim",
+	"https://github.com/echasnovski/mini.nvim",
+	"https://github.com/nvim-tree/nvim-tree.lua",
+	"https://github.com/romus204/tree-sitter-manager.nvim",
+	"https://github.com/lewis6991/gitsigns.nvim",
+	"https://github.com/sindrets/diffview.nvim",
+	"https://github.com/ibhagwan/fzf-lua",
+	"https://github.com/rafamadriz/friendly-snippets",
+	"https://github.com/L3MON4D3/LuaSnip",
+	"https://github.com/saghen/blink.lib",
+	"https://github.com/saghen/blink.cmp",
+	"https://github.com/williamboman/mason.nvim",
+	"https://github.com/neovim/nvim-lspconfig",
+	"https://github.com/creativenull/efmls-configs-nvim",
+	"https://github.com/folke/todo-comments.nvim",
+	"https://github.com/karb94/neoscroll.nvim",
+	"https://github.com/nvim-lua/plenary.nvim",
+	"https://github.com/MunifTanjim/nui.nvim",
+	"https://github.com/olimorris/codecompanion.nvim",
+	"https://github.com/MagicDuck/grug-far.nvim",
+	"https://github.com/s1n7ax/nvim-window-picker",
+	"https://github.com/kdheepak/lazygit.nvim",
+	"https://github.com/nvim-orgmode/orgmode",
+	"https://github.com/michaelb/sniprun",
 })
 
 -- ============================================================================
@@ -130,8 +129,8 @@ vim.pack.add({
 -- ============================================================================
 
 require("kanagawa").setup({
-  theme = "dragon",
-  transparent = true,
+	theme = "dragon",
+	transparent = true,
 })
 vim.cmd.colorscheme("kanagawa-dragon")
 
@@ -145,21 +144,21 @@ require("mini.icons").mock_nvim_web_devicons()
 require("mini.statusline").setup({ use_icons = true })
 
 local function apply_kanagawa_statusline()
-  local ok, colors = pcall(require, "kanagawa.colors")
-  if not ok then
-    return
-  end
-  local p = colors.setup({ theme = "dragon" }).palette
-  vim.api.nvim_set_hl(0, "MiniStatuslineModeNormal", { fg = p.sumiInk0, bg = p.dragonBlue2, bold = true })
-  vim.api.nvim_set_hl(0, "MiniStatuslineModeInsert", { fg = p.sumiInk0, bg = p.dragonGreen2, bold = true })
-  vim.api.nvim_set_hl(0, "MiniStatuslineModeVisual", { fg = p.sumiInk0, bg = p.dragonViolet, bold = true })
-  vim.api.nvim_set_hl(0, "MiniStatuslineModeReplace", { fg = p.sumiInk0, bg = p.dragonRed, bold = true })
-  vim.api.nvim_set_hl(0, "MiniStatuslineModeCommand", { fg = p.sumiInk0, bg = p.dragonOrange, bold = true })
-  vim.api.nvim_set_hl(0, "MiniStatuslineModeOther", { fg = p.sumiInk0, bg = p.dragonAsh, bold = true })
-  vim.api.nvim_set_hl(0, "MiniStatuslineDevinfo", { fg = p.oldWhite, bg = p.dragonBlack4 })
-  vim.api.nvim_set_hl(0, "MiniStatuslineFilename", { fg = p.fujiWhite, bg = p.dragonBlack4 })
-  vim.api.nvim_set_hl(0, "MiniStatuslineFileinfo", { fg = p.oldWhite, bg = p.dragonBlack4 })
-  vim.api.nvim_set_hl(0, "MiniStatuslineInactive", { fg = p.dragonAsh, bg = p.dragonBlack3 })
+	local ok, colors = pcall(require, "kanagawa.colors")
+	if not ok then
+		return
+	end
+	local p = colors.setup({ theme = "dragon" }).palette
+	vim.api.nvim_set_hl(0, "MiniStatuslineModeNormal", { fg = p.sumiInk0, bg = p.dragonBlue2, bold = true })
+	vim.api.nvim_set_hl(0, "MiniStatuslineModeInsert", { fg = p.sumiInk0, bg = p.dragonGreen2, bold = true })
+	vim.api.nvim_set_hl(0, "MiniStatuslineModeVisual", { fg = p.sumiInk0, bg = p.dragonViolet, bold = true })
+	vim.api.nvim_set_hl(0, "MiniStatuslineModeReplace", { fg = p.sumiInk0, bg = p.dragonRed, bold = true })
+	vim.api.nvim_set_hl(0, "MiniStatuslineModeCommand", { fg = p.sumiInk0, bg = p.dragonOrange, bold = true })
+	vim.api.nvim_set_hl(0, "MiniStatuslineModeOther", { fg = p.sumiInk0, bg = p.dragonAsh, bold = true })
+	vim.api.nvim_set_hl(0, "MiniStatuslineDevinfo", { fg = p.oldWhite, bg = p.dragonBlack4 })
+	vim.api.nvim_set_hl(0, "MiniStatuslineFilename", { fg = p.fujiWhite, bg = p.dragonBlack4 })
+	vim.api.nvim_set_hl(0, "MiniStatuslineFileinfo", { fg = p.oldWhite, bg = p.dragonBlack4 })
+	vim.api.nvim_set_hl(0, "MiniStatuslineInactive", { fg = p.dragonAsh, bg = p.dragonBlack3 })
 end
 
 apply_kanagawa_statusline()
@@ -169,12 +168,12 @@ require("mini.pairs").setup()
 require("mini.comment").setup()
 require("mini.surround").setup()
 require("mini.indentscope").setup({
-  symbol = "│",
-  options = { try_as_border = true },
+	symbol = "│",
+	options = { try_as_border = true },
 })
 require("mini.bufremove").setup()
 map("n", "<leader>bd", function()
-  require("mini.bufremove").delete()
+	require("mini.bufremove").delete()
 end, { desc = "Delete buffer" })
 
 -- ============================================================================
@@ -190,14 +189,13 @@ require("neoscroll").setup({ duration_multiplier = 0.6 })
 
 require("todo-comments").setup()
 map("n", "<leader>ft", function()
-  require("todo-comments.fzf").todo({
-    prompt = "Todo comments> ",
-    -- This sets the initial query for ripgrep but keeps it out of the prompt
-    search =
-    [[\b(TODO|HACK|WARNING|WARN|XXX|PERF|OPTIM|PERFORMANCE|OPTIMIZE|NOTE|INFO|TEST|TESTING|PASSED|FAILED|FIX|FIXME|BUG|FIXIT|ISSUE)\b]],
-    no_esc = true, -- Prevents fzf-lua from escaping the regex syntax
-    no_header_i = true,
-  })
+	require("todo-comments.fzf").todo({
+		prompt = "Todo comments> ",
+		-- This sets the initial query for ripgrep but keeps it out of the prompt
+		search = [[\b(TODO|HACK|WARNING|WARN|XXX|PERF|OPTIM|PERFORMANCE|OPTIMIZE|NOTE|INFO|TEST|TESTING|PASSED|FAILED|FIX|FIXME|BUG|FIXIT|ISSUE)\b]],
+		no_esc = true, -- Prevents fzf-lua from escaping the regex syntax
+		no_header_i = true,
+	})
 end, { desc = "Todo Comments" })
 
 -- ============================================================================
@@ -207,13 +205,13 @@ end, { desc = "Todo Comments" })
 
 require("grug-far").setup()
 map("n", "<leader>sr", function()
-  require("grug-far").open({ prefills = { search = vim.fn.expand("<cword>") } })
+	require("grug-far").open({ prefills = { search = vim.fn.expand("<cword>") } })
 end, { desc = "Find & Replace (word)" })
 map("n", "<leader>sR", function()
-  require("grug-far").open()
+	require("grug-far").open()
 end, { desc = "Find & Replace" })
 map("v", "<leader>sr", function()
-  require("grug-far").with_visual_selection()
+	require("grug-far").with_visual_selection()
 end, { desc = "Find & Replace (selection)" })
 
 -- ============================================================================
@@ -224,67 +222,67 @@ end, { desc = "Find & Replace (selection)" })
 local _ok, _kc = pcall(require, "kanagawa.colors")
 local _p = _ok and _kc.setup({ theme = "dragon" }).palette or {}
 require("window-picker").setup({
-  hint = "statusline-winbar",
-  selection_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-  filter_rules = {
-    include_current_win = false,
-    autoselect_one = true,
-    bo = { filetype = { "NvimTree" }, buftype = {} },
-  },
-  highlights = {
-    statusline = {
-      focused = { fg = _p.sumiInk0, bg = _p.dragonGreen2, bold = true },
-      unfocused = { fg = _p.sumiInk0, bg = _p.dragonGreen2 },
-    },
-    winbar = {
-      focused = { fg = _p.sumiInk0, bg = _p.dragonGreen2, bold = true },
-      unfocused = { fg = _p.sumiInk0, bg = _p.dragonGreen2 },
-    },
-  },
+	hint = "statusline-winbar",
+	selection_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+	filter_rules = {
+		include_current_win = false,
+		autoselect_one = true,
+		bo = { filetype = { "NvimTree" }, buftype = {} },
+	},
+	highlights = {
+		statusline = {
+			focused = { fg = _p.sumiInk0, bg = _p.dragonGreen2, bold = true },
+			unfocused = { fg = _p.sumiInk0, bg = _p.dragonGreen2 },
+		},
+		winbar = {
+			focused = { fg = _p.sumiInk0, bg = _p.dragonGreen2, bold = true },
+			unfocused = { fg = _p.sumiInk0, bg = _p.dragonGreen2 },
+		},
+	},
 })
 
 require("nvim-tree").setup({
-  view = { width = 30 },
-  renderer = {
-    group_empty = true,
-    icons = { show = { git = true } },
-  },
-  filters = { dotfiles = false },
-  git = { enable = true },
-  actions = {
-    open_file = {
-      quit_on_open = false,
-      window_picker = {
-        enable = true,
-        picker = function()
-          local cur = vim.api.nvim_get_current_win()
-          local has_target = vim.iter(vim.api.nvim_list_wins()):any(function(w)
-            if w == cur then
-              return false
-            end
-            local ft = vim.bo[vim.api.nvim_win_get_buf(w)].filetype
-            return ft ~= "NvimTree" and vim.api.nvim_win_get_config(w).relative == ""
-          end)
-          if not has_target then
-            vim.cmd("vsplit")
-            return vim.api.nvim_get_current_win()
-          end
-          local picked = require("window-picker").pick_window()
-          vim.schedule(function()
-            vim.cmd("echo ''")
-          end)
-          return picked
-        end,
-      },
-    },
-  },
-  on_attach = function(bufnr)
-    local api = require("nvim-tree.api")
-    api.map.on_attach.default(bufnr)
-    vim.keymap.del("n", "s", { buffer = bufnr })
-    vim.keymap.set("n", "s", api.node.open.horizontal, { buffer = bufnr, desc = "Open: Horizontal Split" })
-    vim.keymap.set("n", "v", api.node.open.vertical, { buffer = bufnr, desc = "Open: Vertical Split" })
-  end,
+	view = { width = 30 },
+	renderer = {
+		group_empty = true,
+		icons = { show = { git = true } },
+	},
+	filters = { dotfiles = false },
+	git = { enable = true },
+	actions = {
+		open_file = {
+			quit_on_open = false,
+			window_picker = {
+				enable = true,
+				picker = function()
+					local cur = vim.api.nvim_get_current_win()
+					local has_target = vim.iter(vim.api.nvim_list_wins()):any(function(w)
+						if w == cur then
+							return false
+						end
+						local ft = vim.bo[vim.api.nvim_win_get_buf(w)].filetype
+						return ft ~= "NvimTree" and vim.api.nvim_win_get_config(w).relative == ""
+					end)
+					if not has_target then
+						vim.cmd("vsplit")
+						return vim.api.nvim_get_current_win()
+					end
+					local picked = require("window-picker").pick_window()
+					vim.schedule(function()
+						vim.cmd("echo ''")
+					end)
+					return picked
+				end,
+			},
+		},
+	},
+	on_attach = function(bufnr)
+		local api = require("nvim-tree.api")
+		api.map.on_attach.default(bufnr)
+		vim.keymap.del("n", "s", { buffer = bufnr })
+		vim.keymap.set("n", "s", api.node.open.horizontal, { buffer = bufnr, desc = "Open: Horizontal Split" })
+		vim.keymap.set("n", "v", api.node.open.vertical, { buffer = bufnr, desc = "Open: Vertical Split" })
+	end,
 })
 map("n", "<leader>e", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file tree" })
 
@@ -298,29 +296,30 @@ map("n", "<leader>e", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file tree" })
 -- ============================================================================
 
 require("tree-sitter-manager").setup({
-  parsers = {
-    "lua",
-    "python",
-    "javascript",
-    "typescript",
-    "tsx",
-    "rust",
-    "go",
-    "c",
-    "cpp",
-    "bash",
-    "json",
-    "yaml",
-    "toml",
-    "markdown",
-    "html",
-    "css",
-  },
+	parsers = {
+		"lua",
+		"python",
+		"javascript",
+		"typescript",
+		"tsx",
+		"rust",
+		"go",
+		"c",
+		"cpp",
+		"bash",
+		"json",
+		"yaml",
+		"toml",
+		"markdown",
+		"html",
+		"css",
+		"org",
+	},
 })
 vim.api.nvim_create_autocmd("FileType", {
-  callback = function()
-    pcall(vim.treesitter.start)
-  end,
+	callback = function()
+		pcall(vim.treesitter.start)
+	end,
 })
 
 -- ============================================================================
@@ -330,26 +329,26 @@ vim.api.nvim_create_autocmd("FileType", {
 -- ============================================================================
 
 require("gitsigns").setup({
-  preview_config = { border = "single" },
-  signs = {
-    add = { text = "▎" },
-    change = { text = "▎" },
-    delete = { text = "" },
-    topdelete = { text = "" },
-    changedelete = { text = "▎" },
-  },
-  on_attach = function(buffer)
-    local gs = package.loaded.gitsigns
-    local gmap = function(mode, l, r, desc)
-      vim.keymap.set(mode, l, r, { buffer = buffer, desc = desc })
-    end
-    gmap("n", "]h", gs.next_hunk, "Next Hunk")
-    gmap("n", "[h", gs.prev_hunk, "Prev Hunk")
-    gmap("n", "<leader>gp", gs.preview_hunk, "Preview Hunk")
-    gmap("n", "<leader>gs", gs.stage_hunk, "Stage Hunk")
-    gmap("n", "<leader>gr", gs.reset_hunk, "Reset Hunk")
-    gmap("n", "<leader>gb", gs.blame_line, "Blame Line")
-  end,
+	preview_config = { border = "single" },
+	signs = {
+		add = { text = "▎" },
+		change = { text = "▎" },
+		delete = { text = "" },
+		topdelete = { text = "" },
+		changedelete = { text = "▎" },
+	},
+	on_attach = function(buffer)
+		local gs = package.loaded.gitsigns
+		local gmap = function(mode, l, r, desc)
+			vim.keymap.set(mode, l, r, { buffer = buffer, desc = desc })
+		end
+		gmap("n", "]h", gs.next_hunk, "Next Hunk")
+		gmap("n", "[h", gs.prev_hunk, "Prev Hunk")
+		gmap("n", "<leader>gp", gs.preview_hunk, "Preview Hunk")
+		gmap("n", "<leader>gs", gs.stage_hunk, "Stage Hunk")
+		gmap("n", "<leader>gr", gs.reset_hunk, "Reset Hunk")
+		gmap("n", "<leader>gb", gs.blame_line, "Blame Line")
+	end,
 })
 
 -- ============================================================================
@@ -363,28 +362,35 @@ map("n", "<leader>gh", "<cmd>DiffviewFileHistory<cr>", { desc = "File History" }
 map("n", "<leader>gc", "<cmd>DiffviewClose<cr>", { desc = "Close Diff" })
 
 -- ============================================================================
+-- LAZYGIT
+-- <leader>gg  open lazygit
+-- ============================================================================
+
+map("n", "<leader>gg", "<cmd>LazyGit<cr>", { desc = "LazyGit" })
+
+-- ============================================================================
 -- FUZZY FINDER: fzf-lua
 -- <leader>ff  files   <leader>fg  grep    <leader>fb  buffers
 -- <leader>fh  help    <leader>fd  diag    <leader>fr  recent   <leader>fs  symbols
 -- ============================================================================
 
 require("fzf-lua").setup({
-  winopts = {
-    height = 0.85,
-    width = 0.85,
-    preview = { layout = "horizontal", ratio = 0.5 },
-  },
-  defaults = {
-    header = false,
-  },
-  files = {
-    fd_opts = "--color=never --type f --hidden --follow --exclude .git",
-    actions = { ["ctrl-i"] = { require("fzf-lua").actions.toggle_ignore } },
-  },
-  grep = {
-    rg_opts = "--column --line-number --no-heading --color=always --smart-case",
-    actions = { ["ctrl-i"] = { require("fzf-lua").actions.toggle_ignore } },
-  },
+	winopts = {
+		height = 0.85,
+		width = 0.85,
+		preview = { layout = "horizontal", ratio = 0.5 },
+	},
+	defaults = {
+		header = false,
+	},
+	files = {
+		fd_opts = "--color=never --type f --hidden --follow --exclude .git",
+		actions = { ["ctrl-i"] = { require("fzf-lua").actions.toggle_ignore } },
+	},
+	grep = {
+		rg_opts = "--column --line-number --no-heading --color=always --smart-case",
+		actions = { ["ctrl-i"] = { require("fzf-lua").actions.toggle_ignore } },
+	},
 })
 map("n", "<leader>ff", "<cmd>FzfLua files<cr>", { desc = "Files" })
 map("n", "<leader>fg", "<cmd>FzfLua live_grep<cr>", { desc = "Live Grep" })
@@ -409,39 +415,31 @@ require("luasnip.loaders.from_vscode").lazy_load()
 -- ============================================================================
 
 vim.api.nvim_create_user_command("BlinkBuild", function()
-  require("blink.cmp").build():wait(60000)
-  vim.notify("blink.cmp: build complete", vim.log.levels.INFO)
+	require("blink.cmp").build():wait(60000)
+	vim.notify("blink.cmp: build complete", vim.log.levels.INFO)
 end, { desc = "Build blink.cmp native library" })
 
 if not pcall(require, "blink.lib") then
-  vim.notify("blink.cmp: building native library...", vim.log.levels.INFO)
-  require("blink.cmp").build():wait(60000)
+	vim.notify("blink.cmp: building native library...", vim.log.levels.INFO)
+	require("blink.cmp").build():wait(60000)
 end
 
 require("blink.cmp").setup({
-  keymap = {
-    preset = "none",
-    ["<C-Space>"] = { "show", "hide" },
-    ["<CR>"] = { "accept", "fallback" },
-    ["<C-n>"] = { "select_next", "fallback" },
-    ["<C-p>"] = { "select_prev", "fallback" },
-    ["<Tab>"] = { "snippet_forward", "fallback" },
-    ["<S-Tab>"] = { "snippet_backward", "fallback" },
-  },
-  appearance = {
-    nerd_font_variant = "mono",
-  },
-  sources = { default = { "lsp", "path", "snippets", "buffer" } },
-  snippets = { preset = "luasnip" },
-  signature = { enabled = true },
-})
-
--- ============================================================================
--- TINY-CMDLINE: centered floating cmdline via ui2
--- ============================================================================
-
-require("tiny-cmdline").setup({
-  on_reposition = require("tiny-cmdline").adapters.blink,
+	keymap = {
+		preset = "none",
+		["<C-Space>"] = { "show", "hide" },
+		["<CR>"] = { "accept", "fallback" },
+		["<C-n>"] = { "select_next", "fallback" },
+		["<C-p>"] = { "select_prev", "fallback" },
+		["<Tab>"] = { "snippet_forward", "fallback" },
+		["<S-Tab>"] = { "snippet_backward", "fallback" },
+	},
+	appearance = {
+		nerd_font_variant = "mono",
+	},
+	sources = { default = { "lsp", "path", "snippets", "buffer" } },
+	snippets = { preset = "luasnip" },
+	signature = { enabled = true },
 })
 
 -- ============================================================================
@@ -451,13 +449,13 @@ require("tiny-cmdline").setup({
 -- ============================================================================
 
 require("mason").setup({
-  ui = {
-    icons = {
-      package_installed = "✓",
-      package_pending = "➜",
-      package_uninstalled = "✗",
-    },
-  },
+	ui = {
+		icons = {
+			package_installed = "✓",
+			package_pending = "➜",
+			package_uninstalled = "✗",
+		},
+	},
 })
 
 -- ============================================================================
@@ -469,84 +467,104 @@ require("mason").setup({
 -- ============================================================================
 
 vim.lsp.config("*", {
-  capabilities = require("blink.cmp").get_lsp_capabilities(),
+	capabilities = require("blink.cmp").get_lsp_capabilities(),
 })
 
 vim.api.nvim_create_autocmd("LspAttach", {
-  callback = function(args)
-    local buffer = args.buf
-    local lmap = function(mode, lhs, rhs, desc)
-      vim.keymap.set(mode, lhs, rhs, { buffer = buffer, desc = desc })
-    end
-    lmap("n", "gd", "<cmd>FzfLua lsp_definitions<cr>", "Go to Definition")
-    lmap("n", "gD", vim.lsp.buf.declaration, "Go to Declaration")
-    lmap("n", "gr", "<cmd>FzfLua lsp_references<cr>", "References")
-    lmap("n", "gi", "<cmd>FzfLua lsp_implementations<cr>", "Implementation")
-    lmap("n", "gO", "<cmd>FzfLua lsp_document_symbols<cr>", "Symbols")
-    lmap("n", "K", function()
-      vim.lsp.buf.hover({ border = "single" })
-    end, "Hover")
-    lmap("n", "<leader>lr", vim.lsp.buf.rename, "Rename")
-    lmap("n", "<leader>la", vim.lsp.buf.code_action, "Code Action")
-    lmap("n", "<leader>lf", function()
-      vim.lsp.buf.format({ async = true })
-    end, "Format")
-  end,
+	callback = function(args)
+		local buffer = args.buf
+		local lmap = function(mode, lhs, rhs, desc)
+			vim.keymap.set(mode, lhs, rhs, { buffer = buffer, desc = desc })
+		end
+		lmap("n", "gd", "<cmd>FzfLua lsp_definitions<cr>", "Go to Definition")
+		lmap("n", "gD", vim.lsp.buf.declaration, "Go to Declaration")
+		lmap("n", "gr", "<cmd>FzfLua lsp_references<cr>", "References")
+		lmap("n", "gi", "<cmd>FzfLua lsp_implementations<cr>", "Implementation")
+		lmap("n", "gO", "<cmd>FzfLua lsp_document_symbols<cr>", "Symbols")
+		lmap("n", "K", function()
+			vim.lsp.buf.hover({ border = "single" })
+		end, "Hover")
+		lmap("n", "<leader>lr", vim.lsp.buf.rename, "Rename")
+		lmap("n", "<leader>la", vim.lsp.buf.code_action, "Code Action")
+		lmap("n", "<leader>lf", function()
+			vim.lsp.buf.format({
+				async = true,
+				filter = function(client)
+					return client.name == "efm"
+				end,
+			})
+		end, "Format")
+		lmap("n", "<leader>ly", function()
+			local diags = vim.diagnostic.get(0, { lnum = vim.fn.line(".") - 1 })
+			if #diags == 0 then
+				vim.notify("No diagnostic on this line")
+				return
+			end
+			vim.fn.setreg("+", diags[1].message)
+			vim.notify("Copied diagnostic")
+		end, "Yank diagnostic")
+	end,
 })
 
 vim.api.nvim_create_autocmd("BufWritePre", {
-  callback = function()
-    vim.lsp.buf.format({ async = false, timeout_ms = 2000 })
-  end,
+	callback = function()
+		vim.lsp.buf.format({
+			async = false,
+			timeout_ms = 2000,
+			filter = function(client)
+				return client.name == "efm"
+			end,
+		})
+	end,
 })
 
 vim.lsp.config("lua_ls", {
-  settings = {
-    Lua = {
-      diagnostics = { globals = { "vim" } },
-      workspace = {
-        checkThirdParty = false,
-        library = vim.api.nvim_get_runtime_file("", true),
-      },
-      telemetry = { enable = false },
-    },
-  },
+	settings = {
+		Lua = {
+			diagnostics = { globals = { "vim" } },
+			workspace = {
+				checkThirdParty = false,
+				library = vim.api.nvim_get_runtime_file("", true),
+			},
+			telemetry = { enable = false },
+		},
+	},
 })
 
 vim.lsp.config("vtsls", {
-  init_options = {
-    autoUseWorkspaceTsdk = false,
-  },
-  settings = {
-    vtsls = {
-      autoUseWorkspaceTsdk = false,
-    },
-    typescript = {
-      tsserver = {
-        implicitProjectConfig = {
-          jsx = "react-jsx",
-        },
-      },
-    },
-    javascript = {
-      tsserver = {
-        implicitProjectConfig = {
-          jsx = "react-jsx",
-        },
-      },
-    },
-  },
+	init_options = {
+		autoUseWorkspaceTsdk = false,
+	},
+	settings = {
+		vtsls = {
+			autoUseWorkspaceTsdk = false,
+		},
+		typescript = {
+			tsserver = {
+				implicitProjectConfig = {
+					jsx = "react-jsx",
+				},
+			},
+		},
+		javascript = {
+			tsserver = {
+				implicitProjectConfig = {
+					jsx = "react-jsx",
+				},
+			},
+		},
+	},
 })
 
 -- Add/remove servers to match what you install via Mason
 vim.lsp.enable({ "lua_ls", "pyright", "vtsls", "rust_analyzer", "gopls", "dockerls", "yamlls" })
 
 vim.diagnostic.config({
-  virtual_text = { prefix = "●" },
-  signs = true,
-  underline = true,
-  update_in_insert = false,
-  float = { source = true },
+	virtual_text = { prefix = "●" },
+	signs = true,
+	underline = true,
+	update_in_insert = false,
+	float = { source = true },
 })
 
 -- ============================================================================
@@ -556,24 +574,24 @@ vim.diagnostic.config({
 -- ============================================================================
 
 local languages = {
-  lua = { require("efmls-configs.formatters.stylua") },
-  python = { require("efmls-configs.formatters.ruff"), require("efmls-configs.linters.ruff") },
-  javascript = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
-  typescript = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
-  typescriptreact = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
-  go = { require("efmls-configs.formatters.goimports") },
+	lua = { require("efmls-configs.formatters.stylua") },
+	python = { require("efmls-configs.formatters.ruff"), require("efmls-configs.linters.ruff") },
+	javascript = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
+	typescript = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
+	typescriptreact = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
+	go = { require("efmls-configs.formatters.goimports") },
 }
 
 vim.lsp.config("efm", {
-  filetypes = vim.tbl_keys(languages),
-  settings = {
-    rootMarkers = { ".git/" },
-    languages = languages,
-  },
-  init_options = {
-    documentFormatting = true,
-    documentRangeFormatting = true,
-  },
+	filetypes = vim.tbl_keys(languages),
+	settings = {
+		rootMarkers = { ".git/" },
+		languages = languages,
+	},
+	init_options = {
+		documentFormatting = true,
+		documentRangeFormatting = true,
+	},
 })
 vim.lsp.enable("efm")
 
@@ -583,34 +601,130 @@ vim.lsp.enable("efm")
 -- ============================================================================
 
 require("codecompanion").setup({
-  strategies = {
-    chat = {
-      adapter = "claude_code",
-      keymaps = {
-        close = { modes = { n = "<leader>q", i = "<leader>q" } },
-      },
-    },
-    inline = {
-      adapter = "claude_code",
-      keymaps = {
-        accept_change = { modes = { n = "ga" }, description = "Accept inline edit" },
-        reject_change = { modes = { n = "gR" }, description = "Reject inline edit" },
-      },
-    },
-  },
-  display = {
-    chat = {
-      window = { layout = "vertical", width = 0.35 },
-      render_headers = false,
-    },
-  },
+	strategies = {
+		chat = {
+			adapter = "claude_code",
+			keymaps = {
+				close = { modes = { n = "<leader>q", i = "<leader>q" } },
+			},
+		},
+		inline = {
+			adapter = "claude_code",
+			keymaps = {
+				accept_change = { modes = { n = "ga" }, description = "Accept inline edit" },
+				reject_change = { modes = { n = "gR" }, description = "Reject inline edit" },
+			},
+		},
+	},
+	display = {
+		chat = {
+			window = { layout = "vertical", width = 0.35 },
+			render_headers = false,
+		},
+	},
 })
 
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "codecompanion" },
-  callback = function()
-    vim.b.miniindentscope_disable = true
-  end,
+	pattern = { "codecompanion" },
+	callback = function()
+		vim.b.miniindentscope_disable = true
+	end,
 })
 
 map("n", "<leader>cc", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "Toggle CodeCompanion" })
+
+-- ============================================================================
+-- ORGMODE
+-- <leader>oa  agenda   <leader>oc  capture   <leader>or  refile
+-- Org files stored in ~/org/
+-- ============================================================================
+
+require("orgmode").setup({
+	org_agenda_files = { "~/org/**/*" },
+	org_default_notes_file = "~/org/inbox.org",
+})
+
+-- ============================================================================
+-- ORGCAL: Google Calendar <-> orgmode via orgcal CLI
+-- Requires: orgcal binary in PATH, ORGCAL_CLIENT_ID, ORGCAL_CLIENT_SECRET
+-- :OrgCalAuth   :OrgCalSync   :OrgCalImport   :OrgCalExport
+-- ============================================================================
+
+local orgcal_dir = "~/org"
+
+local function orgcal_run(subcmd, cb)
+	local cmd = { "orgcal", subcmd, "--dir", orgcal_dir }
+	local output = {}
+	vim.fn.jobstart(cmd, {
+		stdout_buffered = true,
+		on_stdout = function(_, data)
+			for _, line in ipairs(data) do
+				if line ~= "" then
+					table.insert(output, line)
+				end
+			end
+		end,
+		on_stderr = function(_, data)
+			for _, line in ipairs(data) do
+				if line ~= "" then
+					vim.notify("orgcal: " .. line, vim.log.levels.ERROR)
+				end
+			end
+		end,
+		on_exit = function(_, code)
+			if code == 0 then
+				local msg = #output > 0 and table.concat(output, " ") or subcmd .. " done"
+				vim.notify("orgcal: " .. msg, vim.log.levels.INFO)
+				if cb then
+					cb()
+				end
+			end
+		end,
+	})
+end
+
+vim.api.nvim_create_user_command("OrgCalAuth", function()
+	vim.fn.jobstart({ "orgcal", "auth" }, {
+		on_exit = function(_, code)
+			if code == 0 then
+				vim.notify("orgcal: authenticated", vim.log.levels.INFO)
+			end
+		end,
+	})
+end, { desc = "Authenticate orgcal with Google Calendar" })
+
+vim.api.nvim_create_user_command("OrgCalSync", function()
+	vim.notify("orgcal: syncing...", vim.log.levels.INFO)
+	orgcal_run("sync", nil)
+end, { desc = "Bidirectional sync org <-> Google Calendar" })
+
+vim.api.nvim_create_user_command("OrgCalImport", function()
+	vim.notify("orgcal: importing...", vim.log.levels.INFO)
+	orgcal_run("import", nil)
+end, { desc = "Import Google Calendar events to org" })
+
+vim.api.nvim_create_user_command("OrgCalExport", function()
+	vim.notify("orgcal: exporting...", vim.log.levels.INFO)
+	orgcal_run("export", nil)
+end, { desc = "Export org TODOs to Google Calendar" })
+
+vim.api.nvim_create_autocmd("BufWritePost", {
+	pattern = "*.org",
+	callback = function()
+		orgcal_run("sync", nil)
+	end,
+})
+
+-- ============================================================================
+-- SNIPRUN: execute code snippets in any language
+-- <leader>rr  run current line/selection   <leader>rc  clear output
+-- ============================================================================
+
+require("sniprun").setup({
+	display = { "VirtualTextOk", "VirtualTextErr" },
+	selected_interpreters = {},
+	repl_enable = {},
+})
+map("n", "<leader>rr", "<Plug>SnipRun", { desc = "Run snippet" })
+map("v", "<leader>rr", "<Plug>SnipRun", { desc = "Run snippet" })
+map("n", "<leader>rc", "<Plug>SnipClose", { desc = "Clear sniprun" })
