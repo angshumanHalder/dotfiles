@@ -123,7 +123,6 @@ vim.pack.add({
 	"https://github.com/s1n7ax/nvim-window-picker",
 	"https://github.com/kdheepak/lazygit.nvim",
 	"https://github.com/MeanderingProgrammer/render-markdown.nvim",
-	"https://github.com/atiladefreitas/dooing",
 })
 
 -- ============================================================================
@@ -544,6 +543,7 @@ require("conform").setup({
 		javascript = { "prettierd" },
 		typescript = { "prettierd" },
 		typescriptreact = { "prettierd" },
+		json = { "prettierd" },
 		go = { "goimports" },
 	},
 	format_on_save = {
@@ -570,112 +570,6 @@ vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
 		lint.try_lint()
 	end,
 })
-
-
--- ============================================================================
--- DOOING: minimalist todo manager
--- <leader>td  global todos   <leader>tD  project todos
--- <leader>ts  sync due tasks to Google Calendar (requires orgcal in PATH)
--- ============================================================================
-
-require("dooing").setup({
-	per_project = {
-		enabled = true,
-		auto_gitignore = true,
-		on_missing = "auto_create",
-	},
-	due_notifications = { enabled = true, on_startup = true, on_open = true },
-})
-
-local dooing_json = vim.fn.stdpath("data") .. "/dooing_todos.json"
-local orgcal_syncing = false
-
-local function orgcal_dooing_sync(silent, filepath)
-	if orgcal_syncing then return end
-	orgcal_syncing = true
-	local path = filepath or dooing_json
-	local out = {}
-	vim.fn.jobstart({ "orgcal", "dooing", "--file", path }, {
-		stdout_buffered = true,
-		on_stdout = function(_, data)
-			for _, line in ipairs(data) do
-				if line ~= "" then table.insert(out, line) end
-			end
-		end,
-		on_stderr = function(_, data)
-			for _, line in ipairs(data) do
-				if line ~= "" then vim.notify("orgcal: " .. line, vim.log.levels.ERROR) end
-			end
-		end,
-		on_exit = function(_, code)
-			orgcal_syncing = false
-			if code == 0 and not silent then
-				local msg = #out > 0 and table.concat(out, " ") or "sync done"
-				vim.notify("orgcal: " .. msg, vim.log.levels.INFO)
-			end
-		end,
-	})
-end
-
--- global todo watcher (bootstraps via dir watch if file not yet created)
-local global_watcher = nil
-local function start_global_watcher()
-	if global_watcher then
-		global_watcher:stop()
-		global_watcher = nil
-	end
-	global_watcher = vim.uv.new_fs_event()
-	if not global_watcher then return end
-	if vim.fn.filereadable(dooing_json) == 1 then
-		global_watcher:start(dooing_json, {}, vim.schedule_wrap(function(err, _, _)
-			if not err then orgcal_dooing_sync(true) end
-		end))
-	else
-		local data_dir = vim.fn.stdpath("data")
-		global_watcher:start(data_dir, {}, vim.schedule_wrap(function(err, fname, _)
-			if not err and fname == "dooing_todos.json" then
-				start_global_watcher()
-			end
-		end))
-	end
-end
-start_global_watcher()
-
--- project todo watcher: watches file if it exists, else watches git root dir until created
-local project_watcher = nil
-
-local function start_project_watcher()
-	if project_watcher then
-		project_watcher:stop()
-		project_watcher = nil
-	end
-	local result = vim.fn.systemlist("git rev-parse --show-toplevel 2>/dev/null")
-	if vim.v.shell_error ~= 0 or #result == 0 then return end
-	local git_root = vim.trim(result[1])
-	if git_root == "" then return end
-	local path = git_root .. "/dooing.json"
-	project_watcher = vim.uv.new_fs_event()
-	if not project_watcher then return end
-	if vim.fn.filereadable(path) == 1 then
-		project_watcher:start(path, {}, vim.schedule_wrap(function(err, _, _)
-			if not err then orgcal_dooing_sync(true, path) end
-		end))
-	else
-		-- watch dir until dooing.json is created, then switch to file watcher
-		project_watcher:start(git_root, {}, vim.schedule_wrap(function(err, fname, _)
-			if not err and fname == "dooing.json" then
-				start_project_watcher()
-			end
-		end))
-	end
-end
-
-start_project_watcher()
-vim.api.nvim_create_autocmd("DirChanged", { callback = start_project_watcher })
-
-map("n", "<leader>ts", function()
-	orgcal_dooing_sync(false)
-end, { desc = "Sync todos to Google Calendar" })
 
 -- ============================================================================
 -- RENDER-MARKDOWN: modern rendering for org and markdown files
