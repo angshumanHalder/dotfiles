@@ -617,13 +617,29 @@ local function orgcal_dooing_sync(silent, filepath)
 	})
 end
 
--- global todo watcher
-local global_watcher = vim.uv.new_fs_event()
-if global_watcher then
-	global_watcher:start(dooing_json, {}, vim.schedule_wrap(function(err, _, _)
-		if not err then orgcal_dooing_sync(true) end
-	end))
+-- global todo watcher (bootstraps via dir watch if file not yet created)
+local global_watcher = nil
+local function start_global_watcher()
+	if global_watcher then
+		global_watcher:stop()
+		global_watcher = nil
+	end
+	global_watcher = vim.uv.new_fs_event()
+	if not global_watcher then return end
+	if vim.fn.filereadable(dooing_json) == 1 then
+		global_watcher:start(dooing_json, {}, vim.schedule_wrap(function(err, _, _)
+			if not err then orgcal_dooing_sync(true) end
+		end))
+	else
+		local data_dir = vim.fn.stdpath("data")
+		global_watcher:start(data_dir, {}, vim.schedule_wrap(function(err, fname, _)
+			if not err and fname == "dooing_todos.json" then
+				start_global_watcher()
+			end
+		end))
+	end
 end
+start_global_watcher()
 
 -- project todo watcher: watches file if it exists, else watches git root dir until created
 local project_watcher = nil
