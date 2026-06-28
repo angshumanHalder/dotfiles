@@ -44,8 +44,6 @@ opt.laststatus = 3
 opt.foldmethod = "expr"
 opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 opt.foldenable = false
-opt.foldlevel = 99
-opt.foldlevelstart = 99
 
 require("vim._core.ui2").enable({})
 
@@ -490,7 +488,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 vim.api.nvim_create_autocmd("BufWritePre", {
-	callback = function()
+	callback = function(args)
+		if #vim.lsp.get_clients({ bufnr = args.buf, name = "efm" }) == 0 then
+			return
+		end
 		vim.lsp.buf.format({
 			async = false,
 			timeout_ms = 2000,
