@@ -24,6 +24,10 @@
       "rev": "4516612fe98ff56ae0415a259ff6361a89419b0a",
       "src": "https://github.com/sindrets/diffview.nvim"
     },
+    "dooing": {
+      "rev": "ca96059df34a7a51019ff58dfc5bd8f67be23c19",
+      "src": "https://github.com/atiladefreitas/dooing"
+    },
     "efmls-configs-nvim": {
       "rev": "5dc52088c231f2721f545570fcb541b04802ce6b",
       "src": "https://github.com/creativenull/efmls-configs-nvim"
