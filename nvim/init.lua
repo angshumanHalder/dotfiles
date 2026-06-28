@@ -41,6 +41,11 @@ opt.inccommand = "split"
 opt.confirm = true
 opt.virtualedit = "block"
 opt.laststatus = 3
+opt.foldmethod = "expr"
+opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+opt.foldenable = false
+opt.foldlevel = 99
+opt.foldlevelstart = 99
 
 require("vim._core.ui2").enable({})
 
@@ -103,7 +108,6 @@ vim.pack.add({
 	"https://github.com/nvim-tree/nvim-tree.lua",
 	"https://github.com/romus204/tree-sitter-manager.nvim",
 	"https://github.com/lewis6991/gitsigns.nvim",
-	"https://github.com/sindrets/diffview.nvim",
 	"https://github.com/ibhagwan/fzf-lua",
 	"https://github.com/rafamadriz/friendly-snippets",
 	"https://github.com/L3MON4D3/LuaSnip",
@@ -113,10 +117,8 @@ vim.pack.add({
 	"https://github.com/neovim/nvim-lspconfig",
 	"https://github.com/creativenull/efmls-configs-nvim",
 	"https://github.com/folke/todo-comments.nvim",
-	"https://github.com/karb94/neoscroll.nvim",
 	"https://github.com/nvim-lua/plenary.nvim",
 	"https://github.com/MunifTanjim/nui.nvim",
-	"https://github.com/olimorris/codecompanion.nvim",
 	"https://github.com/MagicDuck/grug-far.nvim",
 	"https://github.com/s1n7ax/nvim-window-picker",
 	"https://github.com/kdheepak/lazygit.nvim",
@@ -124,7 +126,8 @@ vim.pack.add({
 	"https://github.com/kkharji/sqlite.lua",
 	"https://github.com/chipsenkbeil/org-roam.nvim",
 	"https://github.com/hamidi-dev/org-super-agenda.nvim",
-	"https://github.com/michaelb/sniprun",
+	"https://github.com/MeanderingProgrammer/render-markdown.nvim",
+	"https://github.com/angshumanhalder/orgcal.nvim",
 })
 
 -- ============================================================================
@@ -168,7 +171,6 @@ apply_kanagawa_statusline()
 vim.api.nvim_create_autocmd("ColorScheme", { callback = apply_kanagawa_statusline })
 
 require("mini.pairs").setup()
-require("mini.comment").setup()
 require("mini.surround").setup()
 require("mini.indentscope").setup({
 	symbol = "│",
@@ -178,12 +180,6 @@ require("mini.bufremove").setup()
 map("n", "<leader>bd", function()
 	require("mini.bufremove").delete()
 end, { desc = "Delete buffer" })
-
--- ============================================================================
--- SMOOTH SCROLL
--- ============================================================================
-
-require("neoscroll").setup({ duration_multiplier = 0.6 })
 
 -- ============================================================================
 -- TODO COMMENTS
@@ -353,16 +349,6 @@ require("gitsigns").setup({
 		gmap("n", "<leader>gb", gs.blame_line, "Blame Line")
 	end,
 })
-
--- ============================================================================
--- DIFFVIEW
--- <leader>gd  open diff   <leader>gh  file history   <leader>gc  close
--- ============================================================================
-
-require("diffview").setup()
-map("n", "<leader>gd", "<cmd>DiffviewOpen<cr>", { desc = "Diff View" })
-map("n", "<leader>gh", "<cmd>DiffviewFileHistory<cr>", { desc = "File History" })
-map("n", "<leader>gc", "<cmd>DiffviewClose<cr>", { desc = "Close Diff" })
 
 -- ============================================================================
 -- LAZYGIT
@@ -598,43 +584,10 @@ vim.lsp.config("efm", {
 })
 vim.lsp.enable("efm")
 
--- ============================================================================
--- CODECOMPANION
--- <leader>cc  toggle chat   ga  accept inline edit   gr  reject inline edit
--- ============================================================================
 
-require("codecompanion").setup({
-	strategies = {
-		chat = {
-			adapter = "claude_code",
-			keymaps = {
-				close = { modes = { n = "<leader>q", i = "<leader>q" } },
-			},
-		},
-		inline = {
-			adapter = "claude_code",
-			keymaps = {
-				accept_change = { modes = { n = "ga" }, description = "Accept inline edit" },
-				reject_change = { modes = { n = "gR" }, description = "Reject inline edit" },
-			},
-		},
-	},
-	display = {
-		chat = {
-			window = { layout = "vertical", width = 0.35 },
-			render_headers = false,
-		},
-	},
-})
-
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = { "codecompanion" },
-	callback = function()
-		vim.b.miniindentscope_disable = true
-	end,
-})
-
-map("n", "<leader>cc", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "Toggle CodeCompanion" })
+map("n", "<leader>of", function()
+	require("fzf-lua").files({ cwd = "~/org" })
+end, { desc = "Browse org files" })
 
 -- ============================================================================
 -- ORGMODE
@@ -645,6 +598,8 @@ map("n", "<leader>cc", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "Toggle Cod
 require("orgmode").setup({
 	org_agenda_files = { "~/org/**/*" },
 	org_default_notes_file = "~/org/inbox.org",
+	org_hide_leading_stars = true,
+	org_ellipsis = " ▾",
 	org_todo_keywords = { "TODO", "NEXT", "WAITING", "|", "DONE", "CANCELLED" },
 	org_agenda_span = "week",
 	org_deadline_warning_days = 3,
@@ -674,76 +629,14 @@ require("orgmode").setup({
 	},
 })
 
+
 -- ============================================================================
 -- ORGCAL: Google Calendar <-> orgmode via orgcal CLI
 -- Requires: orgcal binary in PATH, ORGCAL_CLIENT_ID, ORGCAL_CLIENT_SECRET
 -- :OrgCalAuth   :OrgCalSync   :OrgCalImport   :OrgCalExport
 -- ============================================================================
 
-local orgcal_dir = "~/org"
-
-local function orgcal_run(subcmd, cb)
-	local cmd = { "orgcal", subcmd, "--dir", orgcal_dir }
-	local output = {}
-	vim.fn.jobstart(cmd, {
-		stdout_buffered = true,
-		on_stdout = function(_, data)
-			for _, line in ipairs(data) do
-				if line ~= "" then
-					table.insert(output, line)
-				end
-			end
-		end,
-		on_stderr = function(_, data)
-			for _, line in ipairs(data) do
-				if line ~= "" then
-					vim.notify("orgcal: " .. line, vim.log.levels.ERROR)
-				end
-			end
-		end,
-		on_exit = function(_, code)
-			if code == 0 then
-				local msg = #output > 0 and table.concat(output, " ") or subcmd .. " done"
-				vim.notify("orgcal: " .. msg, vim.log.levels.INFO)
-				if cb then
-					cb()
-				end
-			end
-		end,
-	})
-end
-
-vim.api.nvim_create_user_command("OrgCalAuth", function()
-	vim.fn.jobstart({ "orgcal", "auth" }, {
-		on_exit = function(_, code)
-			if code == 0 then
-				vim.notify("orgcal: authenticated", vim.log.levels.INFO)
-			end
-		end,
-	})
-end, { desc = "Authenticate orgcal with Google Calendar" })
-
-vim.api.nvim_create_user_command("OrgCalSync", function()
-	vim.notify("orgcal: syncing...", vim.log.levels.INFO)
-	orgcal_run("sync", nil)
-end, { desc = "Bidirectional sync org <-> Google Calendar" })
-
-vim.api.nvim_create_user_command("OrgCalImport", function()
-	vim.notify("orgcal: importing...", vim.log.levels.INFO)
-	orgcal_run("import", nil)
-end, { desc = "Import Google Calendar events to org" })
-
-vim.api.nvim_create_user_command("OrgCalExport", function()
-	vim.notify("orgcal: exporting...", vim.log.levels.INFO)
-	orgcal_run("export", nil)
-end, { desc = "Export org TODOs to Google Calendar" })
-
-vim.api.nvim_create_autocmd("BufWritePost", {
-	pattern = "*.org",
-	callback = function()
-		orgcal_run("sync", nil)
-	end,
-})
+require("orgcal").setup({ dir = "~/org" })
 
 -- ============================================================================
 -- ORG-ROAM: notes with backlinks
@@ -833,6 +726,12 @@ require("org-super-agenda").setup({
 			end,
 			sort = { by = "date_nearest", order = "asc" },
 		},
+		{
+			name = "All TODOs",
+			matcher = function(i)
+				return i.todo_state ~= "DONE" and i.todo_state ~= "CANCELLED"
+			end,
+		},
 	},
 	hide_empty_groups = true,
 	allow_duplicates = false,
@@ -849,15 +748,46 @@ require("org-super-agenda").setup({
 map("n", "<leader>oA", "<cmd>OrgSuperAgenda<cr>", { desc = "Super Agenda" })
 
 -- ============================================================================
--- SNIPRUN: execute code snippets in any language
--- <leader>rr  run current line/selection   <leader>rc  clear output
+-- RENDER-MARKDOWN: modern rendering for org and markdown files
+-- Renders headings, bullets, checkboxes, code blocks, tables inline
 -- ============================================================================
 
-require("sniprun").setup({
-	display = { "VirtualTextOk", "VirtualTextErr" },
-	selected_interpreters = {},
-	repl_enable = {},
+require("render-markdown").setup({
+	file_types = { "markdown" },
+	latex = { enabled = false },
+	heading = {
+		enabled = true,
+		sign = false,
+		icons = { "󰲡 ", "󰲣 ", "󰲥 ", "󰲧 ", "󰲩 ", "󰲫 " },
+		width = "full",
+	},
+	bullet = {
+		enabled = true,
+		icons = { "●", "○", "◆", "◇" },
+	},
+	checkbox = {
+		enabled = true,
+		unchecked = { icon = "󰄱 " },
+		checked = { icon = "󰱒 " },
+	},
+	code = {
+		enabled = true,
+		sign = false,
+		style = "full",
+		border = "thin",
+		width = "block",
+		min_width = 40,
+	},
+	dash = { enabled = true },
+	quote = { enabled = true, icon = "▋" },
+	pipe_table = { enabled = true },
+	link = { enabled = true },
 })
-map("n", "<leader>rr", "<Plug>SnipRun", { desc = "Run snippet" })
-map("v", "<leader>rr", "<Plug>SnipRun", { desc = "Run snippet" })
-map("n", "<leader>rc", "<Plug>SnipClose", { desc = "Clear sniprun" })
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = { "org", "markdown" },
+	callback = function()
+		vim.b.miniindentscope_disable = true
+	end,
+})
+
