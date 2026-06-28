@@ -113,7 +113,9 @@ vim.pack.add({
 	"https://github.com/saghen/blink.cmp",
 	"https://github.com/williamboman/mason.nvim",
 	"https://github.com/neovim/nvim-lspconfig",
-	"https://github.com/creativenull/efmls-configs-nvim",
+	"https://github.com/folke/lazydev.nvim",
+	"https://github.com/stevearc/conform.nvim",
+	"https://github.com/mfussenegger/nvim-lint",
 	"https://github.com/folke/todo-comments.nvim",
 	"https://github.com/nvim-lua/plenary.nvim",
 	"https://github.com/MunifTanjim/nui.nvim",
@@ -282,35 +284,16 @@ map("n", "<leader>e", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file tree" })
 -- TREESITTER
 -- nvim-treesitter archived Apr 2026.
 -- tree-sitter-manager.nvim handles parser installs.
--- nvim 0.12 built-in highlighting via vim.treesitter.start().
--- Run :TSMInstall after first launch to install parsers.
--- Verify setup API against README: github.com/romus204/tree-sitter-manager.nvim
+-- :TSInstall <lang>   install parser
+-- :TSManager          TUI browser
 -- ============================================================================
 
 require("tree-sitter-manager").setup({
-	parsers = {
-		"lua",
-		"python",
-		"javascript",
-		"typescript",
-		"tsx",
-		"rust",
-		"go",
-		"c",
-		"cpp",
-		"bash",
-		"json",
-		"yaml",
-		"toml",
-		"markdown",
-		"html",
-		"css",
+	ensure_installed = {
+		"lua", "python", "javascript", "typescript", "tsx",
+		"rust", "go", "c", "cpp", "bash",
+		"json", "yaml", "toml", "markdown", "html", "css",
 	},
-})
-vim.api.nvim_create_autocmd("FileType", {
-	callback = function()
-		pcall(vim.treesitter.start)
-	end,
 })
 
 -- ============================================================================
@@ -329,7 +312,7 @@ require("gitsigns").setup({
 		changedelete = { text = "▎" },
 	},
 	on_attach = function(buffer)
-		local gs = package.loaded.gitsigns
+		local gs = require("gitsigns")
 		local gmap = function(mode, l, r, desc)
 			vim.keymap.set(mode, l, r, { buffer = buffer, desc = desc })
 		end
@@ -418,15 +401,24 @@ require("blink.cmp").setup({
 	appearance = {
 		nerd_font_variant = "mono",
 	},
-	sources = { default = { "lsp", "path", "snippets", "buffer" } },
+	sources = {
+		default = { "lsp", "path", "snippets", "buffer", "lazydev" },
+		providers = {
+			lazydev = {
+				name = "LazyDev",
+				module = "lazydev.integrations.blink",
+				score_offset = 100,
+			},
+		},
+	},
 	snippets = { preset = "luasnip" },
 	signature = { enabled = true },
 })
 
 -- ============================================================================
 -- MASON: LSP/tool installer  (:Mason to open UI)
--- Install servers: lua_ls, pyright, vtsls, rust_analyzer, gopls, efm
--- Install tools:   stylua, ruff, prettier, eslint_d
+-- Install servers: lua_ls, pyright, vtsls, rust_analyzer, gopls
+-- Install tools:   stylua, ruff, prettierd, eslint_d, goimports
 -- ============================================================================
 
 require("mason").setup({
@@ -446,6 +438,17 @@ require("mason").setup({
 -- K   hover         <leader>lr  rename   <leader>la  code action
 -- <leader>lf  format
 -- ============================================================================
+
+-- ============================================================================
+-- LAZYDEV: nvim Lua API completion and diagnostics
+-- Fixes undefined-global vim warnings; lazy-loads only for nvim config files
+-- ============================================================================
+
+require("lazydev").setup({
+	library = {
+		{ path = "${3rd}/luv/library", words = { "vim%.uv" } },
+	},
+})
 
 vim.lsp.config("*", {
 	capabilities = require("blink.cmp").get_lsp_capabilities(),
@@ -469,12 +472,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		lmap("n", "<leader>la", vim.lsp.buf.code_action, "Code Action")
 		lmap("v", "<leader>la", vim.lsp.buf.code_action, "Code Action")
 		lmap("n", "<leader>lf", function()
-			vim.lsp.buf.format({
-				async = true,
-				filter = function(client)
-					return client.name == "efm"
-				end,
-			})
+			require("conform").format({ async = true })
 		end, "Format")
 		lmap("n", "<leader>ly", function()
 			local diags = vim.diagnostic.get(0, { lnum = vim.fn.line(".") - 1 })
@@ -488,29 +486,10 @@ vim.api.nvim_create_autocmd("LspAttach", {
 	end,
 })
 
-vim.api.nvim_create_autocmd("BufWritePre", {
-	callback = function(args)
-		if #vim.lsp.get_clients({ bufnr = args.buf, name = "efm" }) == 0 then
-			return
-		end
-		vim.lsp.buf.format({
-			async = false,
-			timeout_ms = 2000,
-			filter = function(client)
-				return client.name == "efm"
-			end,
-		})
-	end,
-})
-
 vim.lsp.config("lua_ls", {
 	settings = {
 		Lua = {
-			diagnostics = { globals = { "vim" } },
-			workspace = {
-				checkThirdParty = false,
-				library = vim.api.nvim_get_runtime_file("", true),
-			},
+			workspace = { checkThirdParty = false },
 			telemetry = { enable = false },
 		},
 	},
@@ -553,32 +532,43 @@ vim.diagnostic.config({
 })
 
 -- ============================================================================
--- EFM FORMATTERS / LINTERS: efmls-configs-nvim
--- Requires efm-langserver installed via Mason.
--- Add/remove formatters and linters per language as needed.
+-- FORMATTING: conform.nvim
+-- <leader>lf  format buffer / selection
 -- ============================================================================
 
-local languages = {
-	lua = { require("efmls-configs.formatters.stylua") },
-	python = { require("efmls-configs.formatters.ruff"), require("efmls-configs.linters.ruff") },
-	javascript = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
-	typescript = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
-	typescriptreact = { require("efmls-configs.formatters.prettier_d"), require("efmls-configs.linters.eslint_d") },
-	go = { require("efmls-configs.formatters.goimports") },
-}
-
-vim.lsp.config("efm", {
-	filetypes = vim.tbl_keys(languages),
-	settings = {
-		rootMarkers = { ".git/" },
-		languages = languages,
+require("conform").setup({
+	formatters_by_ft = {
+		lua = { "stylua" },
+		python = { "ruff_format" },
+		javascript = { "prettierd" },
+		typescript = { "prettierd" },
+		typescriptreact = { "prettierd" },
+		go = { "goimports" },
 	},
-	init_options = {
-		documentFormatting = true,
-		documentRangeFormatting = true,
+	format_on_save = {
+		timeout_ms = 2000,
+		lsp_fallback = false,
 	},
 })
-vim.lsp.enable("efm")
+
+-- ============================================================================
+-- LINTING: nvim-lint
+-- ============================================================================
+
+local lint = require("lint")
+lint.linters_by_ft = {
+	python = { "ruff" },
+	javascript = { "eslint_d" },
+	typescript = { "eslint_d" },
+	typescriptreact = { "eslint_d" },
+	go = { "golangci_lint" },
+}
+
+vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
+	callback = function()
+		lint.try_lint()
+	end,
+})
 
 
 -- ============================================================================
