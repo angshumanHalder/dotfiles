@@ -44,6 +44,8 @@ opt.laststatus = 3
 opt.foldmethod = "expr"
 opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 opt.foldenable = false
+opt.foldlevel = 99
+opt.foldlevelstart = 99
 
 require("vim._core.ui2").enable({})
 
@@ -121,7 +123,7 @@ vim.pack.add({
 	"https://github.com/MunifTanjim/nui.nvim",
 	"https://github.com/MagicDuck/grug-far.nvim",
 	"https://github.com/s1n7ax/nvim-window-picker",
-	"https://github.com/kdheepak/lazygit.nvim",
+	"https://github.com/folke/snacks.nvim",
 	"https://github.com/MeanderingProgrammer/render-markdown.nvim",
 })
 
@@ -137,7 +139,7 @@ vim.cmd.colorscheme("kanagawa-dragon")
 
 -- ============================================================================
 -- MINI.NVIM
--- Modules: icons, statusline, pairs, comment, surround, indentscope, bufremove
+-- Modules: icons, statusline, pairs, surround
 -- ============================================================================
 
 require("mini.icons").setup()
@@ -167,14 +169,6 @@ vim.api.nvim_create_autocmd("ColorScheme", { callback = apply_kanagawa_statuslin
 
 require("mini.pairs").setup()
 require("mini.surround").setup()
-require("mini.indentscope").setup({
-	symbol = "│",
-	options = { try_as_border = true },
-})
-require("mini.bufremove").setup()
-map("n", "<leader>bd", function()
-	require("mini.bufremove").delete()
-end, { desc = "Delete buffer" })
 
 -- ============================================================================
 -- TODO COMMENTS
@@ -326,11 +320,54 @@ require("gitsigns").setup({
 })
 
 -- ============================================================================
--- LAZYGIT
--- <leader>gg  open lazygit
+-- SNACKS
+-- Modules: bigfile, dashboard, indent, notifier, scroll, statuscolumn,
+--          gitbrowse, scratch, lazygit, bufdelete
+-- <leader>bd  delete buffer   <leader>gg  lazygit   <leader>gB  git browse
+-- <leader>sc  scratch buffer
 -- ============================================================================
 
-map("n", "<leader>gg", "<cmd>LazyGit<cr>", { desc = "LazyGit" })
+require("snacks").setup({
+	bigfile = { enabled = true },
+	dashboard = {
+		enabled = true,
+		preset = {
+			keys = {
+				{ icon = " ", key = "f", desc = "Find File", action = "<cmd>FzfLua files<cr>" },
+				{ icon = " ", key = "r", desc = "Recent Files", action = "<cmd>FzfLua oldfiles<cr>" },
+				{ icon = " ", key = "g", desc = "Live Grep", action = "<cmd>FzfLua live_grep<cr>" },
+				{ icon = " ", key = "n", desc = "New File", action = "<cmd>enew<cr>" },
+				{ icon = " ", key = "c", desc = "Config", action = "<cmd>e $MYVIMRC<cr>" },
+				{ icon = "󰒲 ", key = "u", desc = "Update Plugins", action = function() vim.pack.update() end },
+				{ icon = " ", key = "q", desc = "Quit", action = "<cmd>qa<cr>" },
+			},
+		},
+		sections = {
+			{ section = "header" },
+			{ section = "keys", gap = 1, padding = 1 },
+		},
+	},
+	indent = {
+		enabled = true,
+		char = "│",
+		scope = { char = "│", hl = "SnacksIndentScope" },
+		filter = function(buf)
+			return vim.bo[buf].filetype ~= "markdown" and vim.bo[buf].buftype == ""
+		end,
+	},
+	notifier = { enabled = true, timeout = 3000 },
+	scroll = { enabled = true },
+	statuscolumn = { enabled = true },
+	lazygit = { enabled = true },
+	bufdelete = { enabled = true },
+	gitbrowse = { enabled = true },
+	scratch = { enabled = true },
+})
+
+map("n", "<leader>bd", function() Snacks.bufdelete() end, { desc = "Delete buffer" })
+map("n", "<leader>gg", function() Snacks.lazygit() end, { desc = "LazyGit" })
+map("n", "<leader>gB", function() Snacks.gitbrowse() end, { desc = "Git Browse" })
+map("n", "<leader>sc", function() Snacks.scratch() end, { desc = "Scratch Buffer" })
 
 -- ============================================================================
 -- FUZZY FINDER: fzf-lua
@@ -418,7 +455,7 @@ require("blink.cmp").setup({
 -- ============================================================================
 -- MASON: LSP/tool installer  (:Mason to open UI)
 -- Install servers: lua_ls, pyright, vtsls, rust_analyzer, gopls
--- Install tools:   stylua, ruff, prettierd, eslint_d, goimports
+-- Install tools:   stylua, ruff, prettierd, eslint_d, goimports, rustfmt, taplo, hadolint
 -- ============================================================================
 
 require("mason").setup({
@@ -436,7 +473,7 @@ require("mason").setup({
 -- Configuration via vim.lsp.config / vim.lsp.enable (nvim 0.11+ native API)
 -- gd  definition    gD  declaration   gr  references    gi  implementation
 -- K   hover         <leader>lr  rename   <leader>la  code action
--- <leader>lf  format
+-- <leader>lf  format   <leader>fs  symbols
 -- ============================================================================
 
 -- ============================================================================
@@ -465,6 +502,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		lmap("n", "gr", "<cmd>FzfLua lsp_references<cr>", "References")
 		lmap("n", "gi", "<cmd>FzfLua lsp_implementations<cr>", "Implementation")
 		lmap("n", "gO", "<cmd>FzfLua lsp_document_symbols<cr>", "Symbols")
+		lmap("n", "<leader>fs", "<cmd>FzfLua lsp_document_symbols<cr>", "Symbols")
 		lmap("n", "K", function()
 			vim.lsp.buf.hover({ border = "single" })
 		end, "Hover")
@@ -544,11 +582,14 @@ require("conform").setup({
 		typescript = { "prettierd" },
 		typescriptreact = { "prettierd" },
 		json = { "prettierd" },
+		yaml = { "prettierd" },
+		toml = { "taplo" },
+		rust = { "rustfmt" },
 		go = { "goimports" },
 	},
 	format_on_save = {
 		timeout_ms = 2000,
-		lsp_fallback = false,
+		lsp_format = "never",
 	},
 })
 
@@ -563,6 +604,7 @@ lint.linters_by_ft = {
 	typescript = { "eslint_d" },
 	typescriptreact = { "eslint_d" },
 	go = { "golangcilint" },
+	dockerfile = { "hadolint" },
 }
 
 vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
@@ -608,10 +650,4 @@ require("render-markdown").setup({
 	link = { enabled = true },
 })
 
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = { "markdown" },
-	callback = function()
-		vim.b.miniindentscope_disable = true
-	end,
-})
 
