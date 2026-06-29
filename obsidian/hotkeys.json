@@ -1,0 +1,41 @@
+{
+  "file-explorer:open": [{ "modifiers": ["Mod", "Shift"], "key": "E" }],
+  "file-explorer:move-file": [{ "modifiers": ["Mod"], "key": "M" }],
+  "file-explorer:reveal-active-file": [{ "modifiers": ["Mod", "Shift"], "key": "R" }],
+  "app:toggle-left-sidebar": [{ "modifiers": ["Mod"], "key": "L" }],
+  "app:toggle-right-sidebar": [{ "modifiers": ["Mod"], "key": "R" }],
+  "app:go-back": [{ "modifiers": ["Mod"], "key": "ArrowLeft" }],
+  "app:go-forward": [{ "modifiers": ["Mod"], "key": "ArrowRight" }],
+  "switcher:open": [{ "modifiers": ["Mod", "Shift"], "key": "O" }],
+  "global-search:open": [{ "modifiers": ["Mod"], "key": "F" }],
+  "editor:open-search": [{ "modifiers": ["Ctrl", "Shift"], "key": "F" }],
+  "workspace:close": [
+    { "modifiers": ["Ctrl"], "key": "W" },
+    { "modifiers": ["Mod"], "key": "W" }
+  ],
+  "workspace:close-others": [{ "modifiers": ["Ctrl"], "key": "Q" }],
+  "workspace:next-tab": [{ "modifiers": ["Ctrl"], "key": "L" }],
+  "workspace:previous-tab": [{ "modifiers": ["Ctrl"], "key": "H" }],
+  "workspace:toggle-stacked-tabs": [{ "modifiers": ["Ctrl"], "key": ";" }],
+  "editor:focus-left": [{ "modifiers": ["Ctrl", "Shift"], "key": "H" }],
+  "editor:focus-right": [
+    { "modifiers": ["Ctrl"], "key": "Tab" },
+    { "modifiers": ["Ctrl", "Shift"], "key": "L" }
+  ],
+  "editor:open-link-in-new-leaf": [{ "modifiers": ["Alt", "Mod"], "key": "Enter" }],
+  "editor:insert-wikilink": [{ "modifiers": ["Mod", "Shift"], "key": "I" }],
+  "editor:toggle-checklist-status": [{ "modifiers": ["Mod", "Shift"], "key": "X" }],
+  "editor:toggle-bullet-list": [{ "modifiers": ["Mod", "Shift"], "key": "B" }],
+  "editor:toggle-numbered-list": [{ "modifiers": ["Mod", "Shift"], "key": "N" }],
+  "editor:toggle-blockquote": [{ "modifiers": ["Mod", "Shift"], "key": "P" }],
+  "editor:toggle-highlight": [{ "modifiers": ["Mod"], "key": "H" }],
+  "editor:toggle-source": [{ "modifiers": ["Ctrl"], "key": "`" }],
+  "markdown:toggle-preview": [{ "modifiers": ["Mod"], "key": "E" }],
+  "editor:fold-all": [{ "modifiers": ["Ctrl"], "key": "1" }],
+  "editor:fold-more": [{ "modifiers": ["Ctrl"], "key": "-" }],
+  "editor:fold-less": [{ "modifiers": ["Ctrl"], "key": "=" }],
+  "editor:unfold-all": [{ "modifiers": ["Ctrl"], "key": "0" }],
+  "graph:open-local": [{ "modifiers": ["Mod", "Shift"], "key": "G" }],
+  "templater-obsidian:insert-templater": [{ "modifiers": ["Mod"], "key": "T" }],
+  "omnisearch:show-modal": [{ "modifiers": ["Mod"], "key": "O" }]
+}
