@@ -47,6 +47,13 @@ opt.foldenable = false
 opt.foldlevel = 99
 opt.foldlevelstart = 99
 
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "markdown",
+	callback = function()
+		vim.opt_local.conceallevel = 1
+	end,
+})
+
 require("vim._core.ui2").enable({})
 
 -- ============================================================================
@@ -125,6 +132,7 @@ vim.pack.add({
 	"https://github.com/s1n7ax/nvim-window-picker",
 	"https://github.com/folke/snacks.nvim",
 	"https://github.com/MeanderingProgrammer/render-markdown.nvim",
+	"https://github.com/epwalsh/obsidian.nvim",
 })
 
 -- ============================================================================
@@ -215,7 +223,7 @@ require("window-picker").setup({
 	filter_rules = {
 		include_current_win = false,
 		autoselect_one = true,
-		bo = { filetype = { "NvimTree" }, buftype = {} },
+		bo = { filetype = { "NvimTree", "snacks_notif", "snacks_notif_history" }, buftype = {} },
 	},
 	highlights = {
 		statusline = {
@@ -617,6 +625,31 @@ vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
 -- RENDER-MARKDOWN: modern rendering for org and markdown files
 -- Renders headings, bullets, checkboxes, code blocks, tables inline
 -- ============================================================================
+
+-- ============================================================================
+-- OBSIDIAN: note-taking with vault integration
+-- <leader>on  new note   <leader>oo  open picker   <leader>of  follow link
+-- <leader>ob  backlinks  <leader>ot  tags          <leader>os  search
+-- ============================================================================
+
+require("obsidian").setup({
+	workspaces = {
+		{ name = "notes", path = "~/Documents/Notes/" },
+	},
+	completion = {
+		nvim_cmp = false,
+		blink = true,
+	},
+	ui = { enable = false }, -- render-markdown handles UI
+	mappings = {},
+})
+
+map("n", "<leader>on", "<cmd>ObsidianNew<CR>", { desc = "New Note" })
+map("n", "<leader>oo", "<cmd>ObsidianQuickSwitch<CR>", { desc = "Open Note" })
+map("n", "<leader>of", "<cmd>ObsidianFollowLink<CR>", { desc = "Follow Link" })
+map("n", "<leader>ob", "<cmd>ObsidianBacklinks<CR>", { desc = "Backlinks" })
+map("n", "<leader>ot", "<cmd>ObsidianTags<CR>", { desc = "Tags" })
+map("n", "<leader>os", "<cmd>ObsidianSearch<CR>", { desc = "Search Notes" })
 
 require("render-markdown").setup({
 	file_types = { "markdown" },
