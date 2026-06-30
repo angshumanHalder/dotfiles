@@ -364,7 +364,7 @@ require("snacks").setup({
 		end,
 	},
 	notifier = { enabled = true, timeout = 3000 },
-	scroll = { enabled = true },
+	scroll = { enabled = false },
 	statuscolumn = { enabled = true },
 	lazygit = { enabled = true },
 	bufdelete = { enabled = true },

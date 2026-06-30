@@ -5,11 +5,11 @@ nmap j gj
 nmap k gk
 
 exmap followLink obcommand editor:follow-link
-nmap gd :followLink
+nmap gd :followLink<CR>
 
 exmap openLinkNewSplit obcommand editor:open-link-in-new-split
-nmap gD :openLinkNewSplit
+nmap gD :openLinkNewSplit<CR>
 
 exmap insertLink obcommand editor:insert-wikilink
-imap <C-l> :insertLink
-nmap <C-l> :insertLink
+imap <C-l> :insertLink<CR>
+nmap <C-l> :insertLink<CR>
