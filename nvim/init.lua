@@ -245,6 +245,9 @@ require("nvim-tree").setup({
 	},
 	filters = { dotfiles = false },
 	git = { enable = true },
+	update_focused_file = {
+		enable = true,
+	},
 	actions = {
 		open_file = {
 			quit_on_open = false,
@@ -292,9 +295,22 @@ map("n", "<leader>e", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file tree" })
 
 require("tree-sitter-manager").setup({
 	ensure_installed = {
-		"lua", "python", "javascript", "typescript", "tsx",
-		"rust", "go", "c", "cpp", "bash",
-		"json", "yaml", "toml", "markdown", "html", "css",
+		"lua",
+		"python",
+		"javascript",
+		"typescript",
+		"tsx",
+		"rust",
+		"go",
+		"c",
+		"cpp",
+		"bash",
+		"json",
+		"yaml",
+		"toml",
+		"markdown",
+		"html",
+		"css",
 	},
 })
 
@@ -346,7 +362,14 @@ require("snacks").setup({
 				{ icon = " ", key = "g", desc = "Live Grep", action = "<cmd>FzfLua live_grep<cr>" },
 				{ icon = " ", key = "n", desc = "New File", action = "<cmd>enew<cr>" },
 				{ icon = " ", key = "c", desc = "Config", action = "<cmd>e $MYVIMRC<cr>" },
-				{ icon = "󰒲 ", key = "u", desc = "Update Plugins", action = function() vim.pack.update() end },
+				{
+					icon = "󰒲 ",
+					key = "u",
+					desc = "Update Plugins",
+					action = function()
+						vim.pack.update()
+					end,
+				},
 				{ icon = " ", key = "q", desc = "Quit", action = "<cmd>qa<cr>" },
 			},
 		},
@@ -372,10 +395,18 @@ require("snacks").setup({
 	scratch = { enabled = true },
 })
 
-map("n", "<leader>bd", function() Snacks.bufdelete() end, { desc = "Delete buffer" })
-map("n", "<leader>gg", function() Snacks.lazygit() end, { desc = "LazyGit" })
-map("n", "<leader>gB", function() Snacks.gitbrowse() end, { desc = "Git Browse" })
-map("n", "<leader>sc", function() Snacks.scratch() end, { desc = "Scratch Buffer" })
+map("n", "<leader>bd", function()
+	Snacks.bufdelete()
+end, { desc = "Delete buffer" })
+map("n", "<leader>gg", function()
+	Snacks.lazygit()
+end, { desc = "LazyGit" })
+map("n", "<leader>gB", function()
+	Snacks.gitbrowse()
+end, { desc = "Git Browse" })
+map("n", "<leader>sc", function()
+	Snacks.scratch()
+end, { desc = "Scratch Buffer" })
 
 -- ============================================================================
 -- FUZZY FINDER: fzf-lua
@@ -628,8 +659,9 @@ vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
 
 -- ============================================================================
 -- OBSIDIAN: note-taking with vault integration
--- <leader>on  new note   <leader>oo  open picker   <leader>of  follow link
--- <leader>ob  backlinks  <leader>ot  tags          <leader>os  search
+-- <leader>on  new note        <leader>oo  open picker   <leader>of  follow link
+-- <leader>ob  backlinks       <leader>ot  tags          <leader>os  search
+-- <leader>oT  new from template
 -- ============================================================================
 
 require("obsidian").setup({
@@ -637,14 +669,27 @@ require("obsidian").setup({
 		{ name = "notes", path = "~/Documents/Notes/" },
 	},
 	completion = {
+		min_chars = 3,
 		nvim_cmp = false,
 		blink = true,
 	},
 	ui = { enable = false }, -- render-markdown handles UI
+	note_id_func = function(title)
+		if title ~= nil and #title > 0 then
+			return title
+		end
+		return tostring(os.time())
+	end,
+	templates = {
+		folder = "Templates",
+		date_format = "%Y-%m-%d",
+		time_format = "%H:%M",
+	},
 	mappings = {},
 })
 
 map("n", "<leader>on", "<cmd>ObsidianNew<CR>", { desc = "New Note" })
+map("n", "<leader>oT", "<cmd>ObsidianNewFromTemplate<CR>", { desc = "New Note from Template" })
 map("n", "<leader>oo", "<cmd>ObsidianQuickSwitch<CR>", { desc = "Open Note" })
 map("n", "<leader>of", "<cmd>ObsidianFollowLink<CR>", { desc = "Follow Link" })
 map("n", "<leader>ob", "<cmd>ObsidianBacklinks<CR>", { desc = "Backlinks" })
@@ -667,7 +712,7 @@ require("render-markdown").setup({
 	checkbox = {
 		enabled = true,
 		unchecked = { icon = "󰄱 " },
-		checked = { icon = "󰱒 " },
+		checked = { icon = "✓ " },
 	},
 	code = {
 		enabled = true,
@@ -682,5 +727,3 @@ require("render-markdown").setup({
 	pipe_table = { enabled = true },
 	link = { enabled = true },
 })
-
-

@@ -1,0 +1,21 @@
+# 1. Turn off the language and package versions to save space
+[package]
+disabled = true
+
+[rust]
+disabled = true
+
+[golang]
+disabled = true
+# (You can also add [golang], [zig], [python] etc., with disabled = true if they pop up elsewhere)
+
+[custom.jj]
+when = "jj-starship detect"
+shell = ["jj-starship"]
+format = "$output "
+
+[git_branch]
+disabled = true
+
+[git_status]
+disabled = true
