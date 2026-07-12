@@ -133,6 +133,8 @@ vim.pack.add({
 	"https://github.com/folke/snacks.nvim",
 	"https://github.com/MeanderingProgrammer/render-markdown.nvim",
 	"https://github.com/epwalsh/obsidian.nvim",
+	"https://github.com/NicolasGB/jj.nvim",
+	"https://github.com/sindrets/diffview.nvim",
 })
 
 -- ============================================================================
@@ -334,8 +336,12 @@ require("gitsigns").setup({
 		local gmap = function(mode, l, r, desc)
 			vim.keymap.set(mode, l, r, { buffer = buffer, desc = desc })
 		end
-		gmap("n", "]h", gs.next_hunk, "Next Hunk")
-		gmap("n", "[h", gs.prev_hunk, "Prev Hunk")
+		gmap("n", "]h", function()
+			gs.nav_hunk("next")
+		end, "Next Hunk")
+		gmap("n", "[h", function()
+			gs.nav_hunk("prev")
+		end, "Prev Hunk")
 		gmap("n", "<leader>gp", gs.preview_hunk, "Preview Hunk")
 		gmap("n", "<leader>gs", gs.stage_hunk, "Stage Hunk")
 		gmap("n", "<leader>gr", gs.reset_hunk, "Reset Hunk")
@@ -388,7 +394,7 @@ require("snacks").setup({
 	},
 	notifier = { enabled = true, timeout = 3000 },
 	scroll = { enabled = false },
-	statuscolumn = { enabled = true },
+	statuscolumn = { enabled = false },
 	lazygit = { enabled = true },
 	bufdelete = { enabled = true },
 	gitbrowse = { enabled = true },
@@ -409,11 +415,39 @@ map("n", "<leader>sc", function()
 end, { desc = "Scratch Buffer" })
 
 -- ============================================================================
+-- DIFFVIEW
+-- <leader>gc  open (merge tool auto-activates during an active git conflict)
+-- ============================================================================
+
+require("diffview").setup({})
+map("n", "<leader>gc", "<cmd>DiffviewOpen<CR>", { desc = "Diffview" })
+
+-- ============================================================================
+-- JJ (Jujutsu)
+-- <leader>jl  log   <leader>js  status   <leader>jd  diff
+-- <leader>ja  blame file   <leader>jA  blame line
+-- <leader>jc  browse conflicts (sections)   <leader>jC  browse conflicts (revisions)
+-- ============================================================================
+
+require("jj").setup({})
+
+local annotate = require("jj.annotate")
+local picker = require("jj.picker")
+map("n", "<leader>jl", "<cmd>J log<CR>", { desc = "JJ Log" })
+map("n", "<leader>js", "<cmd>J status<CR>", { desc = "JJ Status" })
+map("n", "<leader>jd", "<cmd>Jdiff<CR>", { desc = "JJ Diff" })
+map("n", "<leader>ja", annotate.file, { desc = "JJ Blame File" })
+map("n", "<leader>jA", annotate.line, { desc = "JJ Blame Line" })
+map("n", "<leader>jc", picker.conflict_sections, { desc = "JJ Browse Conflicts" })
+map("n", "<leader>jC", picker.conflict, { desc = "JJ Conflicted Revisions" })
+
+-- ============================================================================
 -- FUZZY FINDER: fzf-lua
 -- <leader>ff  files   <leader>fg  grep    <leader>fb  buffers
 -- <leader>fh  help    <leader>fd  diag    <leader>fr  recent   <leader>fs  symbols
 -- ============================================================================
 
+---@diagnostic disable: missing-fields
 require("fzf-lua").setup({
 	winopts = {
 		height = 0.85,
@@ -432,6 +466,7 @@ require("fzf-lua").setup({
 		actions = { ["ctrl-i"] = { require("fzf-lua").actions.toggle_ignore } },
 	},
 })
+---@diagnostic enable: missing-fields
 map("n", "<leader>ff", "<cmd>FzfLua files<cr>", { desc = "Files" })
 map("n", "<leader>fg", "<cmd>FzfLua live_grep<cr>", { desc = "Live Grep" })
 map("n", "<leader>fb", "<cmd>FzfLua buffers<cr>", { desc = "Buffers" })
