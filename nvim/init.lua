@@ -133,8 +133,8 @@ vim.pack.add({
 	"https://github.com/folke/snacks.nvim",
 	"https://github.com/MeanderingProgrammer/render-markdown.nvim",
 	"https://github.com/epwalsh/obsidian.nvim",
-	"https://github.com/NicolasGB/jj.nvim",
 	"https://github.com/sindrets/diffview.nvim",
+	"https://github.com/folke/trouble.nvim",
 })
 
 -- ============================================================================
@@ -407,6 +407,9 @@ end, { desc = "Delete buffer" })
 map("n", "<leader>gg", function()
 	Snacks.lazygit()
 end, { desc = "LazyGit" })
+map("n", "<leader>gj", function()
+	Snacks.terminal("lazyjj", { win = { style = "lazygit" } })
+end, { desc = "LazyJJ" })
 map("n", "<leader>gB", function()
 	Snacks.gitbrowse()
 end, { desc = "Git Browse" })
@@ -423,28 +426,9 @@ require("diffview").setup({})
 map("n", "<leader>gc", "<cmd>DiffviewOpen<CR>", { desc = "Diffview" })
 
 -- ============================================================================
--- JJ (Jujutsu)
--- <leader>jl  log   <leader>js  status   <leader>jd  diff
--- <leader>ja  blame file   <leader>jA  blame line
--- <leader>jc  browse conflicts (sections)   <leader>jC  browse conflicts (revisions)
--- ============================================================================
-
-require("jj").setup({})
-
-local annotate = require("jj.annotate")
-local picker = require("jj.picker")
-map("n", "<leader>jl", "<cmd>J log<CR>", { desc = "JJ Log" })
-map("n", "<leader>js", "<cmd>J status<CR>", { desc = "JJ Status" })
-map("n", "<leader>jd", "<cmd>Jdiff<CR>", { desc = "JJ Diff" })
-map("n", "<leader>ja", annotate.file, { desc = "JJ Blame File" })
-map("n", "<leader>jA", annotate.line, { desc = "JJ Blame Line" })
-map("n", "<leader>jc", picker.conflict_sections, { desc = "JJ Browse Conflicts" })
-map("n", "<leader>jC", picker.conflict, { desc = "JJ Conflicted Revisions" })
-
--- ============================================================================
 -- FUZZY FINDER: fzf-lua
 -- <leader>ff  files   <leader>fg  grep    <leader>fb  buffers
--- <leader>fh  help    <leader>fd  diag    <leader>fr  recent   <leader>fs  symbols
+-- <leader>fh  help    <leader>fr  recent   <leader>fs  symbols
 -- ============================================================================
 
 ---@diagnostic disable: missing-fields
@@ -471,8 +455,6 @@ map("n", "<leader>ff", "<cmd>FzfLua files<cr>", { desc = "Files" })
 map("n", "<leader>fg", "<cmd>FzfLua live_grep<cr>", { desc = "Live Grep" })
 map("n", "<leader>fb", "<cmd>FzfLua buffers<cr>", { desc = "Buffers" })
 map("n", "<leader>fh", "<cmd>FzfLua help_tags<cr>", { desc = "Help" })
-map("n", "<leader>fd", "<cmd>FzfLua diagnostics_document<cr>", { desc = "Diagnostics" })
-map("n", "<leader>fD", "<cmd>FzfLua diagnostics_workspace<cr>", { desc = "Workspace Diagnostics" })
 map("n", "<leader>fr", "<cmd>FzfLua oldfiles<cr>", { desc = "Recent Files" })
 map("n", "<leader>?", "<cmd>FzfLua keymaps<cr>", { desc = "Keymaps" })
 
@@ -586,15 +568,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		lmap("n", "<leader>lf", function()
 			require("conform").format({ async = true })
 		end, "Format")
-		lmap("n", "<leader>ly", function()
-			local diags = vim.diagnostic.get(0, { lnum = vim.fn.line(".") - 1 })
-			if #diags == 0 then
-				vim.notify("No diagnostic on this line")
-				return
-			end
-			vim.fn.setreg("+", diags[1].message)
-			vim.notify("Copied diagnostic")
-		end, "Yank diagnostic")
 	end,
 })
 
@@ -633,7 +606,7 @@ vim.lsp.config("vtsls", {
 })
 
 -- Add/remove servers to match what you install via Mason
-vim.lsp.enable({ "lua_ls", "pyright", "vtsls", "rust_analyzer", "gopls", "dockerls", "yamlls" })
+vim.lsp.enable({ "lua_ls", "pyright", "vtsls", "rust_analyzer", "gopls", "dockerls", "yamlls", "wgsl_analyzer" })
 
 vim.diagnostic.config({
 	virtual_text = { prefix = "●" },
@@ -642,6 +615,15 @@ vim.diagnostic.config({
 	update_in_insert = false,
 	float = { source = true },
 })
+
+-- ============================================================================
+-- TROUBLE: diagnostics/quickfix list
+-- <leader>fd  document diagnostics   <leader>fD  workspace diagnostics
+-- ============================================================================
+
+require("trouble").setup()
+map("n", "<leader>fd", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { desc = "Diagnostics" })
+map("n", "<leader>fD", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Workspace Diagnostics" })
 
 -- ============================================================================
 -- FORMATTING: conform.nvim
