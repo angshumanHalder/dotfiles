@@ -110,7 +110,7 @@ map("n", "N", "Nzzzv")
 -- ============================================================================
 
 vim.pack.add({
-	"https://github.com/rebelot/kanagawa.nvim",
+	"https://github.com/webhooked/kanso.nvim",
 	"https://github.com/echasnovski/mini.nvim",
 	"https://github.com/nvim-tree/nvim-tree.lua",
 	"https://github.com/romus204/tree-sitter-manager.nvim",
@@ -138,14 +138,14 @@ vim.pack.add({
 })
 
 -- ============================================================================
--- THEME: kanagawa-dragon
+-- THEME: kanso-ink
 -- ============================================================================
 
-require("kanagawa").setup({
-	theme = "dragon",
+require("kanso").setup({
+	background = { dark = "ink" },
 	transparent = true,
 })
-vim.cmd.colorscheme("kanagawa-dragon")
+vim.cmd.colorscheme("kanso-ink")
 
 -- ============================================================================
 -- MINI.NVIM
@@ -156,26 +156,26 @@ require("mini.icons").setup()
 require("mini.icons").mock_nvim_web_devicons()
 require("mini.statusline").setup({ use_icons = true })
 
-local function apply_kanagawa_statusline()
-	local ok, colors = pcall(require, "kanagawa.colors")
+local function apply_kanso_statusline()
+	local ok, colors = pcall(require, "kanso.colors")
 	if not ok then
 		return
 	end
-	local p = colors.setup({ theme = "dragon" }).palette
-	vim.api.nvim_set_hl(0, "MiniStatuslineModeNormal", { fg = p.sumiInk0, bg = p.dragonBlue2, bold = true })
-	vim.api.nvim_set_hl(0, "MiniStatuslineModeInsert", { fg = p.sumiInk0, bg = p.dragonGreen2, bold = true })
-	vim.api.nvim_set_hl(0, "MiniStatuslineModeVisual", { fg = p.sumiInk0, bg = p.dragonViolet, bold = true })
-	vim.api.nvim_set_hl(0, "MiniStatuslineModeReplace", { fg = p.sumiInk0, bg = p.dragonRed, bold = true })
-	vim.api.nvim_set_hl(0, "MiniStatuslineModeCommand", { fg = p.sumiInk0, bg = p.dragonOrange, bold = true })
-	vim.api.nvim_set_hl(0, "MiniStatuslineModeOther", { fg = p.sumiInk0, bg = p.dragonAsh, bold = true })
-	vim.api.nvim_set_hl(0, "MiniStatuslineDevinfo", { fg = p.oldWhite, bg = p.dragonBlack4 })
-	vim.api.nvim_set_hl(0, "MiniStatuslineFilename", { fg = p.fujiWhite, bg = p.dragonBlack4 })
-	vim.api.nvim_set_hl(0, "MiniStatuslineFileinfo", { fg = p.oldWhite, bg = p.dragonBlack4 })
-	vim.api.nvim_set_hl(0, "MiniStatuslineInactive", { fg = p.dragonAsh, bg = p.dragonBlack3 })
+	local p = colors.setup({ theme = "ink" }).palette
+	vim.api.nvim_set_hl(0, "MiniStatuslineModeNormal", { fg = p.inkBg0, bg = p.blue2, bold = true })
+	vim.api.nvim_set_hl(0, "MiniStatuslineModeInsert", { fg = p.inkBg0, bg = p.green2, bold = true })
+	vim.api.nvim_set_hl(0, "MiniStatuslineModeVisual", { fg = p.inkBg0, bg = p.violet, bold = true })
+	vim.api.nvim_set_hl(0, "MiniStatuslineModeReplace", { fg = p.inkBg0, bg = p.red3, bold = true })
+	vim.api.nvim_set_hl(0, "MiniStatuslineModeCommand", { fg = p.inkBg0, bg = p.orange, bold = true })
+	vim.api.nvim_set_hl(0, "MiniStatuslineModeOther", { fg = p.inkBg0, bg = p.inkBg4, bold = true })
+	vim.api.nvim_set_hl(0, "MiniStatuslineDevinfo", { fg = p.fg2, bg = p.inkBg3 })
+	vim.api.nvim_set_hl(0, "MiniStatuslineFilename", { fg = p.fg, bg = p.inkBg3 })
+	vim.api.nvim_set_hl(0, "MiniStatuslineFileinfo", { fg = p.fg2, bg = p.inkBg3 })
+	vim.api.nvim_set_hl(0, "MiniStatuslineInactive", { fg = p.inkBg4, bg = p.inkBg2 })
 end
 
-apply_kanagawa_statusline()
-vim.api.nvim_create_autocmd("ColorScheme", { callback = apply_kanagawa_statusline })
+apply_kanso_statusline()
+vim.api.nvim_create_autocmd("ColorScheme", { callback = apply_kanso_statusline })
 
 require("mini.pairs").setup()
 require("mini.surround").setup()
@@ -217,8 +217,8 @@ end, { desc = "Find & Replace (selection)" })
 -- <leader>e  toggle
 -- ============================================================================
 
-local _ok, _kc = pcall(require, "kanagawa.colors")
-local _p = _ok and _kc.setup({ theme = "dragon" }).palette or {}
+local _ok, _kc = pcall(require, "kanso.colors")
+local _p = _ok and _kc.setup({ theme = "ink" }).palette or {}
 require("window-picker").setup({
 	hint = "statusline-winbar",
 	selection_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
@@ -229,12 +229,12 @@ require("window-picker").setup({
 	},
 	highlights = {
 		statusline = {
-			focused = { fg = _p.sumiInk0, bg = _p.dragonGreen2, bold = true },
-			unfocused = { fg = _p.sumiInk0, bg = _p.dragonGreen2 },
+			focused = { fg = _p.inkBg0, bg = _p.green2, bold = true },
+			unfocused = { fg = _p.inkBg0, bg = _p.green2 },
 		},
 		winbar = {
-			focused = { fg = _p.sumiInk0, bg = _p.dragonGreen2, bold = true },
-			unfocused = { fg = _p.sumiInk0, bg = _p.dragonGreen2 },
+			focused = { fg = _p.inkBg0, bg = _p.green2, bold = true },
+			unfocused = { fg = _p.inkBg0, bg = _p.green2 },
 		},
 	},
 })

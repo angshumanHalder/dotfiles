@@ -12,7 +12,7 @@ background-blur = true
 cursor-style = block
 cursor-style-blink = false
 shell-integration-features = no-cursor
-theme = kanagawa-dragon
+theme = kanso-ink
 macos-titlebar-style = hidden
 
 macos-option-as-alt = true
