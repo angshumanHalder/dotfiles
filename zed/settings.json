@@ -7,22 +7,28 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
-  "title_bar": {
-    "show_onboarding_banner": false,
-    "show_user_menu": false,
-    "show_user_picture": false,
-    "show_project_items": false,
-    "show_sign_in": false,
+  "which_key": {
+    "enabled": false,
   },
-
-  "tab_bar": {
-    "show": false,
+  "inlay_hints": {
+    "enabled": false,
   },
-
-  "toolbar": {
-    "quick_actions": false,
+  "cli_default_open_behavior": "existing_window",
+  "show_edit_predictions": false,
+  "edit_predictions": {
+    "mode": "subtle",
+    "allow_data_collection": "no",
   },
-
+  "agent_servers": {
+    "codex-acp": {
+      "type": "registry",
+    },
+  },
+  "proxy": "",
+  "lsp_results_location": "picker",
+  "scrollbar": {
+    "show": "never",
+  },
   "project_panel": {
     "dock": "left",
     "default_width": 250,
@@ -31,26 +37,7 @@
       "show": "never",
     },
   },
-
-  "outline_panel": {
-    "dock": "left",
-    "default_width": 300,
-  },
-
-  "file_finder": {
-    "modal_max_width": "large",
-  },
-
-  "scrollbar": {
-    "show": "never",
-  },
-
-  "gutter": {
-    "min_line_number_digits": 0,
-  },
-
   "relative_line_numbers": "enabled",
-
   "ui_font_family": "JetBrains Mono",
   "ui_font_weight": 700.0,
   "ui_font_size": 14.0,
@@ -59,40 +46,23 @@
   "buffer_font_size": 12.0,
   "agent_buffer_font_size": 14.0,
   "agent_ui_font_size": 14.0,
-
-  "theme": "Kanagawa Dragon",
-  "theme_overrides": {
-    "Kanagawa Dragon": {
-      "border.variant": "#12120f",
-      "border": "#12120f",
-      "title_bar.background": "#12120f",
-      "panel.background": "#12120f",
-      "panel.focused_border": "#2D4F67",
-      "element.selected": "#2D4F67",
-      "element.hover": "#223249",
-      "element.active": "#1F384C",
-    },
-  },
-
+  "formatter": "auto",
+  "format_on_save": "on",
+  "tab_size": 2,
+  "hard_tabs": false,
+  "soft_wrap": "none",
+  "vertical_scroll_margin": 8,
+  "theme": "Kanso Ink",
   "vim_mode": true,
   "cursor_blink": false,
   "seed_search_query_from_cursor": "selection",
   "show_whitespaces": "none",
-
-  "cli_default_open_behavior": "existing_window",
-  "lsp_document_colors": "inlay",
-
-  "inlay_hints": {
-    "show_other_hints": false,
-    "show_type_hints": false,
-    "show_parameter_hints": false,
-    "enabled": true,
+  "vim": {
+    "use_system_clipboard": "always",
+    "use_smartcase_find": true,
   },
-
+  "lsp_document_colors": "inlay",
   "terminal": {
-    "shell": {
-      "program": "/bin/zsh",
-    },
     "font_family": "JetBrainsMono Nerd Font",
     "font_weight": 700.0,
     "font_size": 12.0,
@@ -102,30 +72,24 @@
     "light": "JetBrains New UI Icons (Dark)",
     "dark": "JetBrains New UI Icons (Dark)",
   },
-
-  "base_keymap": "VSCode",
-
   "auto_update": false,
-
   "telemetry": {
     "diagnostics": false,
     "metrics": false,
   },
-
   "collaboration_panel": {
     "dock": "left",
   },
-
   "agent": {
+    "default_width": 250.0,
+    "max_content_width": 850.0,
+    "sidebar_side": "right",
     "dock": "right",
-    "default_width": 250,
     "favorite_models": [],
     "model_parameters": [],
   },
-
   "git_panel": {
     "dock": "left",
   },
-
   "extend_comment_on_newline": false,
 }

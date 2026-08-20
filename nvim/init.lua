@@ -29,7 +29,7 @@ opt.scrolloff = 8
 opt.sidescrolloff = 8
 opt.ignorecase = true
 opt.smartcase = true
-opt.hlsearch = true
+opt.hlsearch = false
 opt.clipboard = "unnamedplus"
 opt.mouse = "a"
 opt.showmode = false
@@ -67,7 +67,6 @@ map("n", "<C-j>", "<C-w>j")
 map("n", "<C-k>", "<C-w>k")
 map("n", "<C-l>", "<C-w>l")
 
-map("n", "<Esc>", "<cmd>noh<CR>")
 map("v", "<", "<gv")
 map("v", ">", ">gv")
 
@@ -104,89 +103,98 @@ map("n", "N", "Nzzzv")
 
 -- ============================================================================
 -- PLUGINS
--- vim.pack: no lazy loading, no build hooks, no config callbacks.
+-- vim.pack installs plugins without sourcing plugin scripts during init.lua.
+-- Specialist plugins below are configured on first use.
 -- Spec fields: src (required), name, version, data.
 -- On first launch plugins install; restart nvim if require() errors occur.
 -- ============================================================================
 
 vim.pack.add({
-	"https://github.com/webhooked/kanso.nvim",
+	"https://github.com/thesimonho/kanagawa-paper.nvim",
 	"https://github.com/echasnovski/mini.nvim",
-	"https://github.com/nvim-tree/nvim-tree.lua",
 	"https://github.com/romus204/tree-sitter-manager.nvim",
 	"https://github.com/lewis6991/gitsigns.nvim",
-	"https://github.com/ibhagwan/fzf-lua",
 	"https://github.com/rafamadriz/friendly-snippets",
-	"https://github.com/L3MON4D3/LuaSnip",
 	"https://github.com/saghen/blink.lib",
 	"https://github.com/saghen/blink.cmp",
-	"https://github.com/williamboman/mason.nvim",
 	"https://github.com/neovim/nvim-lspconfig",
 	"https://github.com/folke/lazydev.nvim",
 	"https://github.com/stevearc/conform.nvim",
 	"https://github.com/mfussenegger/nvim-lint",
-	"https://github.com/folke/todo-comments.nvim",
 	"https://github.com/nvim-lua/plenary.nvim",
-	"https://github.com/MunifTanjim/nui.nvim",
+	"https://github.com/folke/snacks.nvim",
+})
+
+vim.pack.add({
+	"https://github.com/nvim-tree/nvim-tree.lua",
+	"https://github.com/ibhagwan/fzf-lua",
+	"https://github.com/williamboman/mason.nvim",
+	"https://github.com/folke/todo-comments.nvim",
 	"https://github.com/MagicDuck/grug-far.nvim",
 	"https://github.com/s1n7ax/nvim-window-picker",
-	"https://github.com/folke/snacks.nvim",
+	"https://github.com/jceb/jiejie.nvim",
 	"https://github.com/MeanderingProgrammer/render-markdown.nvim",
 	"https://github.com/epwalsh/obsidian.nvim",
 	"https://github.com/sindrets/diffview.nvim",
 	"https://github.com/folke/trouble.nvim",
+}, {
+	-- Register/install these packages without adding them to 'runtimepath'.
+	load = function() end,
 })
 
+local loaded = {}
+local function load_plugin(name)
+	if not loaded[name] then
+		vim.cmd.packadd(name)
+		loaded[name] = true
+	end
+end
+
 -- ============================================================================
--- THEME: kanso-ink
+-- THEME: kanagawa paper ink
 -- ============================================================================
 
-require("kanso").setup({
-	background = { dark = "ink" },
-	transparent = true,
-})
-vim.cmd.colorscheme("kanso-ink")
+require("kanagawa-paper").setup({ transparent = true })
+vim.cmd.colorscheme("kanagawa-paper-ink")
 
 -- ============================================================================
 -- MINI.NVIM
--- Modules: icons, statusline, pairs, surround
+-- Modules: icons, statusline, pairs, surround, ai, clue
 -- ============================================================================
 
 require("mini.icons").setup()
 require("mini.icons").mock_nvim_web_devicons()
 require("mini.statusline").setup({ use_icons = true })
 
-local function apply_kanso_statusline()
-	local ok, colors = pcall(require, "kanso.colors")
-	if not ok then
-		return
-	end
-	local p = colors.setup({ theme = "ink" }).palette
-	vim.api.nvim_set_hl(0, "MiniStatuslineModeNormal", { fg = p.inkBg0, bg = p.blue2, bold = true })
-	vim.api.nvim_set_hl(0, "MiniStatuslineModeInsert", { fg = p.inkBg0, bg = p.green2, bold = true })
-	vim.api.nvim_set_hl(0, "MiniStatuslineModeVisual", { fg = p.inkBg0, bg = p.violet, bold = true })
-	vim.api.nvim_set_hl(0, "MiniStatuslineModeReplace", { fg = p.inkBg0, bg = p.red3, bold = true })
-	vim.api.nvim_set_hl(0, "MiniStatuslineModeCommand", { fg = p.inkBg0, bg = p.orange, bold = true })
-	vim.api.nvim_set_hl(0, "MiniStatuslineModeOther", { fg = p.inkBg0, bg = p.inkBg4, bold = true })
-	vim.api.nvim_set_hl(0, "MiniStatuslineDevinfo", { fg = p.fg2, bg = p.inkBg3 })
-	vim.api.nvim_set_hl(0, "MiniStatuslineFilename", { fg = p.fg, bg = p.inkBg3 })
-	vim.api.nvim_set_hl(0, "MiniStatuslineFileinfo", { fg = p.fg2, bg = p.inkBg3 })
-	vim.api.nvim_set_hl(0, "MiniStatuslineInactive", { fg = p.inkBg4, bg = p.inkBg2 })
-end
-
-apply_kanso_statusline()
-vim.api.nvim_create_autocmd("ColorScheme", { callback = apply_kanso_statusline })
-
 require("mini.pairs").setup()
 require("mini.surround").setup()
+require("mini.ai").setup({ n_lines = 500 })
+
+local clue = require("mini.clue")
+clue.setup({
+	triggers = {
+		{ mode = "n", keys = "<Leader>" },
+		{ mode = "x", keys = "<Leader>" },
+		{ mode = "n", keys = "[" },
+		{ mode = "n", keys = "]" },
+	},
+	clues = {
+		clue.gen_clues.builtin_completion(),
+		clue.gen_clues.marks(),
+		clue.gen_clues.registers(),
+		clue.gen_clues.windows(),
+		clue.gen_clues.z(),
+	},
+})
 
 -- ============================================================================
 -- TODO COMMENTS
 -- <leader>ft  search todos
 -- ============================================================================
 
-require("todo-comments").setup()
 map("n", "<leader>ft", function()
+	load_plugin("todo-comments.nvim")
+	require("todo-comments").setup()
 	require("todo-comments.fzf").todo({
 		prompt = "Todo comments> ",
 		-- This sets the initial query for ripgrep but keeps it out of the prompt
@@ -201,15 +209,19 @@ end, { desc = "Todo Comments" })
 -- <leader>sr  open (current word)   <leader>sR  open (empty)
 -- ============================================================================
 
-require("grug-far").setup()
+local function grug_far()
+	load_plugin("grug-far.nvim")
+	require("grug-far").setup()
+	return require("grug-far")
+end
 map("n", "<leader>sr", function()
-	require("grug-far").open({ prefills = { search = vim.fn.expand("<cword>") } })
+	grug_far().open({ prefills = { search = vim.fn.expand("<cword>") } })
 end, { desc = "Find & Replace (word)" })
 map("n", "<leader>sR", function()
-	require("grug-far").open()
+	grug_far().open()
 end, { desc = "Find & Replace" })
 map("v", "<leader>sr", function()
-	require("grug-far").with_visual_selection()
+	grug_far().with_visual_selection()
 end, { desc = "Find & Replace (selection)" })
 
 -- ============================================================================
@@ -217,75 +229,76 @@ end, { desc = "Find & Replace (selection)" })
 -- <leader>e  toggle
 -- ============================================================================
 
-local _ok, _kc = pcall(require, "kanso.colors")
-local _p = _ok and _kc.setup({ theme = "ink" }).palette or {}
-require("window-picker").setup({
-	hint = "statusline-winbar",
-	selection_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-	filter_rules = {
-		include_current_win = false,
-		autoselect_one = true,
-		bo = { filetype = { "NvimTree", "snacks_notif", "snacks_notif_history" }, buftype = {} },
-	},
-	highlights = {
-		statusline = {
-			focused = { fg = _p.inkBg0, bg = _p.green2, bold = true },
-			unfocused = { fg = _p.inkBg0, bg = _p.green2 },
-		},
-		winbar = {
-			focused = { fg = _p.inkBg0, bg = _p.green2, bold = true },
-			unfocused = { fg = _p.inkBg0, bg = _p.green2 },
-		},
-	},
-})
+local nvim_tree_loaded = false
+local function setup_nvim_tree()
+	if nvim_tree_loaded then
+		return
+	end
+	nvim_tree_loaded = true
+	load_plugin("nvim-tree.lua")
+	load_plugin("nvim-window-picker")
 
-require("nvim-tree").setup({
-	view = { width = 30 },
-	renderer = {
-		group_empty = true,
-		icons = { show = { git = true } },
-	},
-	filters = { dotfiles = false },
-	git = { enable = true },
-	update_focused_file = {
-		enable = true,
-	},
-	actions = {
-		open_file = {
-			quit_on_open = false,
-			window_picker = {
-				enable = true,
-				picker = function()
-					local cur = vim.api.nvim_get_current_win()
-					local has_target = vim.iter(vim.api.nvim_list_wins()):any(function(w)
-						if w == cur then
-							return false
+	require("window-picker").setup({
+		hint = "statusline-winbar",
+		selection_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+		filter_rules = {
+			include_current_win = false,
+			autoselect_one = true,
+			bo = { filetype = { "NvimTree", "snacks_notif", "snacks_notif_history" }, buftype = {} },
+		},
+	})
+
+	require("nvim-tree").setup({
+		view = { width = 30 },
+		renderer = {
+			group_empty = true,
+			icons = { show = { git = true } },
+		},
+		filters = { dotfiles = false },
+		git = { enable = true },
+		update_focused_file = {
+			enable = true,
+		},
+		actions = {
+			open_file = {
+				quit_on_open = false,
+				window_picker = {
+					enable = true,
+					picker = function()
+						local cur = vim.api.nvim_get_current_win()
+						local has_target = vim.iter(vim.api.nvim_list_wins()):any(function(w)
+							if w == cur then
+								return false
+							end
+							local ft = vim.bo[vim.api.nvim_win_get_buf(w)].filetype
+							return ft ~= "NvimTree" and vim.api.nvim_win_get_config(w).relative == ""
+						end)
+						if not has_target then
+							vim.cmd("vsplit")
+							return vim.api.nvim_get_current_win()
 						end
-						local ft = vim.bo[vim.api.nvim_win_get_buf(w)].filetype
-						return ft ~= "NvimTree" and vim.api.nvim_win_get_config(w).relative == ""
-					end)
-					if not has_target then
-						vim.cmd("vsplit")
-						return vim.api.nvim_get_current_win()
-					end
-					local picked = require("window-picker").pick_window()
-					vim.schedule(function()
-						vim.cmd("echo ''")
-					end)
-					return picked
-				end,
+						local picked = require("window-picker").pick_window()
+						vim.schedule(function()
+							vim.cmd("echo ''")
+						end)
+						return picked
+					end,
+				},
 			},
 		},
-	},
-	on_attach = function(bufnr)
-		local api = require("nvim-tree.api")
-		api.map.on_attach.default(bufnr)
-		vim.keymap.del("n", "s", { buffer = bufnr })
-		vim.keymap.set("n", "s", api.node.open.horizontal, { buffer = bufnr, desc = "Open: Horizontal Split" })
-		vim.keymap.set("n", "v", api.node.open.vertical, { buffer = bufnr, desc = "Open: Vertical Split" })
-	end,
-})
-map("n", "<leader>e", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file tree" })
+		on_attach = function(bufnr)
+			local api = require("nvim-tree.api")
+			api.map.on_attach.default(bufnr)
+			vim.keymap.del("n", "s", { buffer = bufnr })
+			vim.keymap.set("n", "s", api.node.open.horizontal, { buffer = bufnr, desc = "Open: Horizontal Split" })
+			vim.keymap.set("n", "v", api.node.open.vertical, { buffer = bufnr, desc = "Open: Vertical Split" })
+		end,
+	})
+end
+map("n", "<leader>e", function()
+	setup_nvim_tree()
+	require("nvim-tree.api").tree.toggle()
+end, { desc = "Toggle file tree" })
 
 -- ============================================================================
 -- TREESITTER
@@ -354,8 +367,10 @@ require("gitsigns").setup({
 -- Modules: bigfile, dashboard, indent, notifier, scroll, statuscolumn,
 --          gitbrowse, scratch, lazygit, bufdelete
 -- <leader>bd  delete buffer   <leader>gg  lazygit   <leader>gB  git browse
--- <leader>sc  scratch buffer
+-- <leader>gj  Jujutsu status  <leader>sc  scratch buffer
 -- ============================================================================
+
+local fzf
 
 require("snacks").setup({
 	bigfile = { enabled = true },
@@ -363,9 +378,30 @@ require("snacks").setup({
 		enabled = true,
 		preset = {
 			keys = {
-				{ icon = " ", key = "f", desc = "Find File", action = "<cmd>FzfLua files<cr>" },
-				{ icon = " ", key = "r", desc = "Recent Files", action = "<cmd>FzfLua oldfiles<cr>" },
-				{ icon = " ", key = "g", desc = "Live Grep", action = "<cmd>FzfLua live_grep<cr>" },
+				{
+					icon = " ",
+					key = "f",
+					desc = "Find File",
+					action = function()
+						fzf("files")
+					end,
+				},
+				{
+					icon = " ",
+					key = "r",
+					desc = "Recent Files",
+					action = function()
+						fzf("oldfiles")
+					end,
+				},
+				{
+					icon = " ",
+					key = "g",
+					desc = "Live Grep",
+					action = function()
+						fzf("live_grep")
+					end,
+				},
 				{ icon = " ", key = "n", desc = "New File", action = "<cmd>enew<cr>" },
 				{ icon = " ", key = "c", desc = "Config", action = "<cmd>e $MYVIMRC<cr>" },
 				{
@@ -408,8 +444,9 @@ map("n", "<leader>gg", function()
 	Snacks.lazygit()
 end, { desc = "LazyGit" })
 map("n", "<leader>gj", function()
-	Snacks.terminal("lazyjj", { win = { style = "lazygit" } })
-end, { desc = "LazyJJ" })
+	load_plugin("jiejie.nvim")
+	vim.cmd("J")
+end, { desc = "Jujutsu Status" })
 map("n", "<leader>gB", function()
 	Snacks.gitbrowse()
 end, { desc = "Git Browse" })
@@ -422,8 +459,11 @@ end, { desc = "Scratch Buffer" })
 -- <leader>gc  open (merge tool auto-activates during an active git conflict)
 -- ============================================================================
 
-require("diffview").setup({})
-map("n", "<leader>gc", "<cmd>DiffviewOpen<CR>", { desc = "Diffview" })
+map("n", "<leader>gc", function()
+	load_plugin("diffview.nvim")
+	require("diffview").setup({})
+	vim.cmd.DiffviewOpen()
+end, { desc = "Diffview" })
 
 -- ============================================================================
 -- FUZZY FINDER: fzf-lua
@@ -431,39 +471,51 @@ map("n", "<leader>gc", "<cmd>DiffviewOpen<CR>", { desc = "Diffview" })
 -- <leader>fh  help    <leader>fr  recent   <leader>fs  symbols
 -- ============================================================================
 
----@diagnostic disable: missing-fields
-require("fzf-lua").setup({
-	winopts = {
-		height = 0.85,
-		width = 0.85,
-		preview = { layout = "horizontal", ratio = 0.5 },
-	},
-	defaults = {
-		header = false,
-	},
-	files = {
-		fd_opts = "--color=never --type f --hidden --follow --exclude .git",
-		actions = { ["ctrl-i"] = { require("fzf-lua").actions.toggle_ignore } },
-	},
-	grep = {
-		rg_opts = "--column --line-number --no-heading --color=always --smart-case",
-		actions = { ["ctrl-i"] = { require("fzf-lua").actions.toggle_ignore } },
-	},
-})
----@diagnostic enable: missing-fields
-map("n", "<leader>ff", "<cmd>FzfLua files<cr>", { desc = "Files" })
-map("n", "<leader>fg", "<cmd>FzfLua live_grep<cr>", { desc = "Live Grep" })
-map("n", "<leader>fb", "<cmd>FzfLua buffers<cr>", { desc = "Buffers" })
-map("n", "<leader>fh", "<cmd>FzfLua help_tags<cr>", { desc = "Help" })
-map("n", "<leader>fr", "<cmd>FzfLua oldfiles<cr>", { desc = "Recent Files" })
-map("n", "<leader>?", "<cmd>FzfLua keymaps<cr>", { desc = "Keymaps" })
+local fzf_loaded = false
+fzf = function(picker, opts)
+	if not fzf_loaded then
+		fzf_loaded = true
+		load_plugin("fzf-lua")
+		---@diagnostic disable: missing-fields
+		require("fzf-lua").setup({
+			winopts = {
+				height = 0.85,
+				width = 0.85,
+				preview = { layout = "horizontal", ratio = 0.5 },
+			},
+			defaults = { header = false },
+			files = {
+				fd_opts = "--color=never --type f --hidden --follow --exclude .git",
+				actions = { ["ctrl-i"] = { require("fzf-lua").actions.toggle_ignore } },
+			},
+			grep = {
+				rg_opts = "--column --line-number --no-heading --color=always --smart-case",
+				actions = { ["ctrl-i"] = { require("fzf-lua").actions.toggle_ignore } },
+			},
+		})
+		---@diagnostic enable: missing-fields
+	end
+	require("fzf-lua")[picker](opts)
+end
 
--- ============================================================================
--- SNIPPETS: luasnip + friendly-snippets
--- NOTE: run 'make install_jsregexp' in LuaSnip install dir for regex support
--- ============================================================================
-
-require("luasnip.loaders.from_vscode").lazy_load()
+map("n", "<leader>ff", function()
+	fzf("files")
+end, { desc = "Files" })
+map("n", "<leader>fg", function()
+	fzf("live_grep")
+end, { desc = "Live Grep" })
+map("n", "<leader>fb", function()
+	fzf("buffers")
+end, { desc = "Buffers" })
+map("n", "<leader>fh", function()
+	fzf("help_tags")
+end, { desc = "Help" })
+map("n", "<leader>fr", function()
+	fzf("oldfiles")
+end, { desc = "Recent Files" })
+map("n", "<leader>?", function()
+	fzf("keymaps")
+end, { desc = "Keymaps" })
 
 -- ============================================================================
 -- COMPLETION: blink.cmp
@@ -504,24 +556,30 @@ require("blink.cmp").setup({
 			},
 		},
 	},
-	snippets = { preset = "luasnip" },
+	snippets = { preset = "default" },
 	signature = { enabled = true },
 })
 
 -- ============================================================================
 -- MASON: LSP/tool installer  (:Mason to open UI)
--- Install servers: lua_ls, pyright, vtsls, rust_analyzer, gopls
--- Install tools:   stylua, ruff, prettierd, eslint_d, goimports, rustfmt, taplo, hadolint
+-- Suggested servers/tools below are installed manually through :Mason.
 -- ============================================================================
 
-require("mason").setup({
-	ui = {
-		icons = {
-			package_installed = "✓",
-			package_pending = "➜",
-			package_uninstalled = "✗",
-		},
-	},
+vim.api.nvim_create_autocmd("CmdUndefined", {
+	pattern = "Mason",
+	once = true,
+	callback = function()
+		load_plugin("mason.nvim")
+		require("mason").setup({
+			ui = {
+				icons = {
+					package_installed = "✓",
+					package_pending = "➜",
+					package_uninstalled = "✗",
+				},
+			},
+		})
+	end,
 })
 
 -- ============================================================================
@@ -553,12 +611,22 @@ vim.api.nvim_create_autocmd("LspAttach", {
 		local lmap = function(mode, lhs, rhs, desc)
 			vim.keymap.set(mode, lhs, rhs, { buffer = buffer, desc = desc })
 		end
-		lmap("n", "gd", "<cmd>FzfLua lsp_definitions<cr>", "Go to Definition")
+		lmap("n", "gd", function()
+			fzf("lsp_definitions")
+		end, "Go to Definition")
 		lmap("n", "gD", vim.lsp.buf.declaration, "Go to Declaration")
-		lmap("n", "gr", "<cmd>FzfLua lsp_references<cr>", "References")
-		lmap("n", "gi", "<cmd>FzfLua lsp_implementations<cr>", "Implementation")
-		lmap("n", "gO", "<cmd>FzfLua lsp_document_symbols<cr>", "Symbols")
-		lmap("n", "<leader>fs", "<cmd>FzfLua lsp_document_symbols<cr>", "Symbols")
+		lmap("n", "gr", function()
+			fzf("lsp_references")
+		end, "References (FZF)")
+		lmap("n", "gi", function()
+			fzf("lsp_implementations")
+		end, "Implementation")
+		lmap("n", "gO", function()
+			fzf("lsp_document_symbols")
+		end, "Document Symbols (FZF)")
+		lmap("n", "<leader>fs", function()
+			fzf("lsp_document_symbols")
+		end, "Document Symbols (FZF)")
 		lmap("n", "K", function()
 			vim.lsp.buf.hover({ border = "single" })
 		end, "Hover")
@@ -609,7 +677,8 @@ vim.lsp.config("vtsls", {
 vim.lsp.enable({ "lua_ls", "pyright", "vtsls", "rust_analyzer", "gopls", "dockerls", "yamlls", "wgsl_analyzer" })
 
 vim.diagnostic.config({
-	virtual_text = { prefix = "●" },
+	virtual_text = false,
+	virtual_lines = false,
 	signs = true,
 	underline = true,
 	update_in_insert = false,
@@ -621,9 +690,21 @@ vim.diagnostic.config({
 -- <leader>fd  document diagnostics   <leader>fD  workspace diagnostics
 -- ============================================================================
 
-require("trouble").setup()
-map("n", "<leader>fd", "<cmd>Trouble diagnostics toggle filter.buf=0<cr>", { desc = "Diagnostics" })
-map("n", "<leader>fD", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Workspace Diagnostics" })
+local trouble_loaded = false
+local function trouble(command)
+	load_plugin("trouble.nvim")
+	if not trouble_loaded then
+		trouble_loaded = true
+		require("trouble").setup()
+	end
+	vim.cmd(command)
+end
+map("n", "<leader>fd", function()
+	trouble("Trouble diagnostics toggle filter.buf=0")
+end, { desc = "Diagnostics" })
+map("n", "<leader>fD", function()
+	trouble("Trouble diagnostics toggle")
+end, { desc = "Workspace Diagnostics" })
 
 -- ============================================================================
 -- FORMATTING: conform.nvim
@@ -643,8 +724,9 @@ require("conform").setup({
 		rust = { "rustfmt" },
 		go = { "goimports" },
 	},
-	format_on_save = {
-		timeout_ms = 2000,
+	-- Run formatters asynchronously after writing so slow or failing formatters
+	-- never block saving or editor input. Conform writes successful edits back.
+	format_after_save = {
 		lsp_format = "never",
 	},
 })
@@ -663,14 +745,14 @@ lint.linters_by_ft = {
 	dockerfile = { "hadolint" },
 }
 
-vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
+vim.api.nvim_create_autocmd("BufWritePost", {
 	callback = function()
 		lint.try_lint()
 	end,
 })
 
 -- ============================================================================
--- RENDER-MARKDOWN: modern rendering for org and markdown files
+-- RENDER-MARKDOWN: modern rendering for markdown files
 -- Renders headings, bullets, checkboxes, code blocks, tables inline
 -- ============================================================================
 
@@ -681,66 +763,112 @@ vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
 -- <leader>oT  new from template
 -- ============================================================================
 
-require("obsidian").setup({
-	workspaces = {
-		{ name = "notes", path = "~/Documents/Notes/" },
-	},
-	completion = {
-		min_chars = 3,
-		nvim_cmp = false,
-		blink = true,
-	},
-	ui = { enable = false }, -- render-markdown handles UI
-	note_id_func = function(title)
-		if title ~= nil and #title > 0 then
-			return title
+local obsidian_loaded = false
+local function setup_obsidian()
+	if obsidian_loaded then
+		return
+	end
+	obsidian_loaded = true
+	load_plugin("obsidian.nvim")
+	require("obsidian").setup({
+		workspaces = {
+			{ name = "notes", path = "~/Documents/Notes/" },
+		},
+		completion = {
+			min_chars = 3,
+			nvim_cmp = false,
+			blink = true,
+		},
+		ui = { enable = false },
+		note_id_func = function(title)
+			if title ~= nil and #title > 0 then
+				return title
+			end
+			return tostring(os.time())
+		end,
+		templates = {
+			folder = "Templates",
+			date_format = "%Y-%m-%d",
+			time_format = "%H:%M",
+		},
+		mappings = {},
+	})
+end
+
+local function obsidian_command(command)
+	setup_obsidian()
+	vim.cmd(command)
+end
+map("n", "<leader>on", function()
+	obsidian_command("ObsidianNew")
+end, { desc = "New Note" })
+map("n", "<leader>oT", function()
+	obsidian_command("ObsidianNewFromTemplate")
+end, { desc = "New Note from Template" })
+map("n", "<leader>oo", function()
+	obsidian_command("ObsidianQuickSwitch")
+end, { desc = "Open Note" })
+map("n", "<leader>of", function()
+	obsidian_command("ObsidianFollowLink")
+end, { desc = "Follow Link" })
+map("n", "<leader>ob", function()
+	obsidian_command("ObsidianBacklinks")
+end, { desc = "Backlinks" })
+map("n", "<leader>ot", function()
+	obsidian_command("ObsidianTags")
+end, { desc = "Tags" })
+map("n", "<leader>os", function()
+	obsidian_command("ObsidianSearch")
+end, { desc = "Search Notes" })
+
+local render_markdown_loaded = false
+local function setup_render_markdown()
+	if render_markdown_loaded then
+		return
+	end
+	render_markdown_loaded = true
+	load_plugin("render-markdown.nvim")
+	require("render-markdown").setup({
+		file_types = { "markdown" },
+		latex = { enabled = false },
+		heading = {
+			enabled = true,
+			sign = false,
+			icons = { "󰲡 ", "󰲣 ", "󰲥 ", "󰲧 ", "󰲩 ", "󰲫 " },
+			width = "full",
+		},
+		bullet = {
+			enabled = true,
+			icons = { "●", "○", "◆", "◇" },
+		},
+		checkbox = {
+			enabled = true,
+			unchecked = { icon = "󰄱 " },
+			checked = { icon = "✓ " },
+		},
+		code = {
+			enabled = true,
+			sign = false,
+			style = "full",
+			border = "thin",
+			width = "block",
+			min_width = 40,
+		},
+		dash = { enabled = true },
+		quote = { enabled = true, icon = "▋" },
+		pipe_table = { enabled = true },
+		link = { enabled = true },
+	})
+end
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "markdown",
+	callback = function()
+		setup_render_markdown()
+		local notes = vim.fs.normalize(vim.fn.expand("~/Documents/Notes"))
+		local file = vim.fs.normalize(vim.api.nvim_buf_get_name(0))
+		if file:sub(1, #notes + 1) == notes .. "/" then
+			setup_obsidian()
 		end
-		return tostring(os.time())
 	end,
-	templates = {
-		folder = "Templates",
-		date_format = "%Y-%m-%d",
-		time_format = "%H:%M",
-	},
-	mappings = {},
-})
-
-map("n", "<leader>on", "<cmd>ObsidianNew<CR>", { desc = "New Note" })
-map("n", "<leader>oT", "<cmd>ObsidianNewFromTemplate<CR>", { desc = "New Note from Template" })
-map("n", "<leader>oo", "<cmd>ObsidianQuickSwitch<CR>", { desc = "Open Note" })
-map("n", "<leader>of", "<cmd>ObsidianFollowLink<CR>", { desc = "Follow Link" })
-map("n", "<leader>ob", "<cmd>ObsidianBacklinks<CR>", { desc = "Backlinks" })
-map("n", "<leader>ot", "<cmd>ObsidianTags<CR>", { desc = "Tags" })
-map("n", "<leader>os", "<cmd>ObsidianSearch<CR>", { desc = "Search Notes" })
-
-require("render-markdown").setup({
-	file_types = { "markdown" },
-	latex = { enabled = false },
-	heading = {
-		enabled = true,
-		sign = false,
-		icons = { "󰲡 ", "󰲣 ", "󰲥 ", "󰲧 ", "󰲩 ", "󰲫 " },
-		width = "full",
-	},
-	bullet = {
-		enabled = true,
-		icons = { "●", "○", "◆", "◇" },
-	},
-	checkbox = {
-		enabled = true,
-		unchecked = { icon = "󰄱 " },
-		checked = { icon = "✓ " },
-	},
-	code = {
-		enabled = true,
-		sign = false,
-		style = "full",
-		border = "thin",
-		width = "block",
-		min_width = 40,
-	},
-	dash = { enabled = true },
-	quote = { enabled = true, icon = "▋" },
-	pipe_table = { enabled = true },
-	link = { enabled = true },
 })

@@ -6,198 +6,78 @@
 // To see the default key bindings run `zed: open default keymap`
 // from the command palette.
 [
-  // ============================================================================
-  // GLOBAL — file finder, project panel, diagnostics, search, workspace ops
-  // ============================================================================
   {
-    "context": "(VimControl && vim_mode == normal && !Terminal) || (Workspace && !Editor && !menu && !Terminal)",
+    "context": "Editor && VimControl && vim_mode == normal && !menu",
     "bindings": {
+      "ctrl-h": "workspace::ActivatePaneLeft",
+      "ctrl-j": "workspace::ActivatePaneDown",
+      "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-l": "workspace::ActivatePaneRight",
+      "space s v": "pane::SplitRight",
+      "space s h": "pane::SplitDown",
+      "shift-h": "pane::ActivatePreviousItem",
+      "shift-l": "pane::ActivateNextItem",
+      "space b d": "pane::CloseActiveItem",
+      "space e": "project_panel::Toggle",
       "space f f": "file_finder::Toggle",
       "space f g": "pane::DeploySearch",
       "space f b": "tab_switcher::Toggle",
       "space f r": "projects::OpenRecent",
-      "space q q": "zed::Quit",
-      "space b d": "pane::CloseActiveItem",
-    },
-  },
-  {
-    "context": "vim_mode == normal || (Workspace && !Editor && !Terminal) || (ProjectPanel && not_editing)",
-    "bindings": {
-      "space e": "project_panel::Toggle",
-    },
-  },
-  {
-    "context": "VimControl && vim_mode == normal",
-    "bindings": {
+      "space f s": "outline::Toggle",
       "space f d": "diagnostics::Deploy",
-    },
-  },
-  {
-    "context": "VimControl && vim_mode == normal && !Terminal",
-    "bindings": {
-      "space s v": "pane::SplitRight",
-      "space s h": "pane::SplitDown",
-    },
-  },
-  {
-    "context": "VimControl && !menu && !Terminal",
-    "bindings": {
-      "space g o": "outline::Toggle",
-    },
-  },
-
-  // ============================================================================
-  // UNBINDS
-  // ============================================================================
-  {
-    "context": "VimControl && !menu",
-    "unbind": {
-      "g shift-o": "outline::Toggle",
-    },
-  },
-  {
-    "context": "Editor && !agent_diff && !AgentPanel",
-    "unbind": {
-      "alt-cmd-y": "git::ToggleStaged",
-      "cmd-y": "git::StageAndNext",
-      "alt-cmd-z": "git::Restore",
-    },
-  },
-  {
-    "context": "Editor && multibuffer",
-    "unbind": {
-      "cmd-down": "editor::MoveToStartOfNextExcerpt",
-      "cmd-up": "editor::MoveToStartOfExcerpt",
-    },
-  },
-  {
-    "context": "Workspace",
-    "unbind": {
-      "cmd-t": "project_symbols::Toggle",
-      "cmd-shift-b": "outline_panel::ToggleFocus",
-    },
-  },
-
-  // ============================================================================
-  // EDITOR — vim normal mode
-  // ============================================================================
-  {
-    "context": "Editor && vim_mode == normal",
-    "bindings": {
-      // pane navigation
-      "ctrl-h": "workspace::ActivatePaneLeft",
-      "ctrl-l": "workspace::ActivatePaneRight",
-      "ctrl-j": "workspace::ActivatePaneDown",
-      "ctrl-k": "workspace::ActivatePaneUp",
-      // buffer navigation
-      "shift-h": "pane::ActivatePreviousItem",
-      "shift-l": "pane::ActivateNextItem",
-      // misc
-      "space p s": "project_symbols::Toggle",
-    },
-  },
-  {
-    "context": "Editor && VimControl && vim_mode == normal && !menu",
-    "bindings": {
-      // outline
-      "space f o": "outline_panel::ToggleFocus",
-      // LSP
+      "g d": "editor::GoToDefinition",
+      "g D": "editor::GoToTypeDefinition",
+      "g r": "editor::FindAllReferences",
+      "g i": "editor::GoToImplementation",
+      "shift-k": "editor::Hover",
       "space l a": "editor::ToggleCodeActions",
-      "space l f": "editor::Format",
       "space l r": "editor::Rename",
+      "space l f": "editor::Format",
       "space l d": "editor::Hover",
-      // diagnostics
+      "space l shift-r": [
+        "editor::FindAllReferences",
+        { "open_results_in": "multi_buffer" },
+      ],
+      "space l shift-d": [
+        "editor::GoToDefinition",
+        { "open_results_in": "multi_buffer" },
+      ],
+      "space l shift-i": [
+        "editor::GoToImplementation",
+        { "open_results_in": "multi_buffer" },
+      ],
       "] d": "editor::GoToDiagnostic",
       "[ d": "editor::GoToPreviousDiagnostic",
-      // git hunks + blame
       "] h": "editor::GoToHunk",
       "[ h": "editor::GoToPreviousHunk",
-      "space g b": "git::Blame",
-    },
-  },
-  {
-    "context": "VimControl && !menu",
-    "bindings": {
-      "g r": "editor::FindAllReferences",
-    },
-  },
-
-  // ============================================================================
-  // EDITOR — git staging
-  // ============================================================================
-  {
-    "context": "Editor && !agent_diff && !AgentPanel && (vim_mode == normal || vim_mode == visual)",
-    "bindings": {
-      "space h s": "git::ToggleStaged",
+      "space g p": "editor::ToggleSelectedDiffHunks",
       "space g s": "git::StageAndNext",
-    },
-  },
-  {
-    "context": "Editor && !agent_diff && !AgentPanel && vim_mode == normal",
-    "bindings": {
-      "space h r": "git::Restore",
-    },
-  },
-
-  // ============================================================================
-  // EDITOR — multibuffer
-  // ============================================================================
-  {
-    "context": "Editor && multibuffer && vim_mode == normal",
-    "bindings": {
-      "ctrl-n": "editor::MoveToStartOfNextExcerpt",
-      "ctrl-p": "editor::MoveToEndOfPreviousExcerpt",
-    },
-  },
-
-  // ============================================================================
-  // EDITOR — line move (normal + visual)
-  // ============================================================================
-  {
-    "context": "Editor && (vim_mode == normal || vim_mode == visual)",
-    "bindings": {
+      "space g r": "git::Restore",
+      "space g b": "git::Blame",
+      "space w": "workspace::Save",
+      "space q q": "zed::Quit",
       "alt-j": "editor::MoveLineDown",
       "alt-k": "editor::MoveLineUp",
     },
   },
-
-  // ============================================================================
-  // PANELS — pane navigation
-  // ============================================================================
   {
-    "context": "Terminal",
+    "context": "Editor && vim_mode == visual && !VimWaiting",
     "bindings": {
-      "ctrl-h": "workspace::ActivatePaneLeft",
-      "ctrl-l": "workspace::ActivatePaneRight",
-      "ctrl-j": "workspace::ActivatePaneDown",
-      "ctrl-k": "workspace::ActivatePaneUp",
+      "alt-j": "editor::MoveLineDown",
+      "alt-k": "editor::MoveLineUp",
+      "space l a": "editor::ToggleCodeActions",
+      "space l f": "editor::Format",
     },
   },
   {
     "context": "ProjectPanel",
     "bindings": {
-      "ctrl-h": "workspace::ActivatePaneLeft",
       "ctrl-l": "workspace::ActivatePaneRight",
-      "ctrl-j": "workspace::ActivatePaneDown",
-      "ctrl-k": "workspace::ActivatePaneUp",
     },
   },
   {
-    "context": "OutlinePanel",
+    "context": "Terminal",
     "bindings": {
-      "space f o": "workspace::ToggleLeftDock",
-      "ctrl-h": "workspace::ActivatePaneLeft",
-      "ctrl-l": "workspace::ActivatePaneRight",
-      "ctrl-j": "workspace::ActivatePaneDown",
-      "ctrl-k": "workspace::ActivatePaneUp",
-    },
-  },
-  {
-    "context": "GitPanel",
-    "bindings": {
-      "ctrl-h": "workspace::ActivatePaneLeft",
-      "ctrl-l": "workspace::ActivatePaneRight",
-      "ctrl-j": "workspace::ActivatePaneDown",
       "ctrl-k": "workspace::ActivatePaneUp",
     },
   },

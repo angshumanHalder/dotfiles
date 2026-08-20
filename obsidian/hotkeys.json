@@ -292,21 +292,20 @@
     }
   ],
   "workspace:undo-close-pane": [],
-  "templater-obsidian:create-new-note-from-template": [
-    {
-      "modifiers": [
-        "Alt",
-        "Mod"
-      ],
-      "key": "`"
-    }
-  ],
   "editor:cycle-list-checklist": [
     {
       "modifiers": [
         "Mod"
       ],
       "key": "C"
+    }
+  ],
+  "templater-obsidian:create-new-note-from-template": [
+    {
+      "modifiers": [
+        "Alt"
+      ],
+      "key": "T"
     }
   ]
 }
