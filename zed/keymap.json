@@ -76,6 +76,26 @@
     },
   },
   {
+    "context": "GitPanel",
+    "bindings": {
+      "ctrl-l": "workspace::ActivatePaneRight",
+    },
+  },
+  {
+    "context": "Editor && multibuffer && vim_mode == normal",
+    "bindings": {
+      "ctrl-n": "editor::MoveToStartOfNextExcerpt",
+      "ctrl-p": "editor::MoveToEndOfPreviousExcerpt",
+    },
+  },
+  {
+    "context": "ProjectPanel && not_editing",
+    "bindings": {
+      "a": "project_panel::NewFile",
+      "shift-a": "project_panel::NewDirectory",
+    },
+  },
+  {
     "context": "Terminal",
     "bindings": {
       "ctrl-k": "workspace::ActivatePaneUp",
