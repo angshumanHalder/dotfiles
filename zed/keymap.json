@@ -98,7 +98,9 @@
   {
     "context": "Terminal",
     "bindings": {
+      "ctrl-h": "workspace::ActivatePaneLeft",
       "ctrl-k": "workspace::ActivatePaneUp",
+      "ctrl-l": "workspace::ActivatePaneRight",
     },
   },
 ]
