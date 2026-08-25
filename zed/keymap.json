@@ -9,10 +9,10 @@
   {
     "context": "Editor && VimControl && vim_mode == normal && !menu",
     "bindings": {
-      "ctrl-h": "workspace::ActivatePaneLeft",
-      "ctrl-j": "workspace::ActivatePaneDown",
-      "ctrl-k": "workspace::ActivatePaneUp",
-      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-shift-h": "workspace::ActivatePaneLeft",
+      "ctrl-shift-j": "workspace::ActivatePaneDown",
+      "ctrl-shift-k": "workspace::ActivatePaneUp",
+      "ctrl-shift-l": "workspace::ActivatePaneRight",
       "space s v": "pane::SplitRight",
       "space s h": "pane::SplitDown",
       "shift-h": "pane::ActivatePreviousItem",
@@ -72,13 +72,13 @@
   {
     "context": "ProjectPanel",
     "bindings": {
-      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-shift-l": "workspace::ActivatePaneRight",
     },
   },
   {
     "context": "GitPanel",
     "bindings": {
-      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-shift-l": "workspace::ActivatePaneRight",
     },
   },
   {
@@ -98,9 +98,10 @@
   {
     "context": "Terminal",
     "bindings": {
-      "ctrl-h": "workspace::ActivatePaneLeft",
-      "ctrl-k": "workspace::ActivatePaneUp",
-      "ctrl-l": "workspace::ActivatePaneRight",
+      "ctrl-shift-h": "workspace::ActivatePaneLeft",
+      "ctrl-shift-j": "workspace::ActivatePaneDown",
+      "ctrl-shift-k": "workspace::ActivatePaneUp",
+      "ctrl-shift-l": "workspace::ActivatePaneRight",
     },
   },
 ]
