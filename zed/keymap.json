@@ -23,6 +23,7 @@
       "space f g": "pane::DeploySearch",
       "space f b": "tab_switcher::Toggle",
       "space f r": "projects::OpenRecent",
+      "space f o": "outline_panel::ToggleFocus",
       "space f s": "outline::Toggle",
       "space f d": "diagnostics::Deploy",
       "g d": "editor::GoToDefinition",

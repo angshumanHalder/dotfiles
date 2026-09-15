@@ -21,6 +21,11 @@
   },
   "agent_servers": {
     "codex-acp": {
+      "default_config_options": {
+        "mode": "read-only",
+        "model": "gpt-5.6-luna",
+        "collaboration_mode": "default"
+      },
       "type": "registry",
     },
   },
@@ -52,7 +57,7 @@
   "hard_tabs": false,
   "soft_wrap": "none",
   "vertical_scroll_margin": 8,
-  "theme": "Kanso Ink",
+  "theme": "Kanso Zen",
   "vim_mode": true,
   "cursor_blink": false,
   "seed_search_query_from_cursor": "selection",
@@ -70,7 +75,7 @@
   "icon_theme": {
     "mode": "dark",
     "light": "JetBrains New UI Icons (Dark)",
-    "dark": "JetBrains New UI Icons (Dark)",
+    "dark": "Zed (Default)",
   },
   "auto_update": false,
   "telemetry": {
