@@ -84,6 +84,8 @@
   {
     "context": "Editor && multibuffer && vim_mode == normal",
     "bindings": {
+      "n": "search::SelectNextMatch",
+      "shift-n": "search::SelectPreviousMatch",
       "ctrl-n": "editor::MoveToStartOfNextExcerpt",
       "ctrl-p": "editor::MoveToEndOfPreviousExcerpt",
     },
