@@ -1,0 +1,2 @@
+WRN 2026-08-04T21:34:13.442 ?.8512     server_start:197: Failed to start server: operation not permitted: /var/folders/s9/_gcs49fx5hgdyksy56nqrzqm0000gn/T/nvim.angshumanhalder/cVlC9n/nvim.8512.0
+WRN 2026-08-07T19:02:32.491 ?.72329    server_start:197: Failed to start server: operation not permitted: /var/folders/s9/_gcs49fx5hgdyksy56nqrzqm0000gn/T/nvim.angshumanhalder/NXnHpm/nvim.72329.0

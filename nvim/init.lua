@@ -127,6 +127,7 @@ vim.pack.add({
 
 vim.pack.add({
 	"https://github.com/nvim-tree/nvim-tree.lua",
+	{ src = "https://github.com/olimorris/codecompanion.nvim", version = "v19.23.0" },
 	"https://github.com/ibhagwan/fzf-lua",
 	"https://github.com/williamboman/mason.nvim",
 	"https://github.com/folke/todo-comments.nvim",
@@ -179,6 +180,8 @@ clue.setup({
 		{ mode = "n", keys = "]" },
 	},
 	clues = {
+		{ mode = "n", keys = "<Leader>a", desc = "+AI" },
+		{ mode = "x", keys = "<Leader>a", desc = "+AI" },
 		clue.gen_clues.builtin_completion(),
 		clue.gen_clues.marks(),
 		clue.gen_clues.registers(),
@@ -561,6 +564,75 @@ require("blink.cmp").setup({
 })
 
 -- ============================================================================
+-- AI: CodeCompanion (ACP agents use their existing CLI login/configuration)
+-- <leader>ac  toggle chat   <leader>an  new chat   <leader>aa  actions/chats
+-- <leader>as  add selection   <leader>ar  review edits
+-- In chat: <leader>ap  agent   <leader>am  model/options   ]a/[a  chats
+-- <C-s>  send   q  stop   ?  help   /file, /buffer  attach context
+-- ============================================================================
+
+local codecompanion_width = 0.35
+
+vim.api.nvim_create_autocmd("CmdUndefined", {
+	pattern = "CodeCompanion*",
+	once = true,
+	callback = function()
+		load_plugin("fzf-lua")
+		load_plugin("codecompanion.nvim")
+		require("codecompanion").setup({
+			adapters = {
+				acp = {
+					extend = { codex = { defaults = { auth_method = "chat-gpt" } } },
+				},
+			},
+			interactions = {
+				chat = {
+					adapter = "codex",
+					keymaps = {
+						change_adapter = { modes = { n = "<leader>ap" } },
+						next_chat = { modes = { n = "]a" } },
+						previous_chat = { modes = { n = "[a" } },
+					},
+					slash_commands = {
+						acp_session_options = { keymaps = { modes = { n = "<leader>am" } } },
+					},
+				},
+			},
+			display = {
+				action_palette = { provider = "fzf_lua" },
+				chat = {
+					window = {
+						position = "right",
+						width = codecompanion_width,
+						opts = { number = false, relativenumber = false, signcolumn = "no", winfixwidth = true },
+					},
+				},
+			},
+		})
+	end,
+})
+
+vim.api.nvim_create_autocmd({ "WinNew", "WinClosed", "VimResized" }, {
+	callback = vim.schedule_wrap(function()
+		local width = math.floor(vim.o.columns * codecompanion_width)
+		for _, win in ipairs(vim.api.nvim_list_wins()) do
+			if
+				vim.bo[vim.api.nvim_win_get_buf(win)].filetype == "codecompanion"
+				and vim.api.nvim_win_get_width(win) ~= width
+			then
+				vim.api.nvim_win_set_width(win, width)
+			end
+		end
+	end),
+})
+
+map("n", "<leader>ac", "<cmd>CodeCompanionChat toggle<CR>", { desc = "AI Chat Toggle" })
+map({ "n", "x" }, "<leader>an", ":CodeCompanionChat<CR>", { desc = "AI New Chat" })
+map({ "n", "x" }, "<leader>aa", ":CodeCompanionActions<CR>", { desc = "AI Actions / Chats" })
+map("x", "<leader>as", ":CodeCompanionChat add<CR>", { desc = "AI Add Selection" })
+map("n", "<leader>ar", "<cmd>CodeCompanionCodeReview<CR>", { desc = "AI Review Edits" })
+
+-- ============================================================================
 -- MASON: LSP/tool installer  (:Mason to open UI)
 -- Suggested servers/tools below are installed manually through :Mason.
 -- ============================================================================
@@ -829,7 +901,7 @@ local function setup_render_markdown()
 	render_markdown_loaded = true
 	load_plugin("render-markdown.nvim")
 	require("render-markdown").setup({
-		file_types = { "markdown" },
+		file_types = { "markdown", "codecompanion" },
 		latex = { enabled = false },
 		heading = {
 			enabled = true,
@@ -862,7 +934,7 @@ local function setup_render_markdown()
 end
 
 vim.api.nvim_create_autocmd("FileType", {
-	pattern = "markdown",
+	pattern = { "markdown", "codecompanion" },
 	callback = function()
 		setup_render_markdown()
 		local notes = vim.fs.normalize(vim.fn.expand("~/Documents/Notes"))

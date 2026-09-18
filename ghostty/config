@@ -12,10 +12,10 @@ background-blur = true
 cursor-style = block
 cursor-style-blink = false
 shell-integration-features = no-cursor
-theme = kanagawa-paper-ink
-macos-titlebar-style = hidden
+theme = kanso-ink
 
 macos-option-as-alt = true
+macos-titlebar-style = hidden
 
 
 keybind = ctrl+a=unbind
