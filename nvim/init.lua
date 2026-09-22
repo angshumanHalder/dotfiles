@@ -122,12 +122,13 @@ vim.pack.add({
 	"https://github.com/stevearc/conform.nvim",
 	"https://github.com/mfussenegger/nvim-lint",
 	"https://github.com/nvim-lua/plenary.nvim",
+	"https://github.com/carlos-algms/agentic.nvim",
 	"https://github.com/folke/snacks.nvim",
+  "https://github.com/webhooked/kanso.nvim",
 })
 
 vim.pack.add({
 	"https://github.com/nvim-tree/nvim-tree.lua",
-	{ src = "https://github.com/olimorris/codecompanion.nvim", version = "v19.23.0" },
 	"https://github.com/ibhagwan/fzf-lua",
 	"https://github.com/williamboman/mason.nvim",
 	"https://github.com/folke/todo-comments.nvim",
@@ -155,8 +156,18 @@ end
 -- THEME: kanagawa paper ink
 -- ============================================================================
 
-require("kanagawa-paper").setup({ transparent = true })
-vim.cmd.colorscheme("kanagawa-paper-ink")
+require("kanso").setup({
+	transparent = true,
+	overrides = function()
+		return {
+			WindowPickerStatusLine = { link = "NvimTreeWindowPicker" },
+			WindowPickerStatusLineNC = { link = "NvimTreeWindowPicker" },
+			WindowPickerWinBar = { link = "NvimTreeWindowPicker" },
+			WindowPickerWinBarNC = { link = "NvimTreeWindowPicker" },
+		}
+	end,
+})
+vim.cmd.colorscheme("kanso-ink")
 
 -- ============================================================================
 -- MINI.NVIM
@@ -247,12 +258,25 @@ local function setup_nvim_tree()
 		filter_rules = {
 			include_current_win = false,
 			autoselect_one = true,
-			bo = { filetype = { "NvimTree", "snacks_notif", "snacks_notif_history" }, buftype = {} },
+			bo = {
+				filetype = {
+					"NvimTree",
+					"snacks_notif",
+					"snacks_notif_history",
+					"AgenticChat",
+					"AgenticTodos",
+					"AgenticCode",
+					"AgenticFiles",
+					"AgenticDiagnostics",
+					"AgenticInput",
+				},
+				buftype = {},
+			},
 		},
 	})
 
 	require("nvim-tree").setup({
-		view = { width = 30 },
+		view = { width = 30, preserve_window_proportions = true },
 		renderer = {
 			group_empty = true,
 			icons = { show = { git = true } },
@@ -274,7 +298,9 @@ local function setup_nvim_tree()
 								return false
 							end
 							local ft = vim.bo[vim.api.nvim_win_get_buf(w)].filetype
-							return ft ~= "NvimTree" and vim.api.nvim_win_get_config(w).relative == ""
+							return ft ~= "NvimTree"
+								and not vim.startswith(ft, "Agentic")
+								and vim.api.nvim_win_get_config(w).relative == ""
 						end)
 						if not has_target then
 							vim.cmd("vsplit")
@@ -300,7 +326,10 @@ local function setup_nvim_tree()
 end
 map("n", "<leader>e", function()
 	setup_nvim_tree()
+	local equalalways = vim.o.equalalways
+	vim.o.equalalways = false
 	require("nvim-tree.api").tree.toggle()
+	vim.o.equalalways = equalalways
 end, { desc = "Toggle file tree" })
 
 -- ============================================================================
@@ -564,73 +593,43 @@ require("blink.cmp").setup({
 })
 
 -- ============================================================================
--- AI: CodeCompanion (ACP agents use their existing CLI login/configuration)
--- <leader>ac  toggle chat   <leader>an  new chat   <leader>aa  actions/chats
--- <leader>as  add selection   <leader>ar  review edits
--- In chat: <leader>ap  agent   <leader>am  model/options   ]a/[a  chats
--- <C-s>  send   q  stop   ?  help   /file, /buffer  attach context
+-- AI: Agentic (Codex ACP; shares sessions and authentication with the CLI)
 -- ============================================================================
 
-local codecompanion_width = 0.35
+for group, link in pairs({
+	AgenticDiffDeleteWord = "DiffDelete",
+	AgenticDiffAddWord = "DiffAdd",
+	AgenticStatusPending = "DiagnosticWarn",
+	AgenticStatusCompleted = "DiagnosticOk",
+	AgenticStatusFailed = "DiagnosticError",
+	AgenticPermissionButtonAllow = "DiagnosticOk",
+	AgenticPermissionButtonReject = "DiagnosticError",
+	AgenticPermissionButtonInactive = "Comment",
+	AgenticTitle = "Title",
+	AgenticSpinnerGenerating = "Function",
+	AgenticSpinnerThinking = "Keyword",
+	AgenticSpinnerSearching = "String",
+}) do
+	vim.api.nvim_set_hl(0, group, { link = link })
+end
 
-vim.api.nvim_create_autocmd("CmdUndefined", {
-	pattern = "CodeCompanion*",
-	once = true,
-	callback = function()
-		load_plugin("fzf-lua")
-		load_plugin("codecompanion.nvim")
-		require("codecompanion").setup({
-			adapters = {
-				acp = {
-					extend = { codex = { defaults = { auth_method = "chat-gpt" } } },
-				},
-			},
-			interactions = {
-				chat = {
-					adapter = "codex",
-					keymaps = {
-						change_adapter = { modes = { n = "<leader>ap" } },
-						next_chat = { modes = { n = "]a" } },
-						previous_chat = { modes = { n = "[a" } },
-					},
-					slash_commands = {
-						acp_session_options = { keymaps = { modes = { n = "<leader>am" } } },
-					},
-				},
-			},
-			display = {
-				action_palette = { provider = "fzf_lua" },
-				chat = {
-					window = {
-						position = "right",
-						width = codecompanion_width,
-						opts = { number = false, relativenumber = false, signcolumn = "no", winfixwidth = true },
-					},
-				},
-			},
-		})
-	end,
+require("agentic").setup({
+	provider = "codex-acp",
+	windows = { width = 50 },
 })
 
-vim.api.nvim_create_autocmd({ "WinNew", "WinClosed", "VimResized" }, {
-	callback = vim.schedule_wrap(function()
-		local width = math.floor(vim.o.columns * codecompanion_width)
-		for _, win in ipairs(vim.api.nvim_list_wins()) do
-			if
-				vim.bo[vim.api.nvim_win_get_buf(win)].filetype == "codecompanion"
-				and vim.api.nvim_win_get_width(win) ~= width
-			then
-				vim.api.nvim_win_set_width(win, width)
-			end
-		end
-	end),
-})
-
-map("n", "<leader>ac", "<cmd>CodeCompanionChat toggle<CR>", { desc = "AI Chat Toggle" })
-map({ "n", "x" }, "<leader>an", ":CodeCompanionChat<CR>", { desc = "AI New Chat" })
-map({ "n", "x" }, "<leader>aa", ":CodeCompanionActions<CR>", { desc = "AI Actions / Chats" })
-map("x", "<leader>as", ":CodeCompanionChat add<CR>", { desc = "AI Add Selection" })
-map("n", "<leader>ar", "<cmd>CodeCompanionCodeReview<CR>", { desc = "AI Review Edits" })
+map({ "n", "x" }, "<leader>aa", function()
+	require("agentic").toggle()
+end, { desc = "AI Chat" })
+map({ "n", "x" }, "<leader>an", function()
+	require("agentic").new_session()
+end, { desc = "AI New Session" })
+map({ "n", "x" }, "<leader>ar", function()
+	require("agentic").restore_session()
+end, { desc = "AI Restore Session" })
+map({ "n", "x" }, "<leader>as", function()
+	require("agentic").add_selection_or_file_to_context()
+end, { desc = "AI Add Context" })
 
 -- ============================================================================
 -- MASON: LSP/tool installer  (:Mason to open UI)
@@ -901,7 +900,7 @@ local function setup_render_markdown()
 	render_markdown_loaded = true
 	load_plugin("render-markdown.nvim")
 	require("render-markdown").setup({
-		file_types = { "markdown", "codecompanion" },
+		file_types = { "markdown" },
 		latex = { enabled = false },
 		heading = {
 			enabled = true,
@@ -934,7 +933,7 @@ local function setup_render_markdown()
 end
 
 vim.api.nvim_create_autocmd("FileType", {
-	pattern = { "markdown", "codecompanion" },
+	pattern = "markdown",
 	callback = function()
 		setup_render_markdown()
 		local notes = vim.fs.normalize(vim.fn.expand("~/Documents/Notes"))

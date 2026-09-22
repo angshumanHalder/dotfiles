@@ -7,6 +7,7 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "semantic_tokens": "combined",
   "code_lens": "off",
   "which_key": {
     "enabled": false,
@@ -24,7 +25,7 @@
     "codex-acp": {
       "default_config_options": {
         "mode": "read-only",
-        "model": "gpt-5.6-luna",
+        "model": "gpt-5.6-sol",
         "collaboration_mode": "default"
       },
       "type": "registry",
