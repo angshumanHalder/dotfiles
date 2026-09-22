@@ -615,7 +615,7 @@ end
 
 require("agentic").setup({
 	provider = "codex-acp",
-	windows = { width = 50 },
+	windows = { width = 80 },
 })
 
 map({ "n", "x" }, "<leader>aa", function()
