@@ -40,10 +40,6 @@
       "rev": "862b02f1f96304ef420252522fe2b72c0aebe6e9",
       "src": "https://github.com/jceb/jiejie.nvim"
     },
-    "kanagawa-paper.nvim": {
-      "rev": "ecf19801a2673054c19421d82b766f7641688320",
-      "src": "https://github.com/thesimonho/kanagawa-paper.nvim"
-    },
     "kanso.nvim": {
       "rev": "1afbbb449aa0254823dbe1932e3cbb51886ff9fe",
       "src": "https://github.com/webhooked/kanso.nvim"
@@ -51,6 +47,10 @@
     "lazydev.nvim": {
       "rev": "ff2cbcba459b637ec3fd165a2be59b7bbaeedf0d",
       "src": "https://github.com/folke/lazydev.nvim"
+    },
+    "markdown-table-wrap.nvim": {
+      "rev": "02445d4c338fa0966f997d45b134d197b4605f5a",
+      "src": "https://github.com/ice345/markdown-table-wrap.nvim"
     },
     "mason.nvim": {
       "rev": "2a6940af80375532e5e9e7c1f2fc6319a1b7a69d",

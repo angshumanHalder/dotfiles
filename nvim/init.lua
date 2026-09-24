@@ -110,7 +110,6 @@ map("n", "N", "Nzzzv")
 -- ============================================================================
 
 vim.pack.add({
-	"https://github.com/thesimonho/kanagawa-paper.nvim",
 	"https://github.com/echasnovski/mini.nvim",
 	"https://github.com/romus204/tree-sitter-manager.nvim",
 	"https://github.com/lewis6991/gitsigns.nvim",
@@ -136,6 +135,7 @@ vim.pack.add({
 	"https://github.com/s1n7ax/nvim-window-picker",
 	"https://github.com/jceb/jiejie.nvim",
 	"https://github.com/MeanderingProgrammer/render-markdown.nvim",
+	"https://github.com/ice345/markdown-table-wrap.nvim",
 	"https://github.com/epwalsh/obsidian.nvim",
 	"https://github.com/sindrets/diffview.nvim",
 	"https://github.com/folke/trouble.nvim",
@@ -153,7 +153,7 @@ local function load_plugin(name)
 end
 
 -- ============================================================================
--- THEME: kanagawa paper ink
+-- THEME: kanso ink
 -- ============================================================================
 
 require("kanso").setup({
@@ -615,7 +615,35 @@ end
 
 require("agentic").setup({
 	provider = "codex-acp",
-	windows = { width = 80 },
+	windows = {
+		width = 80,
+		chat = {
+			win_opts = {
+				smoothscroll = true,
+				scrolloff = 0,
+			},
+		},
+	},
+	hooks = {
+		on_session_update = function(data)
+			if
+				data.update.sessionUpdate ~= "agent_message_chunk"
+				or not data.tab_page_id
+				or not vim.api.nvim_tabpage_is_valid(data.tab_page_id)
+				or not package.loaded["markdown-table-wrap"]
+			then
+				return
+			end
+
+			for _, win in ipairs(vim.api.nvim_tabpage_list_wins(data.tab_page_id)) do
+				local buf = vim.api.nvim_win_get_buf(win)
+				if vim.bo[buf].filetype == "AgenticChat" then
+					require("markdown-table-wrap").schedule_refresh({ bufnr = buf, winid = win, silent = true })
+					return
+				end
+			end
+		end,
+	},
 })
 
 map({ "n", "x" }, "<leader>aa", function()
@@ -898,9 +926,8 @@ local function setup_render_markdown()
 		return
 	end
 	render_markdown_loaded = true
-	load_plugin("render-markdown.nvim")
-	require("render-markdown").setup({
-		file_types = { "markdown" },
+	vim.g.render_markdown_config = {
+		file_types = { "markdown", "AgenticChat" },
 		latex = { enabled = false },
 		heading = {
 			enabled = true,
@@ -927,15 +954,30 @@ local function setup_render_markdown()
 		},
 		dash = { enabled = true },
 		quote = { enabled = true, icon = "▋" },
-		pipe_table = { enabled = true },
+		pipe_table = { enabled = false },
 		link = { enabled = true },
+	}
+	load_plugin("render-markdown.nvim")
+end
+
+local markdown_table_wrap_loaded = false
+local function setup_markdown_table_wrap()
+	if markdown_table_wrap_loaded then
+		return
+	end
+	markdown_table_wrap_loaded = true
+	load_plugin("markdown-table-wrap.nvim")
+	require("markdown-table-wrap").setup({
+		extra_filetypes = { "AgenticChat" },
+		preview_mode = "inline",
 	})
 end
 
 vim.api.nvim_create_autocmd("FileType", {
-	pattern = "markdown",
+	pattern = { "markdown", "AgenticChat" },
 	callback = function()
 		setup_render_markdown()
+		setup_markdown_table_wrap()
 		local notes = vim.fs.normalize(vim.fn.expand("~/Documents/Notes"))
 		local file = vim.fs.normalize(vim.api.nvim_buf_get_name(0))
 		if file:sub(1, #notes + 1) == notes .. "/" then
