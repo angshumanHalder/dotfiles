@@ -50,7 +50,7 @@
   "ui_font_size": 14.0,
   "buffer_font_family": "JetBrains Mono",
   "buffer_font_weight": 700.0,
-  "buffer_font_size": 12.0,
+  "buffer_font_size": 13.0,
   "agent_buffer_font_size": 14.0,
   "agent_ui_font_size": 14.0,
   "formatter": "auto",
@@ -59,7 +59,7 @@
   "hard_tabs": false,
   "soft_wrap": "none",
   "vertical_scroll_margin": 8,
-  "theme": "Kanso Zen",
+  "theme": "Kanso Ink (Blurred)",
   "vim_mode": true,
   "cursor_blink": false,
   "seed_search_query_from_cursor": "selection",
@@ -72,7 +72,7 @@
   "terminal": {
     "font_family": "JetBrainsMono Nerd Font",
     "font_weight": 700.0,
-    "font_size": 12.0,
+    "font_size": 13.0,
   },
   "icon_theme": {
     "mode": "dark",
