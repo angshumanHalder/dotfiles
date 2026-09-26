@@ -46,6 +46,7 @@ opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 opt.foldenable = false
 opt.foldlevel = 99
 opt.foldlevelstart = 99
+opt.showcmd = false
 
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "markdown",
@@ -121,9 +122,9 @@ vim.pack.add({
 	"https://github.com/stevearc/conform.nvim",
 	"https://github.com/mfussenegger/nvim-lint",
 	"https://github.com/nvim-lua/plenary.nvim",
-	"https://github.com/carlos-algms/agentic.nvim",
 	"https://github.com/folke/snacks.nvim",
-  "https://github.com/webhooked/kanso.nvim",
+	"https://github.com/webhooked/kanso.nvim",
+	"https://github.com/ChmaraX/herdr-nvim",
 })
 
 vim.pack.add({
@@ -191,8 +192,8 @@ clue.setup({
 		{ mode = "n", keys = "]" },
 	},
 	clues = {
-		{ mode = "n", keys = "<Leader>a", desc = "+AI" },
-		{ mode = "x", keys = "<Leader>a", desc = "+AI" },
+		{ mode = "n", keys = "<Leader>a", desc = "+Herdr" },
+		{ mode = "x", keys = "<Leader>a", desc = "+Herdr" },
 		clue.gen_clues.builtin_completion(),
 		clue.gen_clues.marks(),
 		clue.gen_clues.registers(),
@@ -200,6 +201,8 @@ clue.setup({
 		clue.gen_clues.z(),
 	},
 })
+
+require("herdr-nvim").setup()
 
 -- ============================================================================
 -- TODO COMMENTS
@@ -263,12 +266,6 @@ local function setup_nvim_tree()
 					"NvimTree",
 					"snacks_notif",
 					"snacks_notif_history",
-					"AgenticChat",
-					"AgenticTodos",
-					"AgenticCode",
-					"AgenticFiles",
-					"AgenticDiagnostics",
-					"AgenticInput",
 				},
 				buftype = {},
 			},
@@ -298,9 +295,7 @@ local function setup_nvim_tree()
 								return false
 							end
 							local ft = vim.bo[vim.api.nvim_win_get_buf(w)].filetype
-							return ft ~= "NvimTree"
-								and not vim.startswith(ft, "Agentic")
-								and vim.api.nvim_win_get_config(w).relative == ""
+							return ft ~= "NvimTree" and vim.api.nvim_win_get_config(w).relative == ""
 						end)
 						if not has_target then
 							vim.cmd("vsplit")
@@ -406,6 +401,8 @@ local fzf
 
 require("snacks").setup({
 	bigfile = { enabled = true },
+	input = { enabled = true, win = { row = 0.5 } },
+	picker = { enabled = true, ui_select = true },
 	dashboard = {
 		enabled = true,
 		preset = {
@@ -591,73 +588,6 @@ require("blink.cmp").setup({
 	snippets = { preset = "default" },
 	signature = { enabled = true },
 })
-
--- ============================================================================
--- AI: Agentic (Codex ACP; shares sessions and authentication with the CLI)
--- ============================================================================
-
-for group, link in pairs({
-	AgenticDiffDeleteWord = "DiffDelete",
-	AgenticDiffAddWord = "DiffAdd",
-	AgenticStatusPending = "DiagnosticWarn",
-	AgenticStatusCompleted = "DiagnosticOk",
-	AgenticStatusFailed = "DiagnosticError",
-	AgenticPermissionButtonAllow = "DiagnosticOk",
-	AgenticPermissionButtonReject = "DiagnosticError",
-	AgenticPermissionButtonInactive = "Comment",
-	AgenticTitle = "Title",
-	AgenticSpinnerGenerating = "Function",
-	AgenticSpinnerThinking = "Keyword",
-	AgenticSpinnerSearching = "String",
-}) do
-	vim.api.nvim_set_hl(0, group, { link = link })
-end
-
-require("agentic").setup({
-	provider = "codex-acp",
-	windows = {
-		width = 80,
-		chat = {
-			win_opts = {
-				smoothscroll = true,
-				scrolloff = 0,
-			},
-		},
-	},
-	hooks = {
-		on_session_update = function(data)
-			if
-				data.update.sessionUpdate ~= "agent_message_chunk"
-				or not data.tab_page_id
-				or not vim.api.nvim_tabpage_is_valid(data.tab_page_id)
-				or not package.loaded["markdown-table-wrap"]
-			then
-				return
-			end
-
-			for _, win in ipairs(vim.api.nvim_tabpage_list_wins(data.tab_page_id)) do
-				local buf = vim.api.nvim_win_get_buf(win)
-				if vim.bo[buf].filetype == "AgenticChat" then
-					require("markdown-table-wrap").schedule_refresh({ bufnr = buf, winid = win, silent = true })
-					return
-				end
-			end
-		end,
-	},
-})
-
-map({ "n", "x" }, "<leader>aa", function()
-	require("agentic").toggle()
-end, { desc = "AI Chat" })
-map({ "n", "x" }, "<leader>an", function()
-	require("agentic").new_session()
-end, { desc = "AI New Session" })
-map({ "n", "x" }, "<leader>ar", function()
-	require("agentic").restore_session()
-end, { desc = "AI Restore Session" })
-map({ "n", "x" }, "<leader>as", function()
-	require("agentic").add_selection_or_file_to_context()
-end, { desc = "AI Add Context" })
 
 -- ============================================================================
 -- MASON: LSP/tool installer  (:Mason to open UI)
@@ -927,7 +857,7 @@ local function setup_render_markdown()
 	end
 	render_markdown_loaded = true
 	vim.g.render_markdown_config = {
-		file_types = { "markdown", "AgenticChat" },
+		file_types = { "markdown" },
 		latex = { enabled = false },
 		heading = {
 			enabled = true,
@@ -967,14 +897,11 @@ local function setup_markdown_table_wrap()
 	end
 	markdown_table_wrap_loaded = true
 	load_plugin("markdown-table-wrap.nvim")
-	require("markdown-table-wrap").setup({
-		extra_filetypes = { "AgenticChat" },
-		preview_mode = "inline",
-	})
+	require("markdown-table-wrap").setup({ preview_mode = "inline" })
 end
 
 vim.api.nvim_create_autocmd("FileType", {
-	pattern = { "markdown", "AgenticChat" },
+	pattern = "markdown",
 	callback = function()
 		setup_render_markdown()
 		setup_markdown_table_wrap()

@@ -1,9 +1,5 @@
 {
   "plugins": {
-    "agentic.nvim": {
-      "rev": "81628c1dc07edadd1c2c3c27d8dbcb424da1dea0",
-      "src": "https://github.com/carlos-algms/agentic.nvim"
-    },
     "blink.cmp": {
       "rev": "cba53eff1948109ec0f47cbead4f07494d1e25c9",
       "src": "https://github.com/saghen/blink.cmp"
@@ -35,6 +31,10 @@
     "grug-far.nvim": {
       "rev": "6e05398cf6cad05b3fb46569db96b1ccfcbbd402",
       "src": "https://github.com/MagicDuck/grug-far.nvim"
+    },
+    "herdr-nvim": {
+      "rev": "f35ed6df3cf55919c8d54409d08e8b664d8f0480",
+      "src": "https://github.com/ChmaraX/herdr-nvim"
     },
     "jiejie.nvim": {
       "rev": "862b02f1f96304ef420252522fe2b72c0aebe6e9",
