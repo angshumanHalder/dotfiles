@@ -1,0 +1,35 @@
+onboarding = false
+
+[ui]
+status_indicators = "symbols"
+host_cursor = "drawn"
+sidebar_collapsed_mode = "hidden"
+
+[keys]
+prefix = "ctrl+t"
+workspace_picker = "prefix+w"
+navigate_workspace_down = "j"
+navigate_workspace_up = "k"
+focus_agent = "prefix+alt+1..9"
+
+[[keys.command]]
+key = "prefix+e"
+type = "plugin_action"
+command = "chmarax.herdr-nvim.toggle"
+description = "Neovim sidebar"
+
+[[keys.command]]
+key = "prefix+o"
+type = "plugin_action"
+command = "chmarax.herdr-nvim.pick-file"
+description = "Open agent-touched file"
+
+[theme]
+name = "terminal"
+auto_switch = false
+
+[theme.custom]
+selection_bg = "#393B44"
+
+[ui.toast]
+delivery = "terminal"

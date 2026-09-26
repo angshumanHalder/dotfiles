@@ -3,4 +3,11 @@ fish/fish_variables
 yarn/
 jj/
 
+herdr/*
+!herdr/config.toml
+!herdr/plugins/
+herdr/plugins/*
+!herdr/plugins/config/
+!herdr/plugins/config/**
+
 StardewValley
