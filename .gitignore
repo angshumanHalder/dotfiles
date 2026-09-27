@@ -2,8 +2,7 @@ configstore/
 fish/fish_variables
 yarn/
 jj/
-/orbita/ca.key
-/orbita/ca.crt
+/orbita
 
 herdr/*
 !herdr/config.toml

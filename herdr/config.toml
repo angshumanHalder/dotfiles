@@ -2,7 +2,7 @@ onboarding = false
 
 [ui]
 status_indicators = "symbols"
-host_cursor = "drawn"
+host_cursor = "native"
 sidebar_collapsed_mode = "hidden"
 
 [keys]

@@ -46,7 +46,6 @@ opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 opt.foldenable = false
 opt.foldlevel = 99
 opt.foldlevelstart = 99
-opt.showcmd = false
 
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "markdown",
@@ -75,6 +74,14 @@ map("n", "<A-j>", "<cmd>m .+1<CR>==")
 map("n", "<A-k>", "<cmd>m .-2<CR>==")
 map("v", "<A-j>", "<cmd>m '>+1<CR>gv=gv")
 map("v", "<A-k>", "<cmd>m '<-2<CR>gv=gv")
+
+-- Increase/decrease window height with Alt + Up/Down
+map('n', '<M-Up>', ':resize +2<CR>', { silent = true })
+map('n', '<M-Down>', ':resize -2<CR>', { silent = true })
+
+-- Increase/decrease window width with Alt + Left/Right
+map('n', '<M-Right>', ':vertical resize +2<CR>', { silent = true })
+map('n', '<M-Left>', ':vertical resize -2<CR>', { silent = true })
 
 map("n", "<leader>sv", "<cmd>vsplit<CR>")
 map("n", "<leader>sh", "<cmd>split<CR>")
