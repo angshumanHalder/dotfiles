@@ -40,6 +40,10 @@
       "rev": "862b02f1f96304ef420252522fe2b72c0aebe6e9",
       "src": "https://github.com/jceb/jiejie.nvim"
     },
+    "kanagawa.nvim": {
+      "rev": "bb85e4bfc8d89b0e62c8fa53ccdd13d12e2f77b3",
+      "src": "https://github.com/rebelot/kanagawa.nvim"
+    },
     "kanso.nvim": {
       "rev": "1afbbb449aa0254823dbe1932e3cbb51886ff9fe",
       "src": "https://github.com/webhooked/kanso.nvim"

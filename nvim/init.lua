@@ -130,7 +130,7 @@ vim.pack.add({
 	"https://github.com/mfussenegger/nvim-lint",
 	"https://github.com/nvim-lua/plenary.nvim",
 	"https://github.com/folke/snacks.nvim",
-	"https://github.com/webhooked/kanso.nvim",
+	"https://github.com/rebelot/kanagawa.nvim",
 	"https://github.com/ChmaraX/herdr-nvim",
 })
 
@@ -161,10 +161,10 @@ local function load_plugin(name)
 end
 
 -- ============================================================================
--- THEME: kanso ink
+-- THEME: kanagawa dragon
 -- ============================================================================
 
-require("kanso").setup({
+require("kanagawa").setup({
 	transparent = true,
 	overrides = function()
 		return {
@@ -175,7 +175,7 @@ require("kanso").setup({
 		}
 	end,
 })
-vim.cmd.colorscheme("kanso-ink")
+vim.cmd.colorscheme("kanagawa-dragon")
 
 -- ============================================================================
 -- MINI.NVIM

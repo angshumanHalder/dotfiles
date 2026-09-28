@@ -11,6 +11,10 @@ workspace_picker = "prefix+w"
 navigate_workspace_down = "j"
 navigate_workspace_up = "k"
 focus_agent = "prefix+alt+1..9"
+resize_pane_left = "prefix+shift+h"
+resize_pane_down = "prefix+shift+j"
+resize_pane_up = "prefix+shift+k"
+resize_pane_right = "prefix+shift+l"
 
 [[keys.command]]
 key = "prefix+e"
@@ -25,23 +29,23 @@ command = "chmarax.herdr-nvim.pick-file"
 description = "Open agent-touched file"
 
 [theme]
-# Herdr requires a built-in base; every color token below uses Kansō Ink.
+# Herdr requires a built-in base; custom colors use Kanagawa Dragon.
 name = "kanagawa"
 auto_switch = false
 
 [theme.custom]
-panel_bg = "#14171D"
-sidebar_bg = "#14171D"
-active_row_bg = "#22262D"
-selection_bg = "#393B44"
-surface0 = "#1F1F26"
-surface1 = "#22262D"
-surface_dim = "#14171D"
-overlay0 = "#393B44"
-overlay1 = "#4B4E57"
-text = "#C5C9C7"
-subtext0 = "#A4A7A4"
-accent = "#8BA4B0"
+panel_bg = "#181616"
+sidebar_bg = "#181616"
+active_row_bg = "#282727"
+selection_bg = "#223249"
+surface0 = "#282727"
+surface1 = "#393836"
+surface_dim = "#12120F"
+overlay0 = "#625E5A"
+overlay1 = "#7A8382"
+text = "#C5C9C5"
+subtext0 = "#C8C093"
+accent = "#C4746E"
 mauve = "#A292A3"
 green = "#8A9A7B"
 yellow = "#C4B28A"
