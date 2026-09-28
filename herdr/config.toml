@@ -25,11 +25,30 @@ command = "chmarax.herdr-nvim.pick-file"
 description = "Open agent-touched file"
 
 [theme]
-name = "terminal"
+# Herdr requires a built-in base; every color token below uses Kansō Ink.
+name = "kanagawa"
 auto_switch = false
 
 [theme.custom]
+panel_bg = "#14171D"
+sidebar_bg = "#14171D"
+active_row_bg = "#22262D"
 selection_bg = "#393B44"
+surface0 = "#1F1F26"
+surface1 = "#22262D"
+surface_dim = "#14171D"
+overlay0 = "#393B44"
+overlay1 = "#4B4E57"
+text = "#C5C9C7"
+subtext0 = "#A4A7A4"
+accent = "#8BA4B0"
+mauve = "#A292A3"
+green = "#8A9A7B"
+yellow = "#C4B28A"
+red = "#C4746E"
+blue = "#8BA4B0"
+teal = "#8EA4A2"
+peach = "#B6927B"
 
 [ui.toast]
 delivery = "terminal"
