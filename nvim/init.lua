@@ -168,6 +168,8 @@ require("kanagawa").setup({
 	transparent = true,
 	overrides = function()
 		return {
+			TroubleNormal = { link = "Normal" },
+			TroubleNormalNC = { link = "Normal" },
 			WindowPickerStatusLine = { link = "NvimTreeWindowPicker" },
 			WindowPickerStatusLineNC = { link = "NvimTreeWindowPicker" },
 			WindowPickerWinBar = { link = "NvimTreeWindowPicker" },
@@ -210,6 +212,17 @@ clue.setup({
 })
 
 require("herdr-nvim").setup()
+-- Compact Herdr comments: locations and text; agent reads code as needed.
+do
+	local prompt = require("herdr-nvim.prompt")
+	rawset(prompt, "format", function(items, opts)
+		local parts = {}
+		for _, item in ipairs(items) do
+			parts[#parts + 1] = prompt.location(item.comment, opts and opts.cwd) .. "\n" .. item.comment.text
+		end
+		return table.concat(parts, "\n\n")
+	end)
+end
 
 -- ============================================================================
 -- TODO COMMENTS
