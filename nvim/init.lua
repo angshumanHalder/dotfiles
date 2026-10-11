@@ -410,6 +410,10 @@ local function open_oil(dir)
 								vim.wo.number = true
 								vim.wo.relativenumber = true
 								vim.wo.signcolumn = "yes"
+								local root = vim.fs.root(0, ".git")
+								if root and root ~= vim.fn.getcwd() then
+									vim.cmd.cd(root)
+								end
 							end
 						end)
 					end,
