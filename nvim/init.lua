@@ -231,9 +231,10 @@ end
 -- <leader>ft  search todos
 -- ============================================================================
 
+load_plugin("todo-comments.nvim")
+require("todo-comments").setup()
+
 map("n", "<leader>ft", function()
-	load_plugin("todo-comments.nvim")
-	require("todo-comments").setup()
 	require("todo-comments.fzf").todo({
 		prompt = "Todo comments> ",
 		-- This sets the initial query for ripgrep but keeps it out of the prompt
@@ -510,8 +511,8 @@ require("gitsigns").setup({
 -- ============================================================================
 -- SNACKS
 -- Modules: bigfile, dashboard, indent, notifier, scroll, statuscolumn,
---          gitbrowse, scratch, lazygit, bufdelete
--- <leader>bd  delete buffer   <leader>gg  lazygit   <leader>gB  git browse
+--          gitbrowse, scratch, bufdelete
+-- <leader>bd  delete buffer   <leader>gg  Neogit   <leader>gB  git browse
 -- <leader>gj  Jujutsu status  <leader>sc  scratch buffer
 -- ============================================================================
 
@@ -578,11 +579,9 @@ require("snacks").setup({
 	notifier = { enabled = true, timeout = 3000 },
 	scroll = { enabled = false },
 	statuscolumn = { enabled = false },
-	lazygit = { enabled = true },
 	bufdelete = { enabled = true },
 	gitbrowse = { enabled = true },
 	scratch = { enabled = true },
-	terminal = { win = { border = "single" } },
 	image = { enabled = true, doc = { enabled = false } },
 })
 
@@ -614,11 +613,8 @@ map("t", "<C-\\>t", toggle_terminal, { desc = "Return to editor" })
 map("n", "<leader>bd", function()
 	Snacks.bufdelete()
 end, { desc = "Delete buffer" })
-map("n", "<leader>gg", function()
-	Snacks.lazygit()
-end, { desc = "LazyGit" })
 local neogit_loaded = false
-map("n", "<leader>gn", function()
+map("n", "<leader>gg", function()
 	if not neogit_loaded then
 		load_plugin("diffview.nvim")
 		load_plugin("neogit")
