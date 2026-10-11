@@ -84,9 +84,6 @@ map("n", "<M-Down>", ":resize -2<CR>", { silent = true })
 map("n", "<M-Right>", ":vertical resize +2<CR>", { silent = true })
 map("n", "<M-Left>", ":vertical resize -2<CR>", { silent = true })
 
-map("n", "<leader>sv", "<cmd>vsplit<CR>")
-map("n", "<leader>sh", "<cmd>split<CR>")
-
 map("n", "<S-h>", "<cmd>bprev<CR>")
 map("n", "<S-l>", "<cmd>bnext<CR>")
 
