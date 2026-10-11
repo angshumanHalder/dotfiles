@@ -25,23 +25,23 @@ command = "chmarax.herdr-nvim.pick-file"
 description = "Open agent-touched file"
 
 [theme]
-# Herdr requires a built-in base; custom colors use Kanagawa Dragon.
-name = "kanagawa"
+# Herdr uses terminal colors as a base, with Kanso Ink overrides.
+name = "terminal"
 auto_switch = false
 
 [theme.custom]
-panel_bg = "#181616"
-sidebar_bg = "#181616"
-active_row_bg = "#282727"
-selection_bg = "#223249"
-surface0 = "#282727"
-surface1 = "#393836"
-surface_dim = "#12120F"
-overlay0 = "#625E5A"
-overlay1 = "#7A8382"
-text = "#C5C9C5"
-subtext0 = "#C8C093"
-accent = "#C4746E"
+panel_bg = "#14171d"
+sidebar_bg = "#14171d"
+active_row_bg = "#22262D"
+selection_bg = "#393B44"
+surface0 = "#1f1f26"
+surface1 = "#22262D"
+surface_dim = "#14171d"
+overlay0 = "#4b4e57"
+overlay1 = "#909398"
+text = "#C5C9C7"
+subtext0 = "#A4A7A4"
+accent = "#8BA4B0"
 mauve = "#A292A3"
 green = "#8A9A7B"
 yellow = "#C4B28A"

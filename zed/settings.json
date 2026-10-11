@@ -7,6 +7,8 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "document_symbols": "off",
+  "document_folding_ranges": "on",
   "semantic_tokens": "combined",
   "code_lens": "off",
   "which_key": {
@@ -25,8 +27,8 @@
     "codex-acp": {
       "default_config_options": {
         "mode": "read-only",
-        "model": "gpt-5.6-sol",
-        "collaboration_mode": "default"
+        "model": "gpt-6-sol",
+        "collaboration_mode": "default",
       },
       "type": "registry",
     },
@@ -57,6 +59,27 @@
   "format_on_save": "on",
   "tab_size": 2,
   "hard_tabs": false,
+  "languages": {
+    "Rust": {
+      "tab_size": 4,
+    },
+    "JavaScript": {
+      "tab_size": 2,
+    },
+    "TypeScript": {
+      "tab_size": 2,
+    },
+    "TSX": {
+      "tab_size": 2,
+    },
+    "Python": {
+      "tab_size": 4,
+    },
+    "Go": {
+      "tab_size": 8,
+      "hard_tabs": true,
+    },
+  },
   "soft_wrap": "none",
   "vertical_scroll_margin": 8,
   "theme": "Kanso Ink (Blurred)",
@@ -77,7 +100,7 @@
   "icon_theme": {
     "mode": "dark",
     "light": "JetBrains New UI Icons (Dark)",
-    "dark": "Zed (Default)",
+    "dark": "JetBrains New UI Icons (Dark)",
   },
   "auto_update": false,
   "telemetry": {
@@ -88,10 +111,12 @@
     "dock": "left",
   },
   "agent": {
+    "threads_sidebar": {
+      "position": "right",
+    },
     "use_modifier_to_send": true,
     "default_width": 250.0,
     "max_content_width": 850.0,
-    "sidebar_side": "right",
     "dock": "right",
     "favorite_models": [],
     "model_parameters": [],

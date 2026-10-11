@@ -46,6 +46,7 @@ opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 opt.foldenable = false
 opt.foldlevel = 99
 opt.foldlevelstart = 99
+opt.showcmd = false
 
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "markdown",
@@ -76,12 +77,12 @@ map("v", "<A-j>", "<cmd>m '>+1<CR>gv=gv")
 map("v", "<A-k>", "<cmd>m '<-2<CR>gv=gv")
 
 -- Increase/decrease window height with Alt + Up/Down
-map('n', '<M-Up>', ':resize +2<CR>', { silent = true })
-map('n', '<M-Down>', ':resize -2<CR>', { silent = true })
+map("n", "<M-Up>", ":resize +2<CR>", { silent = true })
+map("n", "<M-Down>", ":resize -2<CR>", { silent = true })
 
 -- Increase/decrease window width with Alt + Left/Right
-map('n', '<M-Right>', ':vertical resize +2<CR>', { silent = true })
-map('n', '<M-Left>', ':vertical resize -2<CR>', { silent = true })
+map("n", "<M-Right>", ":vertical resize +2<CR>", { silent = true })
+map("n", "<M-Left>", ":vertical resize -2<CR>", { silent = true })
 
 map("n", "<leader>sv", "<cmd>vsplit<CR>")
 map("n", "<leader>sh", "<cmd>split<CR>")
@@ -130,13 +131,16 @@ vim.pack.add({
 	"https://github.com/mfussenegger/nvim-lint",
 	"https://github.com/nvim-lua/plenary.nvim",
 	"https://github.com/folke/snacks.nvim",
-	"https://github.com/rebelot/kanagawa.nvim",
+	"https://github.com/webhooked/kanso.nvim",
 	"https://github.com/ChmaraX/herdr-nvim",
 })
 
 vim.pack.add({
 	"https://github.com/nvim-tree/nvim-tree.lua",
+	"https://github.com/stevearc/oil.nvim",
+	"https://github.com/NeogitOrg/neogit",
 	"https://github.com/ibhagwan/fzf-lua",
+	"https://github.com/juniorsundar/refer.nvim",
 	"https://github.com/williamboman/mason.nvim",
 	"https://github.com/folke/todo-comments.nvim",
 	"https://github.com/MagicDuck/grug-far.nvim",
@@ -144,7 +148,6 @@ vim.pack.add({
 	"https://github.com/jceb/jiejie.nvim",
 	"https://github.com/MeanderingProgrammer/render-markdown.nvim",
 	"https://github.com/ice345/markdown-table-wrap.nvim",
-	"https://github.com/epwalsh/obsidian.nvim",
 	"https://github.com/sindrets/diffview.nvim",
 	"https://github.com/folke/trouble.nvim",
 }, {
@@ -161,10 +164,10 @@ local function load_plugin(name)
 end
 
 -- ============================================================================
--- THEME: kanagawa dragon
+-- THEME: kanso ink
 -- ============================================================================
 
-require("kanagawa").setup({
+require("kanso").setup({
 	transparent = true,
 	overrides = function()
 		return {
@@ -177,7 +180,7 @@ require("kanagawa").setup({
 		}
 	end,
 })
-vim.cmd.colorscheme("kanagawa-dragon")
+vim.cmd.colorscheme("kanso-ink")
 
 -- ============================================================================
 -- MINI.NVIM
@@ -293,6 +296,7 @@ local function setup_nvim_tree()
 	})
 
 	require("nvim-tree").setup({
+		sync_root_with_cwd = true,
 		view = { width = 30, preserve_window_proportions = true },
 		renderer = {
 			group_empty = true,
@@ -346,6 +350,97 @@ map("n", "<leader>e", function()
 	require("nvim-tree.api").tree.toggle()
 	vim.o.equalalways = equalalways
 end, { desc = "Toggle file tree" })
+
+-- ============================================================================
+-- PROJECTS AND DIRECTORY VIEW
+-- <leader>fp  projects   <leader>pa  add project   -  directory view
+-- ============================================================================
+
+local project_file = vim.fn.stdpath("data") .. "/projects.txt"
+local function saved_projects()
+	if vim.fn.filereadable(project_file) == 0 then
+		return {}
+	end
+	return vim.tbl_filter(function(dir)
+		return vim.fn.isdirectory(dir) == 1 and vim.uv.fs_stat(dir .. "/.git") ~= nil
+	end, vim.fn.readfile(project_file))
+end
+
+local function add_project()
+	local oil = require("oil")
+	local entry = oil.get_cursor_entry()
+	local dir = oil.get_current_dir()
+	if not dir then
+		vim.notify("Select a local directory", vim.log.levels.WARN)
+		return
+	end
+	if entry and entry.type == "directory" then
+		dir = vim.fs.joinpath(dir, entry.name)
+	end
+	dir = vim.fs.normalize(dir)
+	if vim.fn.isdirectory(dir) == 0 or not vim.uv.fs_stat(dir .. "/.git") then
+		vim.notify("Select a directory containing .git", vim.log.levels.WARN)
+		return
+	end
+	if not vim.tbl_contains(saved_projects(), dir) then
+		local ok, result = pcall(vim.fn.writefile, { dir }, project_file, "a")
+		if not ok or result ~= 0 then
+			vim.notify("Could not save project: " .. tostring(result), vim.log.levels.ERROR)
+			return
+		end
+	end
+	vim.cmd.cd(dir)
+	oil.close()
+	Snacks.picker.files({ cwd = dir })
+end
+
+local oil_loaded = false
+local function open_oil(dir)
+	if not oil_loaded then
+		load_plugin("oil.nvim")
+		require("oil").setup({
+			default_file_explorer = false,
+			view_options = { show_hidden = true },
+			keymaps = {
+				["A"] = { callback = add_project, desc = "Add Git project" },
+				["<CR>"] = {
+					callback = function()
+						require("oil").select({}, function(err)
+							if not err and not vim.api.nvim_buf_get_name(0):match("^oil://") then
+								vim.wo.number = true
+								vim.wo.relativenumber = true
+								vim.wo.signcolumn = "yes"
+							end
+						end)
+					end,
+					desc = "Open entry",
+				},
+			},
+		})
+		oil_loaded = true
+	end
+	require("oil").open(dir)
+end
+
+map("n", "-", function()
+	open_oil()
+end, { desc = "Browse directory" })
+map("n", "<leader>pa", function()
+	open_oil(vim.fn.expand("~"))
+end, { desc = "Add Git project" })
+map("n", "<leader>fp", function()
+	Snacks.picker.projects({
+		dev = {},
+		projects = saved_projects(),
+		confirm = function(picker, item)
+			picker:close()
+			if item then
+				vim.cmd.cd(item.file)
+				Snacks.picker.files({ cwd = item.file })
+			end
+		end,
+	})
+end, { desc = "Projects" })
 
 -- ============================================================================
 -- TREESITTER
@@ -484,7 +579,34 @@ require("snacks").setup({
 	bufdelete = { enabled = true },
 	gitbrowse = { enabled = true },
 	scratch = { enabled = true },
+	terminal = { win = { border = "single" } },
+	image = { enabled = true, doc = { enabled = false } },
 })
+
+-- Keep the shell buffer loaded while another buffer is displayed.
+local terminal_buf, return_buf
+local function toggle_terminal()
+	if vim.api.nvim_get_current_buf() == terminal_buf then
+		vim.cmd.stopinsert()
+		if return_buf and vim.api.nvim_buf_is_valid(return_buf) then
+			vim.api.nvim_win_set_buf(0, return_buf)
+		else
+			vim.cmd.enew()
+		end
+	else
+		return_buf = vim.api.nvim_get_current_buf()
+		if terminal_buf and vim.api.nvim_buf_is_valid(terminal_buf) then
+			vim.api.nvim_win_set_buf(0, terminal_buf)
+		else
+			vim.api.nvim_win_set_buf(0, vim.api.nvim_create_buf(true, false))
+			vim.cmd.terminal()
+			terminal_buf = vim.api.nvim_get_current_buf()
+		end
+		vim.cmd.startinsert()
+	end
+end
+map("n", "<leader>tt", toggle_terminal, { desc = "Toggle terminal buffer" })
+map("t", "<C-\\>t", toggle_terminal, { desc = "Return to editor" })
 
 map("n", "<leader>bd", function()
 	Snacks.bufdelete()
@@ -492,6 +614,16 @@ end, { desc = "Delete buffer" })
 map("n", "<leader>gg", function()
 	Snacks.lazygit()
 end, { desc = "LazyGit" })
+local neogit_loaded = false
+map("n", "<leader>gn", function()
+	if not neogit_loaded then
+		load_plugin("diffview.nvim")
+		load_plugin("neogit")
+		require("neogit").setup({})
+		neogit_loaded = true
+	end
+	require("neogit").open()
+end, { desc = "Neogit" })
 map("n", "<leader>gj", function()
 	load_plugin("jiejie.nvim")
 	vim.cmd("J")
@@ -513,6 +645,8 @@ map("n", "<leader>gc", function()
 	require("diffview").setup({})
 	vim.cmd.DiffviewOpen()
 end, { desc = "Diffview" })
+
+map("n", "<leader>gx", "<cmd>DiffviewClose<CR>", { desc = "Close Diffview" })
 
 -- ============================================================================
 -- FUZZY FINDER: fzf-lua
@@ -550,6 +684,30 @@ end
 map("n", "<leader>ff", function()
 	fzf("files")
 end, { desc = "Files" })
+
+load_plugin("refer.nvim")
+require("refer").setup({
+	min_height = 12,
+	max_height = 12,
+	extras = { find_file = true },
+})
+
+map("n", "<leader>.", function()
+	local picker = require("refer.extras.find_file").run()
+	vim.b[picker.input_buf].completion = false
+	vim.keymap.set("i", "<CR>", function()
+		local item = picker.current_matches[picker.selected_index]
+		if item and item.data and item.data.is_dir then
+			local dir = item.data.filename
+			-- Prevent Refer's WinLeave handler from cancelling during close.
+			picker.is_previewing = true
+			picker:close()
+			open_oil(dir)
+		else
+			picker.actions.select_entry()
+		end
+	end, { buffer = picker.input_buf, desc = "Open directory in Oil or file in editor" })
+end, { desc = "Find file anywhere" })
 map("n", "<leader>fg", function()
 	fzf("live_grep")
 end, { desc = "Live Grep" })
@@ -613,6 +771,8 @@ require("blink.cmp").setup({
 -- MASON: LSP/tool installer  (:Mason to open UI)
 -- Suggested servers/tools below are installed manually through :Mason.
 -- ============================================================================
+
+vim.env.PATH = vim.fn.stdpath("data") .. "/mason/bin:" .. vim.env.PATH
 
 vim.api.nvim_create_autocmd("CmdUndefined", {
 	pattern = "Mason",
@@ -805,71 +965,6 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 -- Renders headings, bullets, checkboxes, code blocks, tables inline
 -- ============================================================================
 
--- ============================================================================
--- OBSIDIAN: note-taking with vault integration
--- <leader>on  new note        <leader>oo  open picker   <leader>of  follow link
--- <leader>ob  backlinks       <leader>ot  tags          <leader>os  search
--- <leader>oT  new from template
--- ============================================================================
-
-local obsidian_loaded = false
-local function setup_obsidian()
-	if obsidian_loaded then
-		return
-	end
-	obsidian_loaded = true
-	load_plugin("obsidian.nvim")
-	require("obsidian").setup({
-		workspaces = {
-			{ name = "notes", path = "~/Documents/Notes/" },
-		},
-		completion = {
-			min_chars = 3,
-			nvim_cmp = false,
-			blink = true,
-		},
-		ui = { enable = false },
-		note_id_func = function(title)
-			if title ~= nil and #title > 0 then
-				return title
-			end
-			return tostring(os.time())
-		end,
-		templates = {
-			folder = "Templates",
-			date_format = "%Y-%m-%d",
-			time_format = "%H:%M",
-		},
-		mappings = {},
-	})
-end
-
-local function obsidian_command(command)
-	setup_obsidian()
-	vim.cmd(command)
-end
-map("n", "<leader>on", function()
-	obsidian_command("ObsidianNew")
-end, { desc = "New Note" })
-map("n", "<leader>oT", function()
-	obsidian_command("ObsidianNewFromTemplate")
-end, { desc = "New Note from Template" })
-map("n", "<leader>oo", function()
-	obsidian_command("ObsidianQuickSwitch")
-end, { desc = "Open Note" })
-map("n", "<leader>of", function()
-	obsidian_command("ObsidianFollowLink")
-end, { desc = "Follow Link" })
-map("n", "<leader>ob", function()
-	obsidian_command("ObsidianBacklinks")
-end, { desc = "Backlinks" })
-map("n", "<leader>ot", function()
-	obsidian_command("ObsidianTags")
-end, { desc = "Tags" })
-map("n", "<leader>os", function()
-	obsidian_command("ObsidianSearch")
-end, { desc = "Search Notes" })
-
 local render_markdown_loaded = false
 local function setup_render_markdown()
 	if render_markdown_loaded then
@@ -925,10 +1020,5 @@ vim.api.nvim_create_autocmd("FileType", {
 	callback = function()
 		setup_render_markdown()
 		setup_markdown_table_wrap()
-		local notes = vim.fs.normalize(vim.fn.expand("~/Documents/Notes"))
-		local file = vim.fs.normalize(vim.api.nvim_buf_get_name(0))
-		if file:sub(1, #notes + 1) == notes .. "/" then
-			setup_obsidian()
-		end
 	end,
 })

@@ -64,6 +64,10 @@
       "rev": "629bf6792187e11b4829411c1648f86f28df3963",
       "src": "https://github.com/echasnovski/mini.nvim"
     },
+    "neogit": {
+      "rev": "70708be9664b7fcdd010eb07bdc3ebc9311c2027",
+      "src": "https://github.com/NeogitOrg/neogit"
+    },
     "nvim-lint": {
       "rev": "a219b2c9e5b4765e5c845aba119dad55806fcaf1",
       "src": "https://github.com/mfussenegger/nvim-lint"
@@ -80,13 +84,17 @@
       "rev": "6382540b2ae5de6c793d4aa2e3fe6dbb518505ec",
       "src": "https://github.com/s1n7ax/nvim-window-picker"
     },
-    "obsidian.nvim": {
-      "rev": "726b60c89f4bafef267a714ea1faa1335bdd414a",
-      "src": "https://github.com/epwalsh/obsidian.nvim"
+    "oil.nvim": {
+      "rev": "b73018b75affd13fa38e2fc94ef753b465f770d7",
+      "src": "https://github.com/stevearc/oil.nvim"
     },
     "plenary.nvim": {
       "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",
       "src": "https://github.com/nvim-lua/plenary.nvim"
+    },
+    "refer.nvim": {
+      "rev": "4561a68ab89484620ea7c6e8831795131d05151f",
+      "src": "https://github.com/juniorsundar/refer.nvim"
     },
     "render-markdown.nvim": {
       "rev": "f422cb5c6855f150e2ddcfaf44e7157b98b34f6a",
