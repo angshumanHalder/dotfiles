@@ -131,6 +131,7 @@ vim.pack.add({
 	"https://github.com/mfussenegger/nvim-lint",
 	"https://github.com/nvim-lua/plenary.nvim",
 	"https://github.com/folke/snacks.nvim",
+	"https://github.com/numToStr/Comment.nvim",
 	"https://github.com/webhooked/kanso.nvim",
 	"https://github.com/ChmaraX/herdr-nvim",
 })
@@ -194,6 +195,7 @@ require("mini.statusline").setup({ use_icons = true })
 require("mini.pairs").setup()
 require("mini.surround").setup()
 require("mini.ai").setup({ n_lines = 500 })
+require("Comment").setup()
 
 local clue = require("mini.clue")
 clue.setup({
@@ -693,6 +695,7 @@ load_plugin("refer.nvim")
 require("refer").setup({
 	min_height = 12,
 	max_height = 12,
+	preview = { enabled = false },
 	extras = { find_file = true },
 })
 
@@ -890,7 +893,7 @@ vim.lsp.config("vtsls", {
 vim.lsp.enable({ "lua_ls", "pyright", "vtsls", "rust_analyzer", "gopls", "dockerls", "yamlls", "wgsl_analyzer" })
 
 vim.diagnostic.config({
-	virtual_text = false,
+	virtual_text = true,
 	virtual_lines = false,
 	signs = true,
 	underline = true,
