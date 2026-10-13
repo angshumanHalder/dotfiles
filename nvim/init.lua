@@ -586,31 +586,6 @@ require("snacks").setup({
 	image = { enabled = true, doc = { enabled = false } },
 })
 
--- Keep the shell buffer loaded while another buffer is displayed.
-local terminal_buf, return_buf
-local function toggle_terminal()
-	if vim.api.nvim_get_current_buf() == terminal_buf then
-		vim.cmd.stopinsert()
-		if return_buf and vim.api.nvim_buf_is_valid(return_buf) then
-			vim.api.nvim_win_set_buf(0, return_buf)
-		else
-			vim.cmd.enew()
-		end
-	else
-		return_buf = vim.api.nvim_get_current_buf()
-		if terminal_buf and vim.api.nvim_buf_is_valid(terminal_buf) then
-			vim.api.nvim_win_set_buf(0, terminal_buf)
-		else
-			vim.api.nvim_win_set_buf(0, vim.api.nvim_create_buf(true, false))
-			vim.cmd.terminal()
-			terminal_buf = vim.api.nvim_get_current_buf()
-		end
-		vim.cmd.startinsert()
-	end
-end
-map("n", "<leader>tt", toggle_terminal, { desc = "Toggle terminal buffer" })
-map("t", "<C-\\>t", toggle_terminal, { desc = "Return to editor" })
-
 map("n", "<leader>bd", function()
 	Snacks.bufdelete()
 end, { desc = "Delete buffer" })
