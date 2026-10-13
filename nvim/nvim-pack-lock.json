@@ -4,6 +4,10 @@
       "rev": "e30b7f2008e52442154b66f7c519bfd2f1e32acb",
       "src": "https://github.com/numToStr/Comment.nvim"
     },
+    "agentic.nvim": {
+      "rev": "5ee51100ce213fed47c9307065155b87ee873141",
+      "src": "https://github.com/carlos-algms/agentic.nvim"
+    },
     "blink.cmp": {
       "rev": "cba53eff1948109ec0f47cbead4f07494d1e25c9",
       "src": "https://github.com/saghen/blink.cmp"
@@ -95,10 +99,6 @@
     "plenary.nvim": {
       "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",
       "src": "https://github.com/nvim-lua/plenary.nvim"
-    },
-    "refer.nvim": {
-      "rev": "4561a68ab89484620ea7c6e8831795131d05151f",
-      "src": "https://github.com/juniorsundar/refer.nvim"
     },
     "render-markdown.nvim": {
       "rev": "f422cb5c6855f150e2ddcfaf44e7157b98b34f6a",

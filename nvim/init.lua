@@ -138,12 +138,12 @@ vim.pack.add({
 	"https://github.com/stevearc/oil.nvim",
 	"https://github.com/NeogitOrg/neogit",
 	"https://github.com/ibhagwan/fzf-lua",
-	"https://github.com/juniorsundar/refer.nvim",
 	"https://github.com/williamboman/mason.nvim",
 	"https://github.com/folke/todo-comments.nvim",
 	"https://github.com/MagicDuck/grug-far.nvim",
 	"https://github.com/s1n7ax/nvim-window-picker",
 	"https://github.com/jceb/jiejie.nvim",
+	"https://github.com/carlos-algms/agentic.nvim",
 	"https://github.com/MeanderingProgrammer/render-markdown.nvim",
 	"https://github.com/ice345/markdown-table-wrap.nvim",
 	"https://github.com/sindrets/diffview.nvim",
@@ -169,6 +169,7 @@ require("kanso").setup({
 	transparent = true,
 	overrides = function()
 		return {
+			WinSeparator = { fg = "#22262D" },
 			TroubleNormal = { link = "Normal" },
 			TroubleNormalNC = { link = "Normal" },
 			WindowPickerStatusLine = { link = "NvimTreeWindowPicker" },
@@ -634,6 +635,21 @@ map("n", "<leader>sc", function()
 	Snacks.scratch()
 end, { desc = "Scratch Buffer" })
 
+-- Codex chat sidebar (ACP). Keep the plugin unloaded until the pane is opened.
+local function agentic()
+	if not loaded["agentic.nvim"] then
+		load_plugin("agentic.nvim")
+		require("agentic").setup({ provider = "codex-acp" })
+	end
+	return require("agentic")
+end
+map("n", "<leader>at", function()
+	agentic().toggle()
+end, { desc = "Toggle Codex chat" })
+map({ "n", "v" }, "<leader>af", function()
+	agentic().add_selection_or_file_to_context()
+end, { desc = "Add file or selection to Codex" })
+
 -- ============================================================================
 -- DIFFVIEW
 -- <leader>gc  open (merge tool auto-activates during an active git conflict)
@@ -654,7 +670,7 @@ map("n", "<leader>gx", "<cmd>DiffviewClose<CR>", { desc = "Close Diffview" })
 -- ============================================================================
 
 local fzf_loaded = false
-fzf = function(picker, opts)
+fzf = function(picker, ...)
 	if not fzf_loaded then
 		fzf_loaded = true
 		load_plugin("fzf-lua")
@@ -677,37 +693,57 @@ fzf = function(picker, opts)
 		})
 		---@diagnostic enable: missing-fields
 	end
-	require("fzf-lua")[picker](opts)
+	require("fzf-lua")[picker](...)
 end
 
 map("n", "<leader>ff", function()
 	fzf("files")
 end, { desc = "Files" })
 
-load_plugin("refer.nvim")
-require("refer").setup({
-	min_height = 12,
-	max_height = 12,
-	preview = { enabled = false },
-	extras = { find_file = true },
-})
-
 map("n", "<leader>.", function()
-	local picker = require("refer.extras.find_file").run()
-	vim.b[picker.input_buf].completion = false
-	vim.keymap.set("i", "<CR>", function()
-		local item = picker.current_matches[picker.selected_index]
-		if item and item.data and item.data.is_dir then
-			local dir = item.data.filename
-			-- Prevent Refer's WinLeave handler from cancelling during close.
-			picker.is_previewing = true
-			picker:close()
-			open_oil(dir)
-		else
-			picker.actions.select_entry()
+	fzf("fzf_live", function(args)
+		local path = vim.fn.fnamemodify(args[1] or "", ":p")
+		local dir, prefix = path:match("^(.*[/])([^/]*)$")
+		local scan = vim.uv.fs_scandir(dir)
+		local matches = {}
+		while scan do
+			local name = vim.uv.fs_scandir_next(scan)
+			if not name then
+				break
+			end
+			if vim.startswith(name, prefix) then
+				local entry = dir .. name
+				matches[#matches + 1] = entry .. (vim.fn.isdirectory(entry) == 1 and "/" or "")
+			end
 		end
-	end, { buffer = picker.input_buf, desc = "Open directory in Oil or file in editor" })
-end, { desc = "Find file anywhere" })
+		return matches
+	end, {
+		cwd = vim.fn.getcwd(),
+		query = vim.fn.fnamemodify(".", ":p"),
+		prompt = "Path> ",
+		previewer = "builtin",
+		keymap = {
+			fzf = {
+				["tab"] = "replace-query",
+				["ctrl-w"] = "backward-kill-word",
+			},
+		},
+		fzf_opts = { ["--multi"] = false, ["--filepath-word"] = true },
+		actions = {
+			["enter"] = function(selected, opts)
+				if not selected[1] then
+					return
+				end
+				local path = require("fzf-lua.path").entry_to_file(selected[1], opts).path
+				if vim.fn.isdirectory(path) == 1 then
+					open_oil(path)
+				else
+					require("fzf-lua.actions").file_edit(selected, opts)
+				end
+			end,
+		},
+	})
+end, { desc = "Find file by editable path" })
 map("n", "<leader>fg", function()
 	fzf("live_grep")
 end, { desc = "Live Grep" })
@@ -972,7 +1008,7 @@ local function setup_render_markdown()
 	end
 	render_markdown_loaded = true
 	vim.g.render_markdown_config = {
-		file_types = { "markdown" },
+		file_types = { "markdown", "AgenticChat" },
 		latex = { enabled = false },
 		heading = {
 			enabled = true,
@@ -1000,6 +1036,7 @@ local function setup_render_markdown()
 		dash = { enabled = true },
 		quote = { enabled = true, icon = "▋" },
 		pipe_table = { enabled = false },
+		overrides = { filetype = { AgenticChat = { pipe_table = { enabled = true } } } },
 		link = { enabled = true },
 	}
 	load_plugin("render-markdown.nvim")
@@ -1016,9 +1053,11 @@ local function setup_markdown_table_wrap()
 end
 
 vim.api.nvim_create_autocmd("FileType", {
-	pattern = "markdown",
+	pattern = { "markdown", "AgenticChat" },
 	callback = function()
 		setup_render_markdown()
-		setup_markdown_table_wrap()
+		if vim.bo.filetype == "markdown" then
+			setup_markdown_table_wrap()
+		end
 	end,
 })
