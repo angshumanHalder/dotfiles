@@ -51,4 +51,4 @@ teal = "#8EA4A2"
 peach = "#B6927B"
 
 [ui.toast]
-delivery = "terminal"
+delivery = "system"

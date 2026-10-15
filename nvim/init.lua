@@ -46,7 +46,7 @@ opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
 opt.foldenable = false
 opt.foldlevel = 99
 opt.foldlevelstart = 99
-opt.showcmd = false
+opt.showcmd = true
 
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "markdown",
@@ -131,7 +131,10 @@ vim.pack.add({
 	"https://github.com/numToStr/Comment.nvim",
 	"https://github.com/webhooked/kanso.nvim",
 	"https://github.com/ChmaraX/herdr-nvim",
+	"https://github.com/xheisenbugx/org.nvim",
 })
+
+require("org").setup({})
 
 vim.pack.add({
 	"https://github.com/nvim-tree/nvim-tree.lua",
@@ -145,7 +148,6 @@ vim.pack.add({
 	"https://github.com/jceb/jiejie.nvim",
 	"https://github.com/carlos-algms/agentic.nvim",
 	"https://github.com/MeanderingProgrammer/render-markdown.nvim",
-	"https://github.com/ice345/markdown-table-wrap.nvim",
 	"https://github.com/sindrets/diffview.nvim",
 	"https://github.com/folke/trouble.nvim",
 }, {
@@ -170,6 +172,18 @@ require("kanso").setup({
 	overrides = function()
 		return {
 			WinSeparator = { fg = "#22262D" },
+			AgenticDiffDeleteWord = { link = "DiffDelete" },
+			AgenticDiffAddWord = { link = "DiffAdd" },
+			AgenticStatusPending = { link = "DiagnosticWarn" },
+			AgenticStatusCompleted = { link = "DiagnosticOk" },
+			AgenticStatusFailed = { link = "DiagnosticError" },
+			AgenticPermissionButtonAllow = { link = "DiagnosticOk" },
+			AgenticPermissionButtonReject = { link = "DiagnosticError" },
+			AgenticPermissionButtonInactive = { link = "Comment" },
+			AgenticTitle = { link = "PmenuSel" },
+			AgenticSpinnerGenerating = { link = "MoreMsg" },
+			AgenticSpinnerThinking = { link = "Special" },
+			AgenticSpinnerSearching = { link = "DiagnosticWarn" },
 			TroubleNormal = { link = "Normal" },
 			TroubleNormalNC = { link = "Normal" },
 			WindowPickerStatusLine = { link = "NvimTreeWindowPicker" },
@@ -621,6 +635,9 @@ end
 map("n", "<leader>at", function()
 	agentic().toggle()
 end, { desc = "Toggle Codex chat" })
+map("n", "<leader>ah", function()
+	agentic().restore_session()
+end, { desc = "Load chat history" })
 map({ "n", "v" }, "<leader>af", function()
 	agentic().add_selection_or_file_to_context()
 end, { desc = "Add file or selection to Codex" })
@@ -710,7 +727,7 @@ map("n", "<leader>.", function()
 					return
 				end
 				local path = require("fzf-lua.path").entry_to_file(selected[1], opts).path
-				if vim.fn.isdirectory(path) == 1 then
+				if path and vim.fn.isdirectory(path) == 1 then
 					open_oil(path)
 				else
 					require("fzf-lua.actions").file_edit(selected, opts)
@@ -758,6 +775,8 @@ require("blink.cmp").setup({
 		["<CR>"] = { "accept", "fallback" },
 		["<C-n>"] = { "select_next", "fallback" },
 		["<C-p>"] = { "select_prev", "fallback" },
+		["<C-j>"] = { "select_next", "fallback" },
+		["<C-k>"] = { "select_prev", "fallback" },
 		["<Tab>"] = { "snippet_forward", "fallback" },
 		["<S-Tab>"] = { "snippet_backward", "fallback" },
 	},
@@ -919,6 +938,7 @@ local function trouble(command)
 	end
 	vim.cmd(command)
 end
+
 map("n", "<leader>fd", function()
 	trouble("Trouble diagnostics toggle filter.buf=0")
 end, { desc = "Diagnostics" })
@@ -1017,22 +1037,7 @@ local function setup_render_markdown()
 	load_plugin("render-markdown.nvim")
 end
 
-local markdown_table_wrap_loaded = false
-local function setup_markdown_table_wrap()
-	if markdown_table_wrap_loaded then
-		return
-	end
-	markdown_table_wrap_loaded = true
-	load_plugin("markdown-table-wrap.nvim")
-	require("markdown-table-wrap").setup({ preview_mode = "inline" })
-end
-
 vim.api.nvim_create_autocmd("FileType", {
-	pattern = { "markdown", "AgenticChat" },
-	callback = function()
-		setup_render_markdown()
-		if vim.bo.filetype == "markdown" then
-			setup_markdown_table_wrap()
-		end
-	end,
+	pattern = { "markdown" },
+	callback = setup_render_markdown,
 })
