@@ -32,43 +32,8 @@ if [[ -z "$brew_bin" ]]; then
 fi
 eval "$("$brew_bin" shellenv)"
 
-# No deprecated taps and no persistent Brewfile to overwrite.
-brew bundle --file=- <<'BREWFILE'
-brew "git"
-brew "gh"
-brew "neovim"
-brew "fzf"
-brew "fd"
-brew "ripgrep"
-brew "lazygit"
-brew "tmux"
-brew "herdr"
-brew "jujutsu"
-brew "starship"
-brew "stow"
-brew "docker"
-brew "postgresql@18"
-brew "cmake"
-brew "pkgconf"
-brew "tree-sitter-cli"
-
-# Languages configured in nvim/init.lua. C/C++ use Apple's Clang toolchain.
-brew "rustup"
-brew "go"
-brew "python"
-brew "node"
-brew "typescript"
-brew "lua"
-
-cask "ghostty"
-cask "kitty"
-cask "orbstack"
-cask "obsidian"
-cask "raycast"
-cask "telegram"
-cask "vlc"
-cask "font-jetbrains-mono-nerd-font"
-BREWFILE
+# Install the checked-in system manifest instead of maintaining a second list here.
+"$brew_bin" bundle --file="$repo_dir/Brewfile"
 
 # Homebrew rustup is keg-only and no longer provides rustup-init.
 rustup_prefix="$(brew --prefix rustup)"
