@@ -115,6 +115,9 @@ map("n", "N", "Nzzzv")
 -- On first launch plugins install; restart nvim if require() errors occur.
 -- ============================================================================
 
+-- Local agent.nvim development checkout.
+vim.opt.runtimepath:append("/Users/angshumanhalder/Documents/projects/agent-nvim")
+
 vim.pack.add({
 	"https://github.com/echasnovski/mini.nvim",
 	"https://github.com/romus204/tree-sitter-manager.nvim",
@@ -134,7 +137,17 @@ vim.pack.add({
 	"https://github.com/xheisenbugx/org.nvim",
 })
 
-require("org").setup({})
+local calendar_url_file = vim.fn.stdpath("config") .. "/calendar-url"
+local calendar_url = vim.fn.filereadable(calendar_url_file) == 1 and vim.fn.readfile(calendar_url_file)[1] or nil
+
+require("org").setup({
+	org_directory = "~/Documents/org",
+	agenda_files = { "~/Documents/org" },
+	extensions = {
+		roam = { directory = "~/Documents/org" },
+		ics = { calendars = calendar_url and calendar_url ~= "" and { { name = "Google", url = calendar_url } } or {} },
+	},
+})
 
 vim.pack.add({
 	"https://github.com/nvim-tree/nvim-tree.lua",
@@ -368,7 +381,7 @@ end, { desc = "Toggle file tree" })
 
 -- ============================================================================
 -- PROJECTS AND DIRECTORY VIEW
--- <leader>fp  projects   <leader>pa  add project   -  directory view
+-- <leader>fp  projects (dd removes)   <leader>pa  add project   -  directory view
 -- ============================================================================
 
 local project_file = vim.fn.stdpath("data") .. "/projects.txt"
@@ -450,7 +463,33 @@ end, { desc = "Add Git project" })
 map("n", "<leader>fp", function()
 	Snacks.picker.projects({
 		dev = {},
+		recent = false,
 		projects = saved_projects(),
+		win = {
+			list = {
+				keys = {
+					["dd"] = {
+						function(picker)
+							local item = picker:current()
+							if not item then
+								return
+							end
+							local projects = vim.tbl_filter(function(dir)
+								return dir ~= item.file
+							end, vim.fn.readfile(project_file))
+							local ok, result = pcall(vim.fn.writefile, projects, project_file)
+							if not ok or result ~= 0 then
+								vim.notify("Could not remove project: " .. tostring(result), vim.log.levels.ERROR)
+								return
+							end
+							picker.opts.projects = saved_projects()
+							picker:refresh()
+						end,
+						desc = "Remove project",
+					},
+				},
+			},
+		},
 		confirm = function(picker, item)
 			picker:close()
 			if item then
