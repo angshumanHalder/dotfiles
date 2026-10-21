@@ -26,7 +26,7 @@
 (setq display-line-numbers-grow-only t)
 
 (setq display-line-numbers-width-start t)
-(setq scroll-conservatively 0
+(setq scroll-conservatively 101
       scroll-step 1
       scroll-margin 2
       auto-window-vscroll nil)
@@ -55,6 +55,8 @@
 (setq display-line-numbers-type 'relative)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 (add-hook 'org-mode-hook #'display-line-numbers-mode)
+(add-hook 'toml-ts-mode-hook #'display-line-numbers-mode)
+(add-hook 'conf-toml-mode-hook #'display-line-numbers-mode)
 (add-hook 'org-mode-hook #'org-indent-mode)
 
 (setq org-directory (expand-file-name "~/Documents/org")
@@ -366,6 +368,13 @@
 ;; AI
 (use-package agent-shell)
 
+(defun my/agent-shell-toggle-full-restore ()
+  "Toggle whether resumed agent-shell sessions replay the full chat."
+  (interactive)
+  (setq agent-shell-session-restore-verbosity
+	(if (eq agent-shell-session-restore-verbosity 'full) 'minimal 'full))
+  (message "agent-shell restore: %s" agent-shell-session-restore-verbosity))
+
 (defun my/agent-shell-ret ()
   (interactive)
   (if (and (derived-mode-p 'agent-shell-mode 'agent-shell-viewport-view-mode)
@@ -383,7 +392,9 @@
   :commands magit-status
   :custom
   (magit-display-buffer-function
-   #'magit-display-buffer-same-window-except-diff-v1))
+   #'magit-display-buffer-same-window-except-diff-v1)
+  :config
+  (remove-hook 'magit-status-headers-hook #'magit-insert-tags-header))
 
 (use-package diff-hl
   :config

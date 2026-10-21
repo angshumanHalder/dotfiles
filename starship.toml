@@ -10,12 +10,10 @@ disabled = true
 # (You can also add [golang], [zig], [python] etc., with disabled = true if they pop up elsewhere)
 
 [custom.jj]
-when = "jj-starship detect"
-shell = ["jj-starship"]
+when = 'd=$PWD; while [ -n "$d" ]; do [ -d "$d/.jj" ] && exit 0; d=${d%/*}; done; exit 1'
+shell = ["zsh"]
+command = "jj-starship"
 format = "$output "
 
-[git_branch]
-disabled = true
-
-[git_status]
-disabled = true
+[git-commit]
+only_detached = false
