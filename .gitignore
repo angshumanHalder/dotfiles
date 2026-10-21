@@ -16,3 +16,4 @@ StardewValley
 .emacs.d/calendar-local.el
 .emacs.d/oauth2-auto.plist
 .emacs.d/org-gcal-token*
+nvim/calendar-url
