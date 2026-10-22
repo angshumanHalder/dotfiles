@@ -90,6 +90,10 @@
                           '("->" "=>" "==" "===" "!=" "!==" "<=" ">=" "&&" "||" "::" ":="))
   (global-ligature-mode t))
 
+;; gc
+(setq gc-cons-threshold (* 128 1024 1024))
+(setq read-process-output-max (* 1024 1024 4))
+
 
 ;; terminal
 (use-package ghostel
