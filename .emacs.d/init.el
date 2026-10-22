@@ -54,9 +54,7 @@
 
 (setq display-line-numbers-type 'relative)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
-(add-hook 'org-mode-hook #'display-line-numbers-mode)
-(add-hook 'toml-ts-mode-hook #'display-line-numbers-mode)
-(add-hook 'conf-toml-mode-hook #'display-line-numbers-mode)
+(add-hook 'text-mode-hook #'display-line-numbers-mode)
 (add-hook 'org-mode-hook #'org-indent-mode)
 
 (setq org-directory (expand-file-name "~/Documents/org")
@@ -142,8 +140,17 @@
 
 (defun my/eldoc-doc-buffer-focus ()
   (interactive)
-  (when-let ((window (eldoc-doc-buffer t)))
-    (select-window window)))
+  (if (not (and (fboundp 'eglot-managed-p) (eglot-managed-p)))
+      (when-let ((win (eldoc-doc-buffer t))) (select-window win))
+    (let ((buf (current-buffer)) (pos (point)))
+      (unless (eglot-hover-eldoc-function
+               (lambda (text &rest props)
+                 (when (and (eq buf (window-buffer)) (= pos (point)))
+                   (if (string-empty-p (or text ""))
+                       (message "No hover documentation at point")
+                     (when-let ((win (eldoc-display-in-buffer (list (cons text props)) t)))
+                       (select-window win))))))
+        (message "Language server does not support hover")))))
 
 ;;; Vim Bindings
 (use-package evil
@@ -210,6 +217,15 @@
   ;; AI
   (evil-define-key 'normal 'global (kbd "<leader>at") #'my/agent-shell-toggle-right)
   (evil-define-key 'normal 'global (kbd "<leader>aT") #'agent-shell)
+  (evil-define-key 'normal 'global (kbd "<leader>an")
+    (lambda ()
+      (interactive)
+      (let ((agent-shell-display-action
+             '(display-buffer-in-side-window (side . right) (window-width . 0.4))))
+        (agent-shell-new-shell))))
+  (evil-define-key 'normal 'global (kbd "<leader>aN") #'agent-shell-new-shell)
+  (evil-define-key '(normal visual) 'global (kbd "<leader>ac") #'agent-shell-send-region)
+  (evil-define-key 'normal 'global (kbd "<leader>af") #'agent-shell-send-file)
 
   ;; Ghostel
   (evil-define-key 'normal 'global (kbd "<leader>ot")
@@ -361,6 +377,8 @@
   (global-hl-todo-mode 1))
 
 (use-package jinx
+  :custom
+  (global-jinx-modes '(text-mode conf-mode))
   :hook (emacs-startup . global-jinx-mode))
 
 
@@ -405,7 +423,15 @@
   (global-diff-hl-mode 1)
   (require 'diff-hl-flydiff)
   (diff-hl-flydiff-mode 1)
-  (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh))
+  (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
+  ;; Pick up commits made outside Emacs (e.g. in a terminal).
+  (defun my/diff-hl-refresh (&rest _)
+    (with-current-buffer (window-buffer)
+      (when diff-hl-mode
+        (vc-refresh-state)
+        (diff-hl-update))))
+  (add-hook 'window-selection-change-functions #'my/diff-hl-refresh)
+  (add-function :after after-focus-change-function #'my/diff-hl-refresh))
 
 
 ;; languages and lsp
@@ -527,9 +553,16 @@
 		  (typescript-ts-mode :language-id "typescript")
 		  (tsx-ts-mode :language-id "typescriptreact"))
 		 . ("vtsls" "--stdio")))
+  ;; Pushed diagnostics (e.g. rust-analyzer's cargo check) go stale on the
+  ;; first edit and Eglot drops them; keep them until the server re-pushes.
+  ;; ponytail: touches Eglot internals, recheck after Emacs upgrades.
+  (define-advice eglot--flymake-report-push+pulled (:before (&rest _) keep-pushed)
+    (when eglot--pushed-diagnostics
+      (setf (cadr eglot--pushed-diagnostics) eglot--docver)))
   :custom
   (eglot-events-buffer-config '(:size 0))
-  )
+  :hook
+  (eglot-managed-mode . (lambda () (eglot-inlay-hints-mode -1))))
 
 (use-package flymake-ruff
   :after eglot
@@ -631,6 +664,22 @@
   :config
   (define-key evil-inner-text-objects-map "a" #'evil-inner-arg)
   (define-key evil-outer-text-objects-map "a" #'evil-outer-arg))
+
+;; mini.ai-style lookahead: when the enclosing ( opened on an earlier line,
+;; prefer the next ( on the current line.
+(defun my/evil-paren-seek (fn &rest args)
+  (let ((open (nth 1 (syntax-ppss))))
+    (when (and (not (region-active-p))
+               (or (null open) (< open (line-beginning-position)))
+               (save-excursion
+                 (skip-chars-forward "^(" (line-end-position))
+                 (eq (char-after) ?\()))
+      (skip-chars-forward "^(" (line-end-position))
+      (forward-char))
+    (apply fn args)))
+(with-eval-after-load 'evil
+  (advice-add 'evil-inner-paren :around #'my/evil-paren-seek)
+  (advice-add 'evil-a-paren :around #'my/evil-paren-seek))
 
 
 (custom-set-variables
