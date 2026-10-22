@@ -88,6 +88,11 @@
                           '("->" "=>" "==" "===" "!=" "!==" "<=" ">=" "&&" "||" "::" ":="))
   (global-ligature-mode t))
 
+;; no auto-save, backup, or lock files
+(setq auto-save-default nil
+      make-backup-files nil
+      create-lockfiles nil)
+
 ;; gc
 (setq gc-cons-threshold (* 128 1024 1024))
 (setq read-process-output-max (* 1024 1024 4))
