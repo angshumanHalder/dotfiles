@@ -49,6 +49,8 @@ append_once() {
 append_once "$HOME/.zprofile" "eval \"\$(\"$brew_bin\" shellenv)\""
 append_once "$HOME/.zprofile" "export PATH=\"$rustup_prefix/bin:\$HOME/.cargo/bin:\$HOME/go/bin:\$PATH\""
 
+append_once "$HOME/.zshrc" 'eval "$(starship init zsh)"'
+
 # The repo is a flat ~/.config tree, not conventional Stow packages.
 # Keep a persistent Stow layout of links to tracked files only. Never adopt or
 # overwrite existing configs, and never link auth/state directories such as gh.
@@ -80,7 +82,7 @@ else
 fi
 
 brew services start postgresql@18
-echo "Bootstrap complete. Open a new terminal to load the updated PATH."
+echo "Bootstrap complete. Open a new terminal to load the updated PATH and prompt."
 echo "Open OrbStack once to finish its setup; Docker CLI uses OrbStack's engine."
 echo "Open Neovim, restart after first plugin install, then run :Mason."
 echo "Install: lua-language-server pyright vtsls gopls dockerfile-language-server yaml-language-server wgsl-analyzer"

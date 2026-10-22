@@ -50,7 +50,7 @@ elif name == 'stow' and '--simulate' in args and (root / 'fail-stow').exists():
     assert (staged / "kitty/kitty.conf").resolve() == (repo / "kitty/kitty.conf").resolve()
     assert not (staged / "gh").exists(), "Never stow credentials"
     assert (home / ".zprofile").read_text().count("shellenv") == 1
-    assert not (home / ".zshrc").exists()
+    assert (home / ".zshrc").read_text().count("starship init") == 1
     brewfile = (root / "Brewfile").read_text()
     for package in ("rustup", "go", "python", "node", "typescript", "lua", "ghostty", "kitty"):
         assert f'"{package}"' in brewfile
