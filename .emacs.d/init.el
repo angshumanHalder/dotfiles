@@ -6,14 +6,18 @@
   (setenv "PATH" (concat dir path-separator (getenv "PATH"))))
 
 ;;; Startup
+;; Custom writes here instead of init.el. Set before any package install,
+;; which saves package-selected-packages through Custom.
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load custom-file t)
+
 ;;; PACKAGE LIST
 (setq package-archives 
       '(("melpa" . "https://melpa.org/packages/")
         ("elpa" . "https://elpa.gnu.org/packages/")))
 
 ;;; BOOTSTRAP USE-PACKAGE
-
-(package-initialize)
+;; Packages are activated before init via package-quickstart (early-init.el).
 (setq use-package-always-ensure t)
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -22,6 +26,12 @@
 
 ;; UI
 (setq frame-resize-pixelwise t)
+
+;; Long lines: skip bidi scanning (left-to-right text only); so-long
+;; takes over minified files.
+(setq-default bidi-paragraph-direction 'left-to-right)
+(setq bidi-inhibit-bpa t)
+(global-so-long-mode 1)
 (setq ring-bell-function #'ignore)
 (setq display-line-numbers-grow-only t)
 
@@ -30,10 +40,11 @@
       scroll-step 1
       scroll-margin 2
       auto-window-vscroll nil)
+;; Skip fontifying text that scrolls past while keys are still arriving.
+(setq fast-but-imprecise-scrolling t
+      redisplay-skip-fontification-on-input t
+      jit-lock-defer-time 0)
 
-(tool-bar-mode -1)
-(menu-bar-mode -1)
-(scroll-bar-mode -1)
 (add-to-list 'display-buffer-alist
 	     '("^\\*eldoc"
 	       (display-buffer-reuse-window display-buffer-in-side-window)
@@ -78,8 +89,6 @@
   (doom-modeline-icon t)
   :config
   (doom-modeline-mode 1))
-
-(set-face-attribute 'default nil :family "JetBrainsMono Nerd Font Mono" :height 130)
 
 (use-package ligature
   :ensure t
@@ -320,6 +329,9 @@
 
 (use-package projectile
   :ensure t
+  :custom
+  ;; doom-modeline already shows the project.
+  (projectile-dynamic-mode-line nil)
   :config
   (projectile-mode +1))
 
@@ -387,17 +399,22 @@
   :hook (emacs-startup . global-jinx-mode))
 
 
+(use-package indent-bars
+  :hook (prog-mode . indent-bars-mode))
+
 ;; Built-in automatic bracket and quote pairing.
 (use-package elec-pair
   :ensure nil
   :hook (prog-mode . electric-pair-local-mode))
 
 ;; AI
-(use-package agent-shell)
+(use-package agent-shell
+  :commands (agent-shell-send-region agent-shell-send-file))
 
 (defun my/agent-shell-toggle-full-restore ()
   "Toggle whether resumed agent-shell sessions replay the full chat."
   (interactive)
+  (require 'agent-shell)
   (setq agent-shell-session-restore-verbosity
 	(if (eq agent-shell-session-restore-verbosity 'full) 'minimal 'full))
   (message "agent-shell restore: %s" agent-shell-session-restore-verbosity))
@@ -424,6 +441,9 @@
   (remove-hook 'magit-status-headers-hook #'magit-insert-tags-header))
 
 (use-package diff-hl
+  :custom
+  (diff-hl-update-async t)
+  (diff-hl-flydiff-delay 1)
   :config
   (global-diff-hl-mode 1)
   (require 'diff-hl-flydiff)
@@ -435,7 +455,6 @@
       (when diff-hl-mode
         (vc-refresh-state)
         (diff-hl-update))))
-  (add-hook 'window-selection-change-functions #'my/diff-hl-refresh)
   (add-function :after after-focus-change-function #'my/diff-hl-refresh))
 
 
@@ -443,7 +462,8 @@
 (use-package go-mode :mode "\\.go\\'")
 (use-package rust-mode :mode "\\.rs\\'")
 (use-package yaml-mode :mode "\\.ya?ml\\'")
-(use-package markdown-mode)
+;; Its own autoloads register the file patterns; .md opens in markdown-ts-mode.
+(use-package markdown-mode :defer t)
 (use-package dockerfile-mode
   :mode ("\\(?:Dockerfile\\(?:\\..*\\)?\\|Containerfile\\)\\'"
 	 . dockerfile-mode))
@@ -505,8 +525,10 @@
 
 ;; Snippet expansion and placeholder navigation
 (use-package yasnippet
+  :hook (prog-mode . yas-minor-mode)
   :config
-  (yas-global-mode 1))
+  ;; yas-global-mode did this; the minor mode alone loads no snippet dirs.
+  (yas-reload-all))
 
 ;; Ready-made snippets for programming languages
 (use-package yasnippet-snippets
@@ -566,6 +588,8 @@
       (setf (cadr eglot--pushed-diagnostics) eglot--docver)))
   :custom
   (eglot-events-buffer-config '(:size 0))
+  ;; Otherwise every cursor move sends a highlight request (slow with vtsls).
+  (eglot-ignored-server-capabilities '(:documentHighlightProvider))
   :hook
   (eglot-managed-mode . (lambda () (eglot-inlay-hints-mode -1))))
 
@@ -686,29 +710,3 @@
   (advice-add 'evil-inner-paren :around #'my/evil-paren-seek)
   (advice-add 'evil-a-paren :around #'my/evil-paren-seek))
 
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(custom-safe-themes
-   '("1533b99965e0cc8115fce299f63b65697e0a0a9ecd26941e4c8c7141b9aafb3b"
-     "c4df9006b9eb32599d758800a32f3487c2cdf13826084511783b47d419024af2"
-     "d2ab3d4f005a9ad4fb789a8f65606c72f30ce9d281a9e42da55f7f4b9ef5bfc6"
-     default))
- '(package-selected-packages
-   '(agent-shell apheleia cape consult corfu diff-hl evil-collection
-		 evil-ghostel flymake-hadolint flymake-ruff jinx
-		 kanagawa-themes ligature magit marginalia orderless
-		 projectile treemacs treemacs-evil treemacs-projectile
-		 treesit-auto undo-fu vertico yasnippet
-		 yasnippet-snippets))
- '(package-vc-selected-packages
-   '((flymake-jsts :url "https://github.com/orzechowskid/flymake-jsts"))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )

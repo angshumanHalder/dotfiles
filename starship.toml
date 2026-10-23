@@ -1,0 +1,17 @@
+[package]
+disabled = true
+
+[rust]
+disabled = true
+
+[golang]
+disabled = true
+
+[custom.jj]
+when = 'd=$PWD; while [ -n "$d" ]; do [ -d "$d/.jj" ] && exit 0; d=${d%/*}; done; exit 1'
+shell = ["zsh"]
+command = "jj-starship"
+format = "$output "
+
+[git_commit]
+only_detached = false
