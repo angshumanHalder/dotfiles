@@ -585,12 +585,6 @@
 		  (typescript-ts-mode :language-id "typescript")
 		  (tsx-ts-mode :language-id "typescriptreact"))
 		 . ("vtsls" "--stdio")))
-  ;; Pushed diagnostics (e.g. rust-analyzer's cargo check) go stale on the
-  ;; first edit and Eglot drops them; keep them until the server re-pushes.
-  ;; ponytail: touches Eglot internals, recheck after Emacs upgrades.
-  (define-advice eglot--flymake-report-push+pulled (:before (&rest _) keep-pushed)
-    (when eglot--pushed-diagnostics
-      (setf (cadr eglot--pushed-diagnostics) eglot--docver)))
   :custom
   (eglot-events-buffer-config '(:size 0))
   ;; Otherwise every cursor move sends a highlight request (slow with vtsls).
