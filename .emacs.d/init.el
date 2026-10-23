@@ -284,6 +284,9 @@
   (global-evil-matchit-mode 1))
 
 ;; utils
+;; The default cleanup stats every entry at startup and hangs on unmounted
+;; volumes; dead entries fall off the end of the list instead.
+(setq recentf-auto-cleanup 'never)
 (recentf-mode 1)
 (use-package consult
   :custom
@@ -547,6 +550,8 @@
 
 
 (setq eglot-sync-connect 0)
+;; Default 0.5s reruns every diagnostic backend on short typing pauses.
+(setq flymake-no-changes-timeout 1.5)
 (use-package eglot
   :ensure nil ;included with emacs
   :hook ((lua-mode lua-ts-mode python-mode python-ts-mode
