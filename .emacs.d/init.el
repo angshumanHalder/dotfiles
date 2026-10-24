@@ -79,7 +79,24 @@
                                (file-name-directory
                                 (file-truename (or load-file-name user-init-file)))))
 (mapc #'disable-theme custom-enabled-themes)
-(load-theme 'kanso-ink t)
+(use-package kanagawa-themes
+  :demand t
+  :config
+  ;; The theme makes treemacs-directory-face inherit the collapsed face, which
+  ;; by default inherits treemacs-directory-face: a cycle if treemacs is loaded.
+  (when (facep 'treemacs-directory-collapsed-face)
+    (set-face-attribute 'treemacs-directory-collapsed-face nil :inherit 'unspecified))
+  (load-theme 'kanagawa-dragon t)
+  ;; The theme styles only diff-hl's margin faces; the fringe ones keep
+  ;; diff-hl's green4/red3/blue3. Use Kanagawa's vcs colors (autumn-*).
+  (custom-theme-set-faces
+   'kanagawa-dragon
+   '(diff-hl-insert ((t (:foreground "#76946A"))))
+   '(diff-hl-change ((t (:foreground "#DCA561"))))
+   '(diff-hl-delete ((t (:foreground "#C34043"))))
+   ;; The theme fills the comint prompt grey. agent-shell hides the prompt
+   ;; under its "Me" label rows, but the grey still paints those rows' ends.
+   '(comint-highlight-prompt ((t (:inherit minibuffer-prompt))))))
 
 (use-package doom-modeline
   :custom
@@ -188,7 +205,6 @@
   (evil-set-leader '(normal visual) (kbd "SPC"))
 
   ;; finders 
-  (evil-define-key 'normal 'global (kbd "<leader>ff") #'consult-fd)
   (evil-define-key 'normal 'global (kbd "<leader>fg") #'consult-ripgrep)
   (evil-define-key 'normal 'global (kbd "<leader>fb") #'consult-buffer)
   (evil-define-key 'normal 'global (kbd "<leader>fr") #'consult-recent-file)
@@ -196,7 +212,7 @@
   (evil-define-key 'normal 'global (kbd "<leader>.") #'find-file)
   (evil-define-key 'normal 'global (kbd "<leader>pp") #'projectile-switch-project)
   (evil-define-key 'normal 'global (kbd "<leader>pa") #'projectile-add-known-project)
-  (evil-define-key 'normal 'global (kbd "<leader>pf") #'projectile-find-file)
+  (evil-define-key 'normal 'global (kbd "<leader>ff") #'projectile-find-file)
   (evil-define-key 'normal 'global (kbd "<leader>op") #'my/treemacs-toggle-current-project)
 
   ;; lsp
@@ -412,7 +428,10 @@
 
 ;; AI
 (use-package agent-shell
-  :commands (agent-shell-send-region agent-shell-send-file))
+  :commands (agent-shell-send-region agent-shell-send-file)
+  :custom-face
+  ;; Default is an inverted, boxed badge filled with the keyword color.
+  (agent-shell-chat-me-label ((t (:inherit (bold font-lock-keyword-face))))))
 
 (defun my/agent-shell-toggle-full-restore ()
   "Toggle whether resumed agent-shell sessions replay the full chat."
@@ -587,10 +606,11 @@
 		 . ("vtsls" "--stdio")))
   :custom
   (eglot-events-buffer-config '(:size 0))
-  ;; Otherwise every cursor move sends a highlight request (slow with vtsls).
-  (eglot-ignored-server-capabilities '(:documentHighlightProvider))
-  :hook
-  (eglot-managed-mode . (lambda () (eglot-inlay-hints-mode -1))))
+  ;; documentHighlight: a request on every cursor move (slow with vtsls).
+  ;; inlayHint: Emacs 31 enables it by default; re-requests after every
+  ;; change and repaints the buffer.
+  (eglot-ignored-server-capabilities
+   '(:documentHighlightProvider :inlayHintProvider)))
 
 (use-package flymake-ruff
   :after eglot
@@ -645,6 +665,21 @@
   :config
   (setf (alist-get 'prettierd apheleia-formatters)
 	'("prettierd" filepath))
+  ;; rustfmt on stdin ignores Cargo.toml and parses as Rust 2015, so any
+  ;; async fn fails to format. Pass the crate's edition explicitly.
+  ;; ponytail: reads only the nearest Cargo.toml; a workspace member with
+  ;; `edition.workspace = true' gets the 2021 fallback.
+  (defun my/rustfmt-edition ()
+    (let* ((dir (locate-dominating-file default-directory "Cargo.toml"))
+           (edition (and dir
+                         (with-temp-buffer
+                           (insert-file-contents (expand-file-name "Cargo.toml" dir))
+                           (and (re-search-forward
+                                 "^edition *= *\"\\([0-9]+\\)\"" nil t)
+                                (match-string 1))))))
+      (list "--edition" (or edition "2021"))))
+  (setf (alist-get 'rustfmt apheleia-formatters)
+	'("rustfmt" "--quiet" "--emit" "stdout" (my/rustfmt-edition)))
   (setq apheleia-mode-alist
 	'((lua-mode . stylua)
 	  (lua-ts-mode . stylua)
@@ -704,7 +739,11 @@
                  (eq (char-after) ?\()))
       (skip-chars-forward "^(" (line-end-position))
       (forward-char))
-    (apply fn args)))
+    ;; Evil only extends a visual selection when the text object sees
+    ;; `called-interactively-p'; a plain apply would hide that and break vi(.
+    (if (called-interactively-p 'any)
+        (apply #'funcall-interactively fn args)
+      (apply fn args))))
 (with-eval-after-load 'evil
   (advice-add 'evil-inner-paren :around #'my/evil-paren-seek)
   (advice-add 'evil-a-paren :around #'my/evil-paren-seek))
