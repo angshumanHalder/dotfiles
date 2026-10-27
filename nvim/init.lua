@@ -1,3 +1,6 @@
+-- Cache compiled Lua modules: about 20ms off every start.
+vim.loader.enable()
+
 -- ============================================================================
 -- OPTIONS
 -- ============================================================================
@@ -32,7 +35,6 @@ opt.clipboard = "unnamedplus"
 opt.mouse = "a"
 opt.showmode = false
 opt.pumheight = 10
-opt.guifont = "JetBrainsMono Nerd Font Mono:h13"
 opt.inccommand = "split"
 opt.confirm = true
 opt.virtualedit = "block"

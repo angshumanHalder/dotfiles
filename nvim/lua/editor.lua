@@ -541,35 +541,11 @@ vim.api.nvim_create_autocmd("FileType", {
 	once = true,
 	callback = function()
 		vim.g.render_markdown_config = {
-			file_types = { "markdown" },
 			latex = { enabled = false },
-			heading = {
-				enabled = true,
-				sign = false,
-				icons = { "󰲡 ", "󰲣 ", "󰲥 ", "󰲧 ", "󰲩 ", "󰲫 " },
-				width = "full",
-			},
-			bullet = {
-				enabled = true,
-				icons = { "●", "○", "◆", "◇" },
-			},
-			checkbox = {
-				enabled = true,
-				unchecked = { icon = "󰄱 " },
-				checked = { icon = "✓ " },
-			},
-			code = {
-				enabled = true,
-				sign = false,
-				style = "full",
-				border = "thin",
-				width = "block",
-				min_width = 40,
-			},
-			dash = { enabled = true },
-			quote = { enabled = true, icon = "▋" },
+			heading = { sign = false },
+			checkbox = { checked = { icon = "✓ " } },
+			code = { sign = false, border = "thin", width = "block", min_width = 40 },
 			pipe_table = { enabled = false },
-			link = { enabled = true },
 		}
 		load_plugin("render-markdown.nvim")
 	end,

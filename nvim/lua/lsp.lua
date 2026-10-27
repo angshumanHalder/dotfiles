@@ -44,14 +44,10 @@ diff.setup({
 	mappings = { goto_prev = "<leader>[h", goto_next = "<leader>]h" },
 })
 
-local function do_hunk(action)
-	return function()
-		local line = vim.fn.line(".")
-		diff.do_hunks(0, action, { line_start = line, line_end = line })
-	end
-end
-map("n", "<leader>gs", do_hunk("apply"), { desc = "Stage Hunk" })
-map("n", "<leader>gr", do_hunk("reset"), { desc = "Reset Hunk" })
+-- Whole hunk under the cursor: mini.diff's operator over its hunk text object.
+-- (do_hunks with a one-line range would stage only that line.)
+map("n", "<leader>gs", "ghgh", { remap = true, desc = "Stage Hunk" })
+map("n", "<leader>gr", "gHgh", { remap = true, desc = "Reset Hunk" })
 map("n", "<leader>gp", function()
 	diff.toggle_overlay(0)
 end, { desc = "Toggle Inline Diff" })
