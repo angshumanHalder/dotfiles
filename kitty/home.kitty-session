@@ -1,0 +1,5 @@
+# Startup session: kitty opens in "home", so every tab belongs to a session and
+# home stays reachable with ctrl+b>w / ctrl+b>o after switching to a project.
+new_tab home
+cd ~
+launch
