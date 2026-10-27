@@ -12,7 +12,8 @@ with tempfile.TemporaryDirectory(prefix="dotfiles-bootstrap-test-") as temporary
     repo, home, tools = (root / name for name in ("repo", "home", "tools"))
     for directory in (repo, home, tools):
         directory.mkdir()
-    shutil.copyfile(Path(__file__).resolve().parents[1] / "bootstrap.sh", repo / "bootstrap.sh")
+    for file in ("bootstrap.sh", "Brewfile"):
+        shutil.copyfile(Path(__file__).resolve().parents[1] / file, repo / file)
     for file in ("nvim/init.lua", "kitty/kitty.conf", "gh/hosts.yml"):
         destination = repo / file
         destination.parent.mkdir(parents=True, exist_ok=True)
@@ -32,7 +33,8 @@ if name == 'uname':
 elif name == 'brew' and args == ['--prefix', 'rustup']:
     print(root / 'rustup')
 elif name == 'brew' and args[:1] == ['bundle']:
-    (root / 'Brewfile').write_text(sys.stdin.read())
+    brewfile = next(a.split('=', 1)[1] for a in args if a.startswith('--file='))
+    (root / 'Brewfile').write_text(pathlib.Path(brewfile).read_text())
 elif name == 'stow' and '--simulate' in args and (root / 'fail-stow').exists():
     sys.exit(1)
 """)
@@ -52,7 +54,8 @@ elif name == 'stow' and '--simulate' in args and (root / 'fail-stow').exists():
     assert (home / ".zprofile").read_text().count("shellenv") == 1
     assert (home / ".zshrc").read_text().count("starship init") == 1
     brewfile = (root / "Brewfile").read_text()
-    for package in ("rustup", "go", "python", "node", "typescript", "lua", "ghostty", "kitty"):
+    for package in ("rustup", "go", "python", "node", "typescript", "lua", "ghostty", "kitty",
+                    "vtsls", "vscode-langservers-extracted", "prettierd", "eslint_d"):
         assert f'"{package}"' in brewfile
     assert "--component rust-analyzer" in (root / "commands").read_text()
     # A Stow conflict must stop before activation or service startup.

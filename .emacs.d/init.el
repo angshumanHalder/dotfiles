@@ -1,6 +1,6 @@
 ;; init.el --- Emacs configuration -*- lexical-binding: t; -*-
-(dolist (dir '("/opt/homebrew/bin" "/usr/local/bin" "~/go/bin"
-               "~/.local/share/emacs-tools/bin"))
+;; Editor tools come from the Brewfile; rust-analyzer and rustfmt from rustup.
+(dolist (dir '("/opt/homebrew/bin" "/usr/local/bin" "~/go/bin" "~/.cargo/bin"))
   (setq dir (expand-file-name dir))
   (add-to-list 'exec-path dir)
   (setenv "PATH" (concat dir path-separator (getenv "PATH"))))
@@ -66,6 +66,8 @@
 (setq display-line-numbers-type 'relative)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 (add-hook 'text-mode-hook #'display-line-numbers-mode)
+;; TOML, INI and other config files: conf-mode derives from neither.
+(add-hook 'conf-mode-hook #'display-line-numbers-mode)
 (add-hook 'org-mode-hook #'org-indent-mode)
 
 (setq org-directory (expand-file-name "~/Documents/org")
@@ -79,24 +81,12 @@
                                (file-name-directory
                                 (file-truename (or load-file-name user-init-file)))))
 (mapc #'disable-theme custom-enabled-themes)
-(use-package kanagawa-themes
-  :demand t
-  :config
-  ;; The theme makes treemacs-directory-face inherit the collapsed face, which
-  ;; by default inherits treemacs-directory-face: a cycle if treemacs is loaded.
-  (when (facep 'treemacs-directory-collapsed-face)
-    (set-face-attribute 'treemacs-directory-collapsed-face nil :inherit 'unspecified))
-  (load-theme 'kanagawa-dragon t)
-  ;; The theme styles only diff-hl's margin faces; the fringe ones keep
-  ;; diff-hl's green4/red3/blue3. Use Kanagawa's vcs colors (autumn-*).
-  (custom-theme-set-faces
-   'kanagawa-dragon
-   '(diff-hl-insert ((t (:foreground "#76946A"))))
-   '(diff-hl-change ((t (:foreground "#DCA561"))))
-   '(diff-hl-delete ((t (:foreground "#C34043"))))
-   ;; The theme fills the comint prompt grey. agent-shell hides the prompt
-   ;; under its "Me" label rows, but the grey still paints those rows' ends.
-   '(comint-highlight-prompt ((t (:inherit minibuffer-prompt))))))
+(load-theme 'kanso-ink t)
+;; agent-shell hides the comint prompt under its "Me" label rows; a filled
+;; prompt face would still paint those rows' ends.
+(custom-theme-set-faces
+ 'kanso-ink
+ '(comint-highlight-prompt ((t (:inherit minibuffer-prompt)))))
 
 (use-package doom-modeline
   :custom
@@ -135,6 +125,7 @@
   :hook (ghostel-mode . evil-ghostel-mode))
 
 (defvar my/ghostel-bottom-buffer nil)
+(defvar my/ghostel-full-buffer nil)
 
 (defun my/ghostel-toggle-bottom ()
   (interactive)
@@ -150,6 +141,15 @@
               (ghostel-create nil '(display-buffer-in-side-window
                                    (side . bottom)
                                    (window-height . 0.3))))))))
+
+(defun my/ghostel-toggle-full ()
+  (interactive)
+  (if (eq (current-buffer) my/ghostel-full-buffer)
+      (switch-to-prev-buffer)
+    (if (buffer-live-p my/ghostel-full-buffer)
+        (switch-to-buffer my/ghostel-full-buffer)
+      (setq my/ghostel-full-buffer
+            (ghostel-create nil '(display-buffer-same-window))))))
 
 (defun my/agent-shell-toggle-right ()
   (interactive)
@@ -213,7 +213,7 @@
   (evil-define-key 'normal 'global (kbd "<leader>pp") #'projectile-switch-project)
   (evil-define-key 'normal 'global (kbd "<leader>pa") #'projectile-add-known-project)
   (evil-define-key 'normal 'global (kbd "<leader>ff") #'projectile-find-file)
-  (evil-define-key 'normal 'global (kbd "<leader>op") #'my/treemacs-toggle-current-project)
+  (evil-define-key 'normal 'global (kbd "<leader>e") #'my/treemacs-toggle-current-project)
 
   ;; lsp
   (evil-define-key 'normal 'global (kbd "]d") #'flymake-goto-next-error)
@@ -243,6 +243,8 @@
   ;; comment
   (evil-define-key 'normal 'global (kbd "gcc") #'comment-line)
   (evil-define-key 'visual 'global (kbd "gc") #'comment-or-uncomment-region)
+  (evil-define-key 'normal 'global (kbd "gbc") #'my/block-comment-line)
+  (evil-define-key 'visual 'global (kbd "gb") #'my/block-comment-region)
 
   ;; AI
   (evil-define-key 'normal 'global (kbd "<leader>at") #'my/agent-shell-toggle-right)
@@ -258,46 +260,64 @@
   (evil-define-key 'normal 'global (kbd "<leader>af") #'agent-shell-send-file)
 
   ;; Ghostel
-  (evil-define-key 'normal 'global (kbd "<leader>ot")
+  (evil-define-key 'normal 'global (kbd "<leader>tt")
     #'my/ghostel-toggle-bottom)
-  (evil-define-key 'normal 'global (kbd "<leader>oT")
-    (lambda ()
-      (interactive)
-      (ghostel-create nil '(display-buffer-same-window))))
+  (evil-define-key 'normal 'global (kbd "<leader>tT")
+    #'my/ghostel-toggle-full)
   
 
   ;; TODO search
   (evil-define-key 'normal 'global (kbd "<leader>st") #'my/project-todos)
 
-  ;; specific to go
-  (evil-define-key 'normal 'global (kbd "<leader>ll") #'my/go-lint-project)
     
 
   ;; buffers
-  (evil-define-key 'normal 'global (kbd "<leader>bk") #'kill-current-buffer)
+  (evil-define-key 'normal 'global (kbd "<leader>bd") #'kill-current-buffer)
   (evil-define-key 'normal 'global (kbd "H") #'previous-buffer)
   (evil-define-key 'normal 'global (kbd "L") #'next-buffer)
 
   ;; format buffer
   (evil-define-key 'normal 'global (kbd "<leader>lf") #'apheleia-format-buffer)
 
-  ;; ghostel keymaps
-  (evil-define-key 'normal 'global (kbd "<leader>tt")
-    (lambda ()
-      (interactive)
-      (ghostel-create nil '(display-buffer-in-side-window
-			    (side . bottom)
-			    (window-height . 0.3)))))
-
+  ;; Editing keys shared with Neovim
+  (evil-define-key 'normal 'global
+    (kbd "C-h") #'evil-window-left
+    (kbd "C-j") #'evil-window-down
+    (kbd "C-k") #'evil-window-up
+    (kbd "C-l") #'evil-window-right
+    (kbd "M-<up>") (lambda () (interactive) (enlarge-window 2))
+    (kbd "M-<down>") (lambda () (interactive) (shrink-window 2))
+    (kbd "M-<right>") (lambda () (interactive) (enlarge-window-horizontally 2))
+    (kbd "M-<left>") (lambda () (interactive) (shrink-window-horizontally 2))
+    (kbd "<leader>w") #'save-buffer
+    (kbd "<leader>qq") #'save-buffers-kill-terminal
+    (kbd "<leader>ld") #'display-local-help)
+  (evil-define-key '(normal visual) 'global
+    (kbd "M-j") (lambda () (interactive) (my/move-lines 1))
+    (kbd "M-k") (lambda () (interactive) (my/move-lines -1)))
+  ;; < and > keep the selection, like <gv / >gv.
+  (evil-define-key 'visual 'global
+    (kbd "<") (lambda () (interactive)
+                (call-interactively #'evil-shift-left) (evil-visual-restore))
+    (kbd ">") (lambda () (interactive)
+                (call-interactively #'evil-shift-right) (evil-visual-restore)))
+  ;; n/N recenter, like nzzzv.
+  (dolist (fn '(evil-ex-search-next evil-ex-search-previous))
+    (advice-add fn :after (lambda (&rest _) (recenter))))
   )
 
 (use-package evil-matchit
   :after evil
   :config
   (evilmi-load-plugin-rules
-   '(html-mode mhtml-mode html-ts-mode)
+   '(html-mode mhtml-mode mhtml-ts-mode html-ts-mode)
    '(template simple html))
   (global-evil-matchit-mode 1))
+
+;; Undo history survives restarts, like Neovim's undofile.
+(use-package undo-fu-session
+  :config
+  (undo-fu-session-global-mode 1))
 
 ;; utils
 ;; The default cleanup stats every entry at startup and hangs on unmounted
@@ -308,6 +328,73 @@
   :custom
   (xref-show-xrefs-function #'consult-xref)
   (xref-show-definitions-function #'consult-xref))
+
+;; Folding: hideshow handles tree-sitter modes in Emacs 31. Starts unfolded;
+;; evil's za/zc/zo/zR/zM drive it, as in Neovim.
+(add-hook 'prog-mode-hook #'hs-minor-mode)
+
+;; Block comments like Comment.nvim's gbc / visual gb.
+(defun my/block-comment-delimiters ()
+  "Block comment open/close strings for the current mode, or nil."
+  (cond ((derived-mode-p 'lua-mode 'lua-ts-mode) '("--[[" . "]]"))
+        ((and comment-end (not (string-blank-p comment-end)))
+         (cons (string-trim comment-start) (string-trim comment-end)))
+        ((and comment-start (string-prefix-p "//" (string-trim comment-start)))
+         '("/*" . "*/"))))
+
+(defun my/toggle-block-comment (beg end)
+  "Wrap the text between BEG and END in a block comment, or unwrap it."
+  (pcase-let ((`(,open . ,close)
+               (or (my/block-comment-delimiters)
+                   (user-error "No block comment syntax in %s" major-mode))))
+    (save-excursion
+      (let ((start (progn (goto-char beg) (skip-chars-forward " \t\n") (point)))
+            (stop (progn (goto-char end) (skip-chars-backward " \t\n") (point))))
+        (if (and (>= (- stop start) (+ (length open) (length close)))
+                 (string-prefix-p open (buffer-substring-no-properties start stop))
+                 (string-suffix-p close (buffer-substring-no-properties start stop)))
+            (progn
+              (goto-char stop)
+              (delete-char (- (length close)))
+              (when (eq (char-before) ?\s) (delete-char -1))
+              (goto-char start)
+              (delete-char (length open))
+              (when (eq (char-after) ?\s) (delete-char 1)))
+          (goto-char stop)
+          (insert " " close)
+          (goto-char start)
+          (insert open " "))))))
+
+(defun my/block-comment-line ()
+  "Toggle a block comment around the current line."
+  (interactive)
+  (my/toggle-block-comment (line-beginning-position) (line-end-position)))
+
+(defun my/block-comment-region (beg end)
+  "Toggle a block comment around the selection."
+  (interactive "r")
+  (my/toggle-block-comment beg end)
+  (evil-exit-visual-state))
+
+(defun my/move-lines (n)
+  "Move the current line, or the selected lines, down (N > 0) or up one line."
+  (let* ((visual (evil-visual-state-p))
+         (first (line-number-at-pos (if visual evil-visual-beginning (point))))
+         (last (line-number-at-pos
+                (if visual (max evil-visual-beginning (1- evil-visual-end)) (point))))
+         (count (line-number-at-pos (point-max))))
+    (when (if (> n 0) (< last (1- count)) (> first 1))
+      (goto-char (point-min))
+      (forward-line (1- first))
+      (let ((beg (point)))
+        (forward-line (1+ (- last first)))
+        (evil-move beg (point) (if (> n 0) (1+ last) (- first 2))))
+      (if visual
+          ;; evil-move moves the visual markers; rebuild the selection from them.
+          (progn (evil-visual-refresh evil-visual-mark evil-visual-point)
+                 (indent-region evil-visual-beginning evil-visual-end))
+        (indent-according-to-mode)
+        (back-to-indentation)))))
 
 (defun my/project-todos ()
   "Search common TODO markers in the current project."
@@ -381,7 +468,12 @@
 
 (use-package treemacs-evil
   :ensure t
-  :after (treemacs evil))
+  :after (treemacs evil)
+  :config
+  ;; Treemacs buffers run in their own evil state, outside the leader map, so
+  ;; SPC e needs binding there to close the tree from inside it.
+  (evil-define-key 'treemacs treemacs-mode-map
+    (kbd "SPC e") #'my/treemacs-toggle-current-project))
 
 (use-package treemacs-projectile
   :ensure t
@@ -407,6 +499,13 @@
   :after (embark consult)
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
+
+;; Project search & replace, like grug-far: SPC fg, C-. E (export) gives a grep
+;; buffer; i edits it (evil-collection), ZZ or :w applies and saves, ZQ cancels.
+;; Emacs 31's built-in grep-edit-mode errored when applying edits, so use wgrep.
+(use-package wgrep
+  :custom
+  (wgrep-auto-save-buffer t))
 
 (use-package hl-todo
   :config
@@ -481,21 +580,14 @@
 
 
 ;; languages and lsp
-(use-package go-mode :mode "\\.go\\'")
-(use-package rust-mode :mode "\\.rs\\'")
-(use-package yaml-mode :mode "\\.ya?ml\\'")
-;; Its own autoloads register the file patterns; .md opens in markdown-ts-mode.
-(use-package markdown-mode :defer t)
-(use-package dockerfile-mode
-  :mode ("\\(?:Dockerfile\\(?:\\..*\\)?\\|Containerfile\\)\\'"
-	 . dockerfile-mode))
+;; Emacs 31: open every language in its tree-sitter mode, compiling a missing
+;; grammar on first visit. setopt, not setq: the :set function does the remap.
+(setopt treesit-enabled-modes t
+        treesit-auto-install-grammar 'always)
 
-(use-package treesit-auto
-  :custom
-  (treesit-auto-langs '(lua python javascript typescript tsx rust go c cpp bash
-			    json yaml toml html css))
-  :config
-  (treesit-auto-add-to-auto-mode-alist))
+;; Its own autoloads register the file patterns; .md opens in markdown-ts-mode.
+;; Eglot also renders hover documentation with it.
+(use-package markdown-mode :defer t)
 
 (defun my/markdown-ts-mode ()
   (require 'markdown-ts-mode)
@@ -575,26 +667,19 @@
   :ensure nil ;included with emacs
   :hook ((lua-mode lua-ts-mode python-mode python-ts-mode
 		   js-mode js-ts-mode typescript-ts-mode tsx-ts-mode
-		   rust-mode rust-ts-mode go-mode go-ts-mode
+		   rust-ts-mode go-ts-mode
 		   c-mode c-ts-mode c++-mode c++-ts-mode
 		   sh-mode bash-ts-mode js-json-mode json-ts-mode
-		   yaml-mode yaml-ts-mode conf-toml-mode toml-ts-mode
+		   yaml-ts-mode conf-toml-mode toml-ts-mode
 		   markdown-mode markdown-ts-mode
-		   mhtml-mode html-mode html-ts-mode
-		   css-mode css-ts-mode) . eglot-ensure)
+		   mhtml-mode mhtml-ts-mode html-mode html-ts-mode
+		   css-mode css-ts-mode dockerfile-ts-mode) . eglot-ensure)
   :config
   ;; Select the same Python and TOML servers on both machines.
   (add-to-list 'eglot-server-programs
                '((python-mode python-ts-mode) . ("pyright-langserver" "--stdio")))
   (add-to-list 'eglot-server-programs
                '((conf-toml-mode toml-ts-mode) . ("taplo" "lsp" "stdio")))
-  ;; emacs opens .html files in mhtml-mode
-  (add-to-list 'eglot-server-programs
-	       '((mhtml-mode :language-id "html")
-		 . ("vscode-html-language-server" "--stdio")))
-  (add-to-list 'eglot-server-programs
-               '((html-ts-mode :language-id "html")
-                 . ("vscode-html-language-server" "--stdio")))
   (add-to-list 'eglot-server-programs
                '((markdown-ts-mode :language-id "markdown")
                  . ("marksman" "server")))
@@ -604,6 +689,13 @@
 		  (typescript-ts-mode :language-id "typescript")
 		  (tsx-ts-mode :language-id "typescriptreact"))
 		 . ("vtsls" "--stdio")))
+  ;; .html opens in mhtml-ts-mode, which derives from js-ts-mode. eglot takes
+  ;; the first match and add-to-list prepends, so this must follow vtsls.
+  (add-to-list 'eglot-server-programs
+	       '(((mhtml-mode :language-id "html")
+		  (mhtml-ts-mode :language-id "html")
+		  (html-ts-mode :language-id "html"))
+		 . ("vscode-html-language-server" "--stdio")))
   :custom
   (eglot-events-buffer-config '(:size 0))
   ;; documentHighlight: a request on every cursor move (slow with vtsls).
@@ -647,17 +739,75 @@
   (add-hook 'eglot-managed-mode-hook #'my/enable-js-eslint))
 
 
-(defun my/go-lint-project ()
-  "Run golangci-lint asynchronously at the project root."
-  (interactive)
-  (let ((default-directory
-	 (project-root (project-current t))))
-    (compile "golangci-lint run --output.text.colors=false ./...")))
+;; golangci-lint for the open file's package, shown inline like Neovim's
+;; nvim-lint. MELPA's flymake-golangci (2019) passes flags that golangci-lint
+;; v2 removed. golangci-lint reads files from disk, so it runs on open and
+;; save; while the buffer has unsaved edits the last results are kept, on
+;; markers so they move with the text. Outside a module it lints the file alone.
+(defvar-local my/golangci--proc nil)
+(defvar-local my/golangci--issues nil) ; (BEG-MARKER END-MARKER TEXT)...
+
+(defun my/golangci--report (report-fn)
+  ;; Fresh diagnostics each time: flymake takes over the objects it is given.
+  (funcall report-fn
+           (mapcar (lambda (issue)
+                     (flymake-make-diagnostic (current-buffer) (marker-position (nth 0 issue))
+                                              (marker-position (nth 1 issue)) :warning (nth 2 issue)))
+                   my/golangci--issues)))
+
+(defun my/flymake-golangci (report-fn &rest _)
+  "Flymake backend running golangci-lint on the current file's package."
+  (if (or (buffer-modified-p) (not buffer-file-name))
+      (my/golangci--report report-fn)
+    (when (process-live-p my/golangci--proc)
+      (kill-process my/golangci--proc))
+    (let* ((source (current-buffer))
+           (file (file-truename buffer-file-name))
+           (default-directory (file-name-directory file))
+           (gomod (car (ignore-errors (process-lines "go" "env" "GOMOD"))))
+           (target (if (member gomod '(nil "" "/dev/null")) file ".")))
+      (setq my/golangci--proc
+            (make-process
+             :name "golangci-lint" :noquery t :connection-type 'pipe
+             :buffer (generate-new-buffer " *golangci-lint*")
+             :command (list "golangci-lint" "run" "--path-mode=abs" "--show-stats=false"
+                            "--output.text.path=stdout" "--output.text.colors=false"
+                            "--output.text.print-issued-lines=false" target)
+             :sentinel
+             (lambda (proc _event)
+               (when (memq (process-status proc) '(exit signal))
+                 (unwind-protect
+                     (when (and (buffer-live-p source)
+                                (eq proc (buffer-local-value 'my/golangci--proc source)))
+                       (let (issues)
+                         (with-current-buffer (process-buffer proc)
+                           (goto-char (point-min))
+                           (while (re-search-forward
+                                   "^\\(.+?\\):\\([0-9]+\\):\\(?:\\([0-9]+\\):\\)? \\(.*\\)$" nil t)
+                             (when (equal (file-truename (match-string 1)) file)
+                               (let ((region (flymake-diag-region
+                                              source (string-to-number (match-string 2))
+                                              (and (match-string 3)
+                                                   (string-to-number (match-string 3))))))
+                                 (push (list (with-current-buffer source (copy-marker (car region)))
+                                             (with-current-buffer source (copy-marker (cdr region) t))
+                                             (match-string 4))
+                                       issues)))))
+                         (with-current-buffer source
+                           (dolist (old my/golangci--issues)
+                             (set-marker (nth 0 old) nil)
+                             (set-marker (nth 1 old) nil))
+                           (setq my/golangci--issues issues)
+                           (my/golangci--report report-fn))))
+                   (kill-buffer (process-buffer proc))))))))))
+
+(defun my/enable-go-golangci ()
+  (when (and (eglot-managed-p) (derived-mode-p 'go-ts-mode))
+    (add-hook 'flymake-diagnostic-functions #'my/flymake-golangci nil t)))
+(add-hook 'eglot-managed-mode-hook #'my/enable-go-golangci)
 
 (use-package flymake-hadolint
-  :hook ((dockerfile-mode . flymake-hadolint-setup)
-	 (dockerfile-mode . flymake-mode)
-	 (dockerfile-ts-mode . flymake-hadolint-setup)
+  :hook ((dockerfile-ts-mode . flymake-hadolint-setup)
 	 (dockerfile-ts-mode . flymake-mode)))
 
 
@@ -690,13 +840,10 @@
 	  (typescript-ts-mode . prettierd)
 	  (tsx-ts-mode . prettierd)
 	  (json-ts-mode . prettierd)
-	  (yaml-mode . prettierd)
 	  (yaml-ts-mode . prettierd)
 	  (conf-toml-mode . taplo)
 	  (toml-ts-mode . taplo)
-	  (rust-mode . rustfmt)
 	  (rust-ts-mode . rustfmt)
-	  (go-mode . goimports)
 	  (go-ts-mode . goimports)))
   (apheleia-global-mode 1))
 
@@ -716,11 +863,19 @@
   (evil-define-key 'normal 'eglot-mode-map
     (kbd "K") #'my/eldoc-doc-buffer-focus))
 
-;; Vim-style surround operations.
+;; Surround with mini.surround's keys, shared with Neovim:
+;; sa{motion}{char} add (also on a visual selection), sd{char} delete,
+;; sr{old}{new} change. `s` becomes a prefix, so evil's `s` (substitute
+;; char) is gone; `cl` does the same.
 (use-package evil-surround
   :after evil
   :config
-  (global-evil-surround-mode 1))
+  (evil-define-key '(normal visual) 'global (kbd "s") nil)
+  (evil-define-key 'normal 'global
+    (kbd "sa") #'evil-surround-region
+    (kbd "sd") #'evil-surround-delete
+    (kbd "sr") #'evil-surround-change)
+  (evil-define-key 'visual 'global (kbd "sa") #'evil-surround-region))
 
 (use-package evil-args
   :after evil

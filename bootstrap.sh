@@ -84,7 +84,6 @@ fi
 brew services start postgresql@18
 echo "Bootstrap complete. Open a new terminal to load the updated PATH and prompt."
 echo "Open OrbStack once to finish its setup; Docker CLI uses OrbStack's engine."
-echo "Open Neovim, restart after first plugin install, then run :Mason."
-echo "Install: lua-language-server pyright vtsls gopls dockerfile-language-server yaml-language-server wgsl-analyzer"
-echo "Tools: stylua ruff prettierd taplo goimports eslint_d golangci-lint hadolint"
-echo "Rust analyzer, rustfmt, and clippy are provided by the stable Rust toolchain."
+echo "Open Neovim and restart it after the first plugin install."
+echo "Language servers, formatters and linters for Neovim and Emacs come from the Brewfile;"
+echo "rust-analyzer, rustfmt and clippy from the stable Rust toolchain; clangd from the Command Line Tools."

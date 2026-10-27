@@ -6,18 +6,14 @@ Copy this entire directory, including `themes/`, to `~/.emacs.d/`, or link
 `~/.emacs.d/init.el` to this checkout's `init.el` as on the original machine.
 Do not overwrite an existing init without backing it up.
 
-From the dotfiles checkout root, install the shared system manifest and Emacs's
-npm tools:
+From the dotfiles checkout root, install the shared system manifest:
 
 ```sh
 brew bundle --file=Brewfile
-npm install --global --prefix "$HOME/.local/share/emacs-tools" \
-  @vtsls/language-server typescript vscode-langservers-extracted \
-  @fsouza/prettierd eslint_d
 ```
 
-The npm prefix is added to both Emacs `exec-path` and subprocess `PATH` in
-`init.el`. It avoids depending on a particular machine's global npm prefix.
+Neovim and Emacs use the same binaries: `init.el` adds Homebrew, `~/go/bin`
+and `~/.cargo/bin` to Emacs `exec-path` and subprocess `PATH`.
 
 The root Brewfile covers the language servers, linters, formatters, runtimes,
 and apps used by the dotfiles. Rust tooling comes from rustup; the bootstrap
