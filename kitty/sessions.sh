@@ -21,6 +21,7 @@ SESSIONS_JSON=$(mktemp)
 export SESSIONS_JSON
 trap 'rm -f "$SESSIONS_JSON"' EXIT
 kitten @ ls >"$SESSIONS_JSON"
+cp "$SESSIONS_JSON" "/private/tmp/claude-501/-Users-angshumanhalder--config/183d5cc7-66a9-47ee-8f1b-0b30f103dedf/scratchpad/kitty-debug/$(date +%H%M%S).json" # DEBUG: remove
 
 # Lines are "display<TAB>name"; tabs ordered active, then by recency, then the rest.
 pick=$(jq -r "$sname"'

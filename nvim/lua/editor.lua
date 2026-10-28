@@ -1,4 +1,4 @@
--- Editor: theme, UI, navigation, files, projects, pickers, terminal, org, agent chat
+-- Editor: theme, UI, navigation, files, pickers, org, agent chat
 
 local map = vim.keymap.set
 
@@ -64,11 +64,9 @@ clue.setup({
 		{ mode = "n", keys = "<Leader>g", desc = "+Git" },
 		{ mode = "n", keys = "<Leader>l", desc = "+LSP" },
 		{ mode = "x", keys = "<Leader>l", desc = "+LSP" },
-		{ mode = "n", keys = "<Leader>p", desc = "+Project" },
 		{ mode = "n", keys = "<Leader>q", desc = "+Quit" },
 		{ mode = "n", keys = "<Leader>s", desc = "+Search/Scratch" },
 		{ mode = "x", keys = "<Leader>s", desc = "+Search" },
-		{ mode = "n", keys = "<Leader>t", desc = "+Terminal" },
 		{ mode = "n", keys = "<Leader>o", desc = "+Org" },
 		clue.gen_clues.builtin_completion(),
 		clue.gen_clues.marks(),
@@ -164,7 +162,7 @@ local function setup_nvim_tree()
 			},
 			filters = { dotfiles = false },
 			git = { enable = true },
-			-- The root follows cwd (project_root autocmd below); update_root would
+			-- The root stays on cwd (the kitty session's project); update_root would
 			-- fall back to the file's own folder for files outside cwd.
 			update_focused_file = { enable = true },
 			actions = {
@@ -204,21 +202,6 @@ local function setup_nvim_tree()
 		})
 	end)
 end
--- Keep cwd on the current file's Git root, so the tree and pickers show the project.
-vim.api.nvim_create_autocmd("BufEnter", {
-	group = vim.api.nvim_create_augroup("project_root", { clear = true }),
-	nested = true, -- let :cd fire DirChanged, which nvim-tree's sync_root_with_cwd listens to
-	callback = function(args)
-		if vim.bo[args.buf].buftype ~= "" then
-			return
-		end
-		local root = vim.fs.root(args.buf, ".git")
-		if root and root ~= vim.fn.getcwd() then
-			vim.cmd.cd(root)
-		end
-	end,
-})
-
 map("n", "<leader>e", function()
 	setup_nvim_tree()
 	local equalalways = vim.o.equalalways
@@ -228,11 +211,11 @@ map("n", "<leader>e", function()
 end, { desc = "Toggle file tree" })
 
 -- ============================================================================
--- PROJECTS AND DIRECTORY VIEW
--- <leader>pp  projects   -  directory view
+-- DIRECTORY VIEW: oil (projects are kitty sessions, see kitty/project.sh)
+-- -  directory view
 -- ============================================================================
 
-local function open_oil(dir)
+local function open_oil()
 	load_plugin("oil.nvim", function()
 		require("oil").setup({
 			default_file_explorer = false,
@@ -252,29 +235,10 @@ local function open_oil(dir)
 			},
 		})
 	end)
-	require("oil").open(dir)
+	require("oil").open()
 end
 
-map("n", "-", function()
-	open_oil()
-end, { desc = "Browse directory" })
--- Projects are discovered: Git repos under ~/Documents/projects plus recently used ones.
-local function pick_project()
-	Snacks.picker.projects({
-		dev = { "~/Documents/projects" },
-		max_depth = 3, -- pomodoro-game/focus-valley sits one level deeper
-		patterns = { ".git" }, -- not package.json/Makefile: those match front-end/, A01/ subfolders
-		projects = { vim.fn.expand("~/.config") },
-		confirm = function(picker, item)
-			picker:close()
-			if item then
-				vim.cmd.cd(item.file)
-				Snacks.picker.files({ cwd = item.file })
-			end
-		end,
-	})
-end
-map("n", "<leader>pp", pick_project, { desc = "Projects" })
+map("n", "-", open_oil, { desc = "Browse directory" })
 
 -- ============================================================================
 -- SNACKS
@@ -288,7 +252,7 @@ map("n", "<leader>pp", pick_project, { desc = "Projects" })
 local function project_files()
 	local cwd = vim.fs.normalize(vim.fn.getcwd())
 	if cwd == vim.fs.normalize("~") or cwd == "/" then
-		vim.notify("Not in a project; open one with <leader>fp", vim.log.levels.WARN)
+		vim.notify("Not in a project; open one with kitty's ctrl+b p", vim.log.levels.WARN)
 		return
 	end
 	Snacks.picker.files({
@@ -313,7 +277,6 @@ require("snacks").setup({
 		enabled = true,
 		preset = {
 			keys = {
-				{ icon = " ", key = "p", desc = "Projects", action = pick_project },
 				{
 					icon = " ",
 					key = "r",
@@ -428,91 +391,14 @@ map("n", "<leader>af", function()
 end, { desc = "Send file to agent chat" })
 
 -- ============================================================================
--- TERMINAL (Snacks; mirrors the Emacs ghostel toggles, one shell per project)
--- <leader>tt  bottom terminal   <leader>tT  full-window terminal   <Esc><Esc>  normal mode
--- ============================================================================
-
-map("n", "<leader>tt", function()
-	Snacks.terminal.toggle(nil, { count = 1, win = { position = "bottom", height = 0.3 } })
-end, { desc = "Toggle bottom terminal" })
-
--- Snacks hides a "current"-window terminal by closing the window, so switching
--- back to the previous buffer (Emacs switch-to-prev-buffer) stays here.
-local before_full_term
-map("n", "<leader>tT", function()
-	local opts = { count = 2, win = { position = "current" } }
-	local term = Snacks.terminal.get(nil, { count = 2, create = false, win = opts.win })
-	if term and vim.api.nvim_get_current_buf() == term.buf then
-		if before_full_term and vim.api.nvim_buf_is_valid(before_full_term) then
-			vim.api.nvim_win_set_buf(0, before_full_term)
-		else
-			vim.cmd.bprevious()
-		end
-		return
-	end
-	before_full_term = vim.api.nvim_get_current_buf()
-	local created
-	term, created = Snacks.terminal.get(nil, opts)
-	if not created then
-		term:show()
-		vim.cmd.startinsert()
-	end
-end, { desc = "Toggle full-window terminal" })
-
--- ============================================================================
 -- FUZZY FINDER: Snacks picker (also serves vim.ui.select, so every prompt looks the same)
--- <leader>ff  project files   <leader>.  find file by path   <leader>fg  grep
+-- <leader>ff  project files   <leader>fg  grep
 -- <leader>fb  buffers   <leader>fh  help   <leader>fr  recent   <leader>fs  symbols
 -- Inside a picker: <A-h> toggle hidden, <A-i> toggle ignored
 -- ============================================================================
 
 map("n", "<leader>ff", project_files, { desc = "Project files" })
 
--- Emacs find-file: the query is a path; <Tab> completes it to the selected entry.
-map("n", "<leader>.", function()
-	Snacks.picker.pick({
-		title = "Find file",
-		live = true,
-		search = vim.fn.getcwd() .. "/",
-		finder = function(_, ctx)
-			local path = vim.fn.fnamemodify(ctx.filter.search, ":p")
-			local dir, prefix = path:match("^(.*/)([^/]*)$")
-			local items = {}
-			if not dir or vim.fn.isdirectory(dir) == 0 then
-				return items
-			end
-			for name, type in vim.fs.dir(dir) do
-				if vim.startswith(name, prefix) then
-					items[#items + 1] = { file = dir .. name, text = dir .. name, dir = type == "directory" }
-				end
-			end
-			table.sort(items, function(a, b)
-				return a.file < b.file
-			end)
-			return items
-		end,
-		format = "file",
-		actions = {
-			complete = function(picker, item)
-				if item then
-					picker.input:set(nil, item.file .. (item.dir and "/" or ""))
-					picker:find() -- set() alone does not re-run a live finder
-				end
-			end,
-		},
-		win = { input = { keys = { ["<Tab>"] = { "complete", mode = { "i", "n" } } } } },
-		confirm = function(picker, item)
-			-- No match: open the typed path, creating the file like Emacs does.
-			local path = item and item.file or vim.fn.fnamemodify(picker.input.filter.search, ":p")
-			picker:close()
-			if vim.fn.isdirectory(path) == 1 then
-				open_oil(path)
-			else
-				vim.cmd.edit(vim.fn.fnameescape(path))
-			end
-		end,
-	})
-end, { desc = "Find file by editable path" })
 -- Emacs consult-imenu: LSP symbols, headings in prose, Treesitter otherwise.
 local heading_patterns = { markdown = "^#", org = "^*" }
 map("n", "<leader>fs", function()

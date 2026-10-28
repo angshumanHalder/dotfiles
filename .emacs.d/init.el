@@ -124,32 +124,38 @@
   :after (ghostel evil)
   :hook (ghostel-mode . evil-ghostel-mode))
 
-(defvar my/ghostel-bottom-buffer nil)
-(defvar my/ghostel-full-buffer nil)
+;; Terminals belong to the tabspaces tab: each project tab has its own bottom
+;; and full-window terminal, started in the project root. They are named after
+;; the tab, not the shell's directory, which follows cd.
+(defun my/ghostel-name (kind)
+  "Buffer name of the current tab's KIND terminal."
+  (format "*ghostel %s: %s*" kind (alist-get 'name (assq 'current-tab (tab-bar-tabs)))))
+
+(defun my/ghostel-create (kind display)
+  "Start the current tab's KIND terminal in the project root, shown with DISPLAY."
+  (let ((default-directory (or (projectile-project-root) default-directory)))
+    (ghostel-create (my/ghostel-name kind) display)))
 
 (defun my/ghostel-toggle-bottom ()
   (interactive)
-  (let ((window (and (buffer-live-p my/ghostel-bottom-buffer)
-                     (get-buffer-window my/ghostel-bottom-buffer (selected-frame)))))
+  (let* ((buffer (get-buffer (my/ghostel-name "bottom")))
+         (window (and buffer (get-buffer-window buffer (selected-frame)))))
     (if (and window (eq (window-parameter window 'window-side) 'bottom))
         (delete-window window)
-      (if (buffer-live-p my/ghostel-bottom-buffer)
+      (if buffer
           (select-window
            (display-buffer-in-side-window
-            my/ghostel-bottom-buffer '((side . bottom) (window-height . 0.3))))
-        (setq my/ghostel-bottom-buffer
-              (ghostel-create nil '(display-buffer-in-side-window
-                                   (side . bottom)
-                                   (window-height . 0.3))))))))
+            buffer '((side . bottom) (window-height . 0.3))))
+        (my/ghostel-create "bottom" '(display-buffer-in-side-window
+                                     (side . bottom)
+                                     (window-height . 0.3)))))))
 
 (defun my/ghostel-toggle-full ()
   (interactive)
-  (if (eq (current-buffer) my/ghostel-full-buffer)
-      (switch-to-prev-buffer)
-    (if (buffer-live-p my/ghostel-full-buffer)
-        (switch-to-buffer my/ghostel-full-buffer)
-      (setq my/ghostel-full-buffer
-            (ghostel-create nil '(display-buffer-same-window))))))
+  (let ((buffer (get-buffer (my/ghostel-name "full"))))
+    (cond ((and buffer (eq (current-buffer) buffer)) (switch-to-prev-buffer))
+          (buffer (switch-to-buffer buffer))
+          (t (my/ghostel-create "full" '(display-buffer-same-window))))))
 
 (defun my/agent-shell-toggle-right ()
   (interactive)
@@ -212,6 +218,8 @@
   (evil-define-key 'normal 'global (kbd "<leader>.") #'find-file)
   (evil-define-key 'normal 'global (kbd "<leader>pp") #'projectile-switch-project)
   (evil-define-key 'normal 'global (kbd "<leader>pa") #'projectile-add-known-project)
+  (evil-define-key 'normal 'global (kbd "<leader>pk") #'tabspaces-kill-buffers-close-workspace)
+  (evil-define-key 'normal 'global (kbd "<leader>TAB") #'toggle-frame-tab-bar)
   (evil-define-key 'normal 'global (kbd "<leader>ff") #'projectile-find-file)
   (evil-define-key 'normal 'global (kbd "<leader>e") #'my/treemacs-toggle-current-project)
 
@@ -240,9 +248,7 @@
   ;; text manipulation
   (evil-define-key 'normal 'global (kbd "<leader>sr") #'project-query-replace-regexp)
 
-  ;; comment
-  (evil-define-key 'normal 'global (kbd "gcc") #'comment-line)
-  (evil-define-key 'visual 'global (kbd "gc") #'comment-or-uncomment-region)
+  ;; comment (gc{motion}, gcc, visual gc: evil-commentary)
   (evil-define-key 'normal 'global (kbd "gbc") #'my/block-comment-line)
   (evil-define-key 'visual 'global (kbd "gb") #'my/block-comment-region)
 
@@ -281,10 +287,6 @@
 
   ;; Editing keys shared with Neovim
   (evil-define-key 'normal 'global
-    (kbd "C-h") #'evil-window-left
-    (kbd "C-j") #'evil-window-down
-    (kbd "C-k") #'evil-window-up
-    (kbd "C-l") #'evil-window-right
     (kbd "M-<up>") (lambda () (interactive) (enlarge-window 2))
     (kbd "M-<down>") (lambda () (interactive) (shrink-window 2))
     (kbd "M-<right>") (lambda () (interactive) (enlarge-window-horizontally 2))
@@ -301,9 +303,12 @@
                 (call-interactively #'evil-shift-left) (evil-visual-restore))
     (kbd ">") (lambda () (interactive)
                 (call-interactively #'evil-shift-right) (evil-visual-restore)))
-  ;; n/N recenter, like nzzzv.
-  (dolist (fn '(evil-ex-search-next evil-ex-search-previous))
-    (advice-add fn :after (lambda (&rest _) (recenter))))
+  ;; C-d/C-u/n/N recenter, like <C-d>zz and nzzzv. Consecutive scrolls put the
+  ;; cursor back on the screen row of the first one, undoing the recenter; not
+  ;; counting as a scroll makes the next C-d start from the centered cursor.
+  (dolist (fn '(evil-scroll-down evil-scroll-up
+                evil-ex-search-next evil-ex-search-previous))
+    (advice-add fn :after (lambda (&rest _) (recenter) (setq real-this-command #'recenter))))
   )
 
 (use-package evil-matchit
@@ -438,8 +443,43 @@
   :custom
   ;; doom-modeline already shows the project.
   (projectile-dynamic-mode-line nil)
+  (projectile-switch-project-action #'my/projectile-open-tabspace)
   :config
   (projectile-mode +1))
+
+;; Workspaces: each project gets its own tab with its own buffer list, so
+;; SPC f b (consult-buffer) only shows that project's buffers. SPC p p opens a
+;; project in a new tab or switches to its tab; gt/gT cycle tabs; SPC p k kills
+;; the project's buffers and closes its tab.
+(use-package tabspaces
+  :hook (after-init . tabspaces-mode)
+  :custom
+  (tabspaces-include-buffers '("*scratch*" "*dashboard*"))
+  ;; A new project tab starts on *scratch*, not the previous project's buffer.
+  (tab-bar-new-tab-choice "*scratch*")
+  ;; Tab bar hidden; SPC TAB toggles it (top of the window). Just the tabs,
+  ;; sized to their names, 2px apart: no close/new/history buttons.
+  (tab-bar-show nil)
+  (tab-bar-format '(tab-bar-format-tabs))
+  (tab-bar-auto-width nil)
+  (tab-bar-separator (propertize " " 'display '(space :width (2))))
+  (tab-bar-close-button-show nil)
+  ;; Number the tabs ("1 .config"), the count for {count}gt.
+  (tab-bar-tab-hints t)
+  (consult-buffer-list-function #'tabspaces-local-buffer-list))
+
+(defun my/projectile-open-tabspace ()
+  "Switch to the current project's tab, or open it in a new tab."
+  (let* ((root (projectile-project-root))
+         (name (projectile-project-name root))
+         (open (seq-find (lambda (tab) (equal name (alist-get 'name tab)))
+                         (tab-bar-tabs))))
+    (tabspaces-switch-or-create-workspace name)
+    ;; The new tab shows *scratch*, which is outside the project: find files
+    ;; from the project root captured above.
+    (unless open
+      (let ((default-directory root))
+        (projectile-find-file)))))
 
 ;; dashboard
 (use-package dashboard
@@ -876,6 +916,12 @@
     (kbd "sd") #'evil-surround-delete
     (kbd "sr") #'evil-surround-change)
   (evil-define-key 'visual 'global (kbd "sa") #'evil-surround-region))
+
+;; gc as an operator, like Comment.nvim: gcc, gcip, gcap, visual gc.
+(use-package evil-commentary
+  :after evil
+  :config
+  (evil-commentary-mode 1))
 
 (use-package evil-args
   :after evil

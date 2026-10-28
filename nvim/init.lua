@@ -61,11 +61,6 @@ require("vim._core.ui2").enable({})
 
 local map = vim.keymap.set
 
-map("n", "<C-h>", "<C-w>h")
-map("n", "<C-j>", "<C-w>j")
-map("n", "<C-k>", "<C-w>k")
-map("n", "<C-l>", "<C-w>l")
-
 map("v", "<", "<gv")
 map("v", ">", ">gv")
 
@@ -104,11 +99,6 @@ map("n", "N", "Nzzzv")
 -- Spec fields: src (required), name, version, data.
 -- On first launch plugins install; restart nvim if require() errors occur.
 -- ============================================================================
-
--- Local agent.nvim development checkout.
-vim.opt.runtimepath:append("/Users/angshumanhalder/Documents/projects/agent-nvim")
--- <leader>ac belongs to agentic (Emacs: agent-shell-send-region); :AgentContext stays a command.
-require("agent_nvim.keymaps").setup({ commands = { AgentContext = false } })
 
 vim.pack.add({
 	"https://github.com/echasnovski/mini.nvim",

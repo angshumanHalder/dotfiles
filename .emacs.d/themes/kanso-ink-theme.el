@@ -120,6 +120,13 @@
    `(dashboard-footer-face ((t (:foreground ,comment))))
    `(dired-directory ((t (:foreground ,fun))))
    `(dired-symlink ((t (:foreground ,type))))
+   ;; Tab bar (tabspaces, toggled by SPC TAB), flat like the kitty tabs: the box
+   ;; is padding in the tab's own colour.
+   `(tab-bar ((t (:foreground ,dim :background ,bg :box nil))))
+   `(tab-bar-tab ((t (:foreground ,bg :background ,fun :weight bold
+                      :box (:line-width (12 . 2) :color ,fun)))))
+   `(tab-bar-tab-inactive ((t (:foreground ,dim :background ,line :weight normal
+                               :box (:line-width (12 . 2) :color ,line)))))
    ;; Mode line and Doom Modeline.
    `(mode-line ((t (:foreground ,fg :background ,line :box nil))))
    `(mode-line-inactive ((t (:foreground ,comment :background ,panel :box nil))))
