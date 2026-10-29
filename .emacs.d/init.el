@@ -128,10 +128,14 @@
 
 ;; Terminals belong to the tabspaces tab: each project tab has its own bottom
 ;; and full-window terminal, started in the project root. They are named after
-;; the tab, not the shell's directory, which follows cd.
+;; the tab, not the shell's directory, which follows cd. An unnamed tab (the
+;; first one) is named after its selected buffer, which changes once the
+;; terminal is selected, so it gets a fixed name instead.
 (defun my/ghostel-name (kind)
   "Buffer name of the current tab's KIND terminal."
-  (format "*ghostel %s: %s*" kind (alist-get 'name (assq 'current-tab (tab-bar-tabs)))))
+  (let ((tab (assq 'current-tab (tab-bar-tabs))))
+    (format "*ghostel %s: %s*" kind
+            (if (alist-get 'explicit-name tab) (alist-get 'name tab) "default"))))
 
 (defun my/ghostel-create (kind display)
   "Start the current tab's KIND terminal in the project root, shown with DISPLAY."
@@ -923,7 +927,10 @@
 (use-package evil-commentary
   :after evil
   :config
-  (evil-commentary-mode 1))
+  (evil-commentary-mode 1)
+  ;; Its global gy (yank and comment) shadows agent-shell's gy (accept all diff).
+  (add-hook 'agent-shell-diff-mode-hook
+            (lambda () (setq-local evil-commentary-mode nil))))
 
 (use-package evil-args
   :after evil
