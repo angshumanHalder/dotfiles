@@ -187,7 +187,8 @@ local function setup_nvim_tree()
 							vim.schedule(function()
 								vim.cmd("echo ''")
 							end)
-							return picked
+							-- nil (cancelled) is allowed by nvim-tree's docs; its annotation says integer.
+							return picked --[[@as integer]]
 						end,
 					},
 				},
@@ -248,37 +249,41 @@ map("n", "-", open_oil, { desc = "Browse directory" })
 -- <leader>bk  kill buffer   <leader>sc  scratch buffer
 -- ============================================================================
 
--- Project file search. Refuses ~ and /: listing ~ held ~400 MB (766k files).
--- <Tab> inserts the highlighted path into the prompt, like vertico; <S-Tab> multi-selects.
-local function project_files()
-	local cwd = vim.fs.normalize(vim.fn.getcwd())
-	if cwd == vim.fs.normalize("~") or cwd == "/" then
-		vim.notify("Not in a project; open one with kitty's ctrl+b p", vim.log.levels.WARN)
-		return
-	end
-	Snacks.picker.files({
-		hidden = true,
-		actions = {
-			insert_path = function(picker, item)
-				if item then
-					picker.input:set(vim.fn.fnamemodify(Snacks.picker.util.path(item), ":."))
-					picker:find({ refresh = false })
-				end
-			end,
-		},
-		win = { input = { keys = { ["<Tab>"] = { "insert_path", mode = { "i", "n" } } } } },
-	})
-end
-
 require("snacks").setup({
 	bigfile = { enabled = true },
 	input = { enabled = true, win = { row = 0.5 } },
-	picker = { enabled = true, ui_select = true },
+	picker = {
+		enabled = true,
+		ui_select = true,
+		sources = {
+			-- <Tab> inserts the highlighted path into the prompt, like vertico; <S-Tab> multi-selects.
+			files = {
+				hidden = true,
+				actions = {
+					insert_path = function(picker, item)
+						local path = Snacks.picker.util.path(item)
+						if path then
+							picker.input:set(vim.fn.fnamemodify(path, ":."))
+							picker:find({ refresh = false })
+						end
+					end,
+				},
+				win = { input = { keys = { ["<Tab>"] = { "insert_path", mode = { "i", "n" } } } } },
+			},
+		},
+	},
 	dashboard = {
 		enabled = true,
 		preset = {
 			keys = {
-				{ icon = " ", key = "f", desc = "Find File", action = project_files },
+				{
+					icon = " ",
+					key = "f",
+					desc = "Find File",
+					action = function()
+						Snacks.picker.files()
+					end,
+				},
 				{
 					icon = " ",
 					key = "r",
@@ -399,7 +404,9 @@ end, { desc = "Send file to agent chat" })
 -- Inside a picker: <A-h> toggle hidden, <A-i> toggle ignored
 -- ============================================================================
 
-map("n", "<leader>ff", project_files, { desc = "Project files" })
+map("n", "<leader>ff", function()
+	Snacks.picker.files()
+end, { desc = "Project files" })
 
 -- Emacs consult-imenu: LSP symbols, headings in prose, Treesitter otherwise.
 local heading_patterns = { markdown = "^#", org = "^*" }

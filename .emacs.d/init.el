@@ -117,7 +117,9 @@
 ;; terminal
 (use-package ghostel
   :ensure t
-  :commands (ghostel ghostel-create))
+  :commands (ghostel ghostel-create)
+  ;; 60fps: the prompt after a command waits one frame.
+  :custom (ghostel-timer-delay 0.016))
 
 (use-package evil-ghostel
   :ensure t

@@ -103,6 +103,7 @@ map("n", "N", "Nzzzv")
 
 vim.pack.add({
 	"https://github.com/echasnovski/mini.nvim",
+	"https://github.com/lewis6991/gitsigns.nvim",
 	"https://github.com/romus204/tree-sitter-manager.nvim",
 	"https://github.com/rafamadriz/friendly-snippets",
 	"https://github.com/saghen/blink.lib",

@@ -32,32 +32,78 @@ require("tree-sitter-manager").setup({
 })
 
 -- ============================================================================
--- GIT HUNKS: mini.diff (Emacs diff-hl)
--- <leader>]h/<leader>[h  next/prev hunk   <leader>gp  toggle inline diff   <leader>gs  stage
--- <leader>gr  reset        <leader>gb  blame line (Snacks popup)
--- gh{motion}/gH{motion}  stage/reset hunks in a range
+-- GIT HUNKS AND BLAME: gitsigns (Emacs diff-hl, magit-blame-echo)
+-- <leader>]h/<leader>[h  next/prev hunk   <leader>gp  preview hunk   <leader>gs  stage
+-- <leader>gr  reset (both take a visual range)   <leader>gb  toggle line blame
+-- <leader>gf  whole-file blame   :Gitsigns show <rev>  file at a revision
 -- ============================================================================
 
-local diff = require("mini.diff")
-diff.setup({
-	view = { style = "sign", signs = { add = "▎", change = "▎", delete = "▁" } },
-	mappings = { goto_prev = "<leader>[h", goto_next = "<leader>]h" },
+require("gitsigns").setup({
+	preview_config = { border = "single" },
+	-- Default waits 1s after the cursor stops before showing blame.
+	current_line_blame_opts = { delay = 100 },
+	signs = {
+		add = { text = "▎" },
+		change = { text = "▎" },
+		delete = { text = "▁" },
+		topdelete = { text = "▔" },
+		changedelete = { text = "▎" },
+	},
+	on_attach = function(buffer)
+		local gs = require("gitsigns")
+		local function gmap(mode, l, r, desc)
+			vim.keymap.set(mode, l, r, { buffer = buffer, desc = desc })
+		end
+		local function range()
+			return { vim.fn.line("."), vim.fn.line("v") }
+		end
+		gmap("n", "<leader>]h", function()
+			gs.nav_hunk("next")
+		end, "Next Hunk")
+		gmap("n", "<leader>[h", function()
+			gs.nav_hunk("prev")
+		end, "Prev Hunk")
+		-- Opens the preview and moves into it, ready for s/r/u below (q closes).
+		gmap("n", "<leader>gp", function()
+			gs.preview_hunk()
+			gs.preview_hunk() -- a second call focuses the open preview
+		end, "Preview Hunk")
+		gmap("n", "<leader>gs", gs.stage_hunk, "Stage Hunk")
+		gmap("n", "<leader>gr", gs.reset_hunk, "Reset Hunk")
+		gmap("v", "<leader>gs", function()
+			gs.stage_hunk(range())
+		end, "Stage Lines")
+		gmap("v", "<leader>gr", function()
+			gs.reset_hunk(range())
+		end, "Reset Lines")
+		-- Blame follows the cursor as faint end-of-line text, like magit-blame-echo.
+		gmap("n", "<leader>gb", gs.toggle_current_line_blame, "Toggle Line Blame")
+		gmap("n", "<leader>gf", gs.blame, "Blame File")
+	end,
 })
 
--- Whole hunk under the cursor: mini.diff's operator over its hunk text object.
--- (do_hunks with a one-line range would stage only that line.)
-map("n", "<leader>gs", "ghgh", { remap = true, desc = "Stage Hunk" })
-map("n", "<leader>gr", "gHgh", { remap = true, desc = "Reset Hunk" })
-map("n", "<leader>gp", function()
-	diff.toggle_overlay(0)
-end, { desc = "Toggle Inline Diff" })
-map("n", "<leader>gb", function()
-	Snacks.git.blame_line()
-end, { desc = "Blame Line" })
+-- Inside the hunk preview (<leader>gp), act on that hunk like Magit:
+-- s  stage   r  reset   u  undo last stage. Each closes the preview first.
+vim.api.nvim_create_autocmd("WinEnter", {
+	callback = function()
+		if vim.w.gitsigns_preview ~= "hunk" then
+			return
+		end
+		for key, action in pairs({ s = "stage_hunk", r = "reset_hunk", u = "undo_stage_hunk" }) do
+			vim.keymap.set("n", key, function()
+				vim.cmd.close()
+				require("gitsigns")[action]()
+			end, { buffer = true, nowait = true, desc = action })
+		end
+	end,
+})
 
 -- ============================================================================
 -- NEOGIT AND DIFFVIEW
 -- <leader>gg  Neogit   <leader>gB  git browse   <leader>gc  Diffview   <leader>gx  close Diffview
+-- Merge conflicts: <leader>gc during a merge opens Diffview's 3-way merge view, with its
+-- own keys: ]x/[x  next/prev conflict   <leader>co/ct/cb/ca  take ours/theirs/base/all
+-- dx  drop the conflict   <leader>cO/cT/cB/cA/dX  same for every conflict in the file
 -- ============================================================================
 
 local function load_diffview()
@@ -142,6 +188,8 @@ require("blink.cmp").setup({
 require("lazydev").setup({
 	library = {
 		{ path = "${3rd}/luv/library", words = { "vim%.uv" } },
+		-- blink.cmp's build() returns a Task class defined in blink.lib.
+		{ path = "blink.lib", words = { "blink%.cmp" } },
 	},
 })
 

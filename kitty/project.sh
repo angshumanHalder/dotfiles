@@ -1,7 +1,7 @@
 #!/bin/sh
 # Pick a project and switch kitty to its session: a Neovim tab and a shell tab
 # in the project. The session file is created on first use, so new git repos
-# under ~/Documents/projects show up without setup. Run by kitty.conf's ctrl+b>p.
+# under ~/Documents/projects show up without setup. Run by kitty.conf's ctrl+t>p.
 export PATH="/opt/homebrew/bin:/Applications/kitty.app/Contents/MacOS:$PATH"
 projects="$HOME/Documents/projects"
 sessions="$HOME/.local/share/kitty/sessions"

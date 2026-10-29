@@ -1,5 +1,5 @@
 #!/bin/sh
-# Running sessions for kitty.conf's ctrl+b>w: an fzf list, most recent first
+# Running sessions for kitty.conf's ctrl+t>w: an fzf list, most recent first
 # (● = current), previewing each session's tabs, programs and folders.
 export PATH="/opt/homebrew/bin:/Applications/kitty.app/Contents/MacOS:$PATH"
 
