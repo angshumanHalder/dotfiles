@@ -5,7 +5,7 @@
 (push '(menu-bar-lines . 0) default-frame-alist)
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
-(push '(font . "JetBrainsMono Nerd Font Mono-12") default-frame-alist)
+(push '(font . "JetBrainsMono Nerd Font Mono-13") default-frame-alist)
 (setq menu-bar-mode nil
       tool-bar-mode nil
       scroll-bar-mode nil)
