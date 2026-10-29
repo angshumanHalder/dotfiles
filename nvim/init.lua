@@ -18,6 +18,7 @@ opt.shiftwidth = 2
 opt.expandtab = true
 opt.smartindent = true
 opt.wrap = false
+opt.signcolumn = "yes"
 opt.cursorline = true
 opt.termguicolors = true
 opt.updatetime = 250

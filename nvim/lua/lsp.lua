@@ -231,15 +231,7 @@ vim.lsp.enable({
 vim.diagnostic.config({
 	virtual_text = true,
 	virtual_lines = false,
-	-- Line numbers take the severity colour too.
-	signs = {
-		numhl = {
-			[vim.diagnostic.severity.ERROR] = "DiagnosticSignError",
-			[vim.diagnostic.severity.WARN] = "DiagnosticSignWarn",
-			[vim.diagnostic.severity.INFO] = "DiagnosticSignInfo",
-			[vim.diagnostic.severity.HINT] = "DiagnosticSignHint",
-		},
-	},
+	signs = true,
 	underline = true,
 	update_in_insert = false,
 	float = { source = true },

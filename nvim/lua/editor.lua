@@ -227,6 +227,7 @@ local function open_oil()
 							if not err and not vim.api.nvim_buf_get_name(0):match("^oil://") then
 								vim.wo.number = true
 								vim.wo.relativenumber = true
+								vim.wo.signcolumn = "yes"
 							end
 						end)
 					end,
@@ -277,6 +278,7 @@ require("snacks").setup({
 		enabled = true,
 		preset = {
 			keys = {
+				{ icon = " ", key = "f", desc = "Find File", action = project_files },
 				{
 					icon = " ",
 					key = "r",
