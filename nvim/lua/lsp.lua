@@ -33,7 +33,7 @@ require("tree-sitter-manager").setup({
 
 -- ============================================================================
 -- GIT HUNKS AND BLAME: gitsigns (Emacs diff-hl, magit-blame-echo)
--- <leader>]h/<leader>[h  next/prev hunk   <leader>gp  preview hunk   <leader>gs  stage
+-- <leader>]h/<leader>[h or <leader>hn/hp  next/prev hunk   <leader>gp  preview hunk   <leader>gs  stage
 -- <leader>gr  reset (both take a visual range)   <leader>gb  toggle line blame
 -- <leader>gf  whole-file blame   :Gitsigns show <rev>  file at a revision
 -- ============================================================================
@@ -57,12 +57,15 @@ require("gitsigns").setup({
 		local function range()
 			return { vim.fn.line("."), vim.fn.line("v") }
 		end
-		gmap("n", "<leader>]h", function()
-			gs.nav_hunk("next")
-		end, "Next Hunk")
-		gmap("n", "<leader>[h", function()
-			gs.nav_hunk("prev")
-		end, "Prev Hunk")
+		-- <leader>]h/[h match Emacs; <leader>hn/hp are the same, also used in agentic's diff preview.
+		for _, keys in ipairs({ { "<leader>]h", "<leader>[h" }, { "<leader>hn", "<leader>hp" } }) do
+			gmap("n", keys[1], function()
+				gs.nav_hunk("next")
+			end, "Next Hunk")
+			gmap("n", keys[2], function()
+				gs.nav_hunk("prev")
+			end, "Prev Hunk")
+		end
 		-- Opens the preview and moves into it, ready for s/r/u below (q closes).
 		gmap("n", "<leader>gp", function()
 			gs.preview_hunk()

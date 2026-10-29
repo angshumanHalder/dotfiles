@@ -369,7 +369,11 @@ local function agentic()
 	load_plugin("agentic.nvim", function()
 		-- provider: used only by history restore when no chat is open.
 		-- session_scope: each project gets its own chat session.
-		require("agentic").setup({ provider = "codex-acp", settings = { session_scope = "project" } })
+		require("agentic").setup({
+			provider = "codex-acp",
+			settings = { session_scope = "project" },
+			keymaps = { diff_preview = { next_hunk = "<leader>hn", prev_hunk = "<leader>hp" } },
+		})
 	end)
 	return require("agentic")
 end
