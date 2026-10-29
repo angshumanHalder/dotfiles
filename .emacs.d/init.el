@@ -224,7 +224,7 @@
   (evil-define-key 'normal 'global (kbd "<leader>.") #'find-file)
   (evil-define-key 'normal 'global (kbd "<leader>pp") #'projectile-switch-project)
   (evil-define-key 'normal 'global (kbd "<leader>pa") #'projectile-add-known-project)
-  (evil-define-key 'normal 'global (kbd "<leader>pk") #'tabspaces-kill-buffers-close-workspace)
+  (evil-define-key 'normal 'global (kbd "<leader>pk") #'my/project-close)
   (evil-define-key 'normal 'global (kbd "<leader>TAB") #'toggle-frame-tab-bar)
   (evil-define-key 'normal 'global (kbd "<leader>ff") #'projectile-find-file)
   (evil-define-key 'normal 'global (kbd "<leader>e") #'my/treemacs-toggle-current-project)
@@ -487,6 +487,19 @@
       (let ((default-directory root))
         (projectile-find-file)))))
 
+(defun my/project-close ()
+  "Kill the tab's buffers and every buffer of its project, then close the tab.
+tabspaces only tracks buffers shown in the tab, so files opened from another
+tab (or by the agent) would survive and keep the project's eglot server alive."
+  (interactive)
+  (let* ((name (alist-get 'name (assq 'current-tab (tab-bar-tabs))))
+         (root (seq-find (lambda (r) (equal name (projectile-project-name r)))
+                         projectile-known-projects))
+         (project (and root (project-current nil root))))
+    (when project
+      (project-kill-buffers t project)))
+  (tabspaces-kill-buffers-close-workspace))
+
 ;; dashboard
 (use-package dashboard
   :after projectile
@@ -720,6 +733,10 @@
 		   markdown-mode markdown-ts-mode
 		   mhtml-mode mhtml-ts-mode html-mode html-ts-mode
 		   css-mode css-ts-mode dockerfile-ts-mode) . eglot-ensure)
+  :custom
+  ;; A server stops once its last buffer is killed (e.g. SPC pk), like quitting
+  ;; a project's Neovim. Other projects' servers keep their own buffers.
+  (eglot-autoshutdown t)
   :config
   ;; Select the same Python and TOML servers on both machines.
   (add-to-list 'eglot-server-programs
