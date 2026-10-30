@@ -250,6 +250,10 @@
   (evil-define-key 'normal 'global (kbd "<leader>gs") #'diff-hl-stage-current-hunk)
   (evil-define-key 'normal 'global (kbd "<leader>gr") #'diff-hl-revert-hunk)
   (evil-define-key 'normal 'global (kbd "<leader>gb") #'magit-blame-echo)
+  (evil-define-key 'normal 'global (kbd "<leader>gf") #'magit-blame-addition)
+  ;; Like Diffview: every change vs HEAD. On a conflicted file, use `e' in
+  ;; magit-status for the 3-way ediff instead.
+  (evil-define-key 'normal 'global (kbd "<leader>gc") #'magit-diff-working-tree)
 
   ;; text manipulation
   (evil-define-key 'normal 'global (kbd "<leader>sr") #'project-query-replace-regexp)
