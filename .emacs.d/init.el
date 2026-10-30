@@ -124,7 +124,11 @@
 (use-package evil-ghostel
   :ensure t
   :after (ghostel evil)
-  :hook (ghostel-mode . evil-ghostel-mode))
+  :hook (ghostel-mode . evil-ghostel-mode)
+  :config
+  ;; The global insert-state C-c (escape) shadows ghostel's C-c prefix, so
+  ;; C-c C-c never reached the terminal. Other C-c commands: normal state.
+  (evil-define-key 'insert evil-ghostel-mode-map (kbd "C-c C-c") #'ghostel-send-C-c))
 
 ;; Terminals belong to the tabspaces tab: each project tab has its own bottom
 ;; and full-window terminal, started in the project root. They are named after
