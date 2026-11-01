@@ -983,23 +983,25 @@ tab (or by the agent) would survive and keep the project's eglot server alive."
   (define-key evil-inner-text-objects-map "a" #'evil-inner-arg)
   (define-key evil-outer-text-objects-map "a" #'evil-outer-arg))
 
-;; mini.ai-style lookahead: when the enclosing ( opened on an earlier line,
-;; prefer the next ( on the current line.
-(defun my/evil-paren-seek (fn &rest args)
-  (let ((open (nth 1 (syntax-ppss))))
-    (when (and (not (region-active-p))
-               (or (null open) (< open (line-beginning-position)))
-               (save-excursion
-                 (skip-chars-forward "^(" (line-end-position))
-                 (eq (char-after) ?\()))
-      (skip-chars-forward "^(" (line-end-position))
-      (forward-char))
-    ;; Evil only extends a visual selection when the text object sees
-    ;; `called-interactively-p'; a plain apply would hide that and break vi(.
-    (if (called-interactively-p 'any)
-        (apply #'funcall-interactively fn args)
-      (apply fn args))))
+;; mini.ai-style lookahead for (, [ and {: when the enclosing pair opened on
+;; an earlier line, prefer the next OPEN on the current line.
 (with-eval-after-load 'evil
-  (advice-add 'evil-inner-paren :around #'my/evil-paren-seek)
-  (advice-add 'evil-a-paren :around #'my/evil-paren-seek))
+  (pcase-dolist (`(,char . ,objects) '((?\( evil-inner-paren evil-a-paren)
+                                       (?\[ evil-inner-bracket evil-a-bracket)
+                                       (?{ evil-inner-curly evil-a-curly)))
+    (dolist (object objects)
+      (advice-add object :around
+                  (lambda (fn &rest args)
+                    (let ((open (nth 1 (syntax-ppss)))
+                          (next (save-excursion
+                                  (search-forward (string char) (line-end-position) t))))
+                      (when (and next (not (region-active-p))
+                                 (or (null open) (< open (line-beginning-position))))
+                        (goto-char next)))
+                    ;; Evil only extends a visual selection when the text
+                    ;; object sees `called-interactively-p'; a plain apply
+                    ;; would hide that and break vi(.
+                    (if (called-interactively-p 'any)
+                        (apply #'funcall-interactively fn args)
+                      (apply fn args)))))))
 
