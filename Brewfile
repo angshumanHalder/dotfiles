@@ -16,6 +16,7 @@ brew "postgresql@18"
 brew "cmake"
 brew "pkgconf"
 brew "tree-sitter-cli"
+brew "mermaid-cli"
 
 # Language runtimes and servers.
 brew "rustup"

@@ -71,7 +71,8 @@
 (add-hook 'org-mode-hook #'org-indent-mode)
 
 (setq org-directory (expand-file-name "~/Documents/org")
-      org-agenda-files (list org-directory))
+      org-agenda-files (list org-directory)
+      org-default-notes-file (expand-file-name "notes.org" org-directory))
 (with-eval-after-load 'org-agenda
   (setq org-agenda-window-setup 'other-window))
 
@@ -205,6 +206,8 @@
   :init
   ;; allows for using cgn
   (setq evil-search-module 'evil-search)
+  ;; Like Neovim's hlsearch off: highlight only while typing the search.
+  (setq evil-ex-search-persistent-highlight nil)
   (setq evil-want-keybinding nil
 	;; no vim insert bindings
 	evil-undo-system 'undo-redo)
@@ -236,7 +239,11 @@
   ;; lsp
   (evil-define-key 'normal 'global (kbd "]d") #'flymake-goto-next-error)
   (evil-define-key 'normal 'global (kbd "[d") #'flymake-goto-prev-error)
-  (evil-define-key 'normal 'global (kbd "<leader>fd") #'flymake-show-buffer-diagnostics)
+  ;; Emacs 31.1's interactive spec passes every diagnostic at point as an
+  ;; argument, so two on one spot signalled "Wrong number of arguments".
+  (evil-define-key 'normal 'global (kbd "<leader>fd")
+    (lambda () (interactive)
+      (flymake-show-buffer-diagnostics (car (flymake-diagnostics (point))))))
   (evil-define-key 'normal 'global (kbd "<leader>fD") #'flymake-show-project-diagnostics)
   (evil-define-key 'normal 'global (kbd "gd") #'xref-find-definitions)
   (evil-define-key 'normal 'global (kbd "gD") #'eglot-find-declaration)
@@ -248,8 +255,8 @@
 
   ;; git
   (evil-define-key 'normal 'global (kbd "<leader>gg") #'magit-status)
-  (evil-define-key 'normal 'global (kbd "<leader>]h") #'diff-hl-next-hunk)
-  (evil-define-key 'normal 'global (kbd "<leader>[h") #'diff-hl-previous-hunk)
+  (evil-define-key 'normal 'global (kbd "]h") #'diff-hl-next-hunk)
+  (evil-define-key 'normal 'global (kbd "[h") #'diff-hl-previous-hunk)
   (evil-define-key 'normal 'global (kbd "<leader>gp") #'diff-hl-show-hunk)
   (evil-define-key 'normal 'global (kbd "<leader>gs") #'diff-hl-stage-current-hunk)
   (evil-define-key 'normal 'global (kbd "<leader>gr") #'diff-hl-revert-hunk)
@@ -292,7 +299,7 @@
     
 
   ;; buffers
-  (evil-define-key 'normal 'global (kbd "<leader>bd") #'kill-current-buffer)
+  (evil-define-key 'normal 'global (kbd "<leader>bk") #'kill-current-buffer)
   (evil-define-key 'normal 'global (kbd "H") #'previous-buffer)
   (evil-define-key 'normal 'global (kbd "L") #'next-buffer)
 
@@ -697,6 +704,19 @@ tab (or by the agent) would survive and keep the project's eglot server alive."
   (corfu-auto t)
   :init
   (global-corfu-mode))
+
+;; With one candidate, eglot's style expands the input to the candidate's
+;; label, which rust-analyzer decorates: C-SPC inserted the literal
+;; "SharedState(use crate::state::SharedState)". Never expand; the popup
+;; shows instead and RET applies the real edit (and the import).
+(defun my/eglot-no-expand (string _table _pred point)
+  (cons string point))
+(with-eval-after-load 'eglot
+  (add-to-list 'completion-styles-alist
+               '(my/eglot-no-expand my/eglot-no-expand eglot--dumb-allc
+                                    "Eglot's style without try-completion expansion."))
+  (add-to-list 'completion-category-overrides
+               '(eglot-capf (styles my/eglot-no-expand))))
 
 (use-package nerd-icons-corfu
   :after corfu

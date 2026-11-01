@@ -41,6 +41,10 @@ export PATH="$rustup_prefix/bin:$HOME/.cargo/bin:$HOME/go/bin:$PATH"
 rustup toolchain install stable --profile default --component rust-src --component rust-analyzer
 rustup default stable
 
+# mmdc (Brewfile mermaid-cli) needs the headless browser its bundled puppeteer pins.
+"$(brew --prefix mermaid-cli)/libexec/lib/node_modules/@mermaid-js/mermaid-cli/node_modules/.bin/puppeteer" \
+  browsers install chrome-headless-shell
+
 append_once() {
   local file="$1" line="$2"
   touch "$file"
