@@ -795,6 +795,13 @@ tab (or by the agent) would survive and keep the project's eglot server alive."
   (eglot-ignored-server-capabilities
    '(:documentHighlightProvider :inlayHintProvider)))
 
+;; Servers like rust-analyzer only re-run their checker (cargo check) on
+;; didSave, so edits from outside Emacs (agents, git) left stale errors after
+;; the buffer auto-reverted. A revert is a save from the server's view.
+(add-hook 'after-revert-hook
+          (lambda ()
+            (when (eglot-managed-p) (eglot--signal-textDocument/didSave))))
+
 (use-package flymake-ruff
   :after eglot
   :config
