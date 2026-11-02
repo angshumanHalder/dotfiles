@@ -990,6 +990,9 @@ tab (or by the agent) would survive and keep the project's eglot server alive."
   (define-key evil-inner-text-objects-map "a" #'evil-inner-arg)
   (define-key evil-outer-text-objects-map "a" #'evil-outer-arg))
 
+;; Like Vim's iskeyword: _ is part of a word, so dw/ciw take all of hello_world.
+(add-hook 'after-change-major-mode-hook (lambda () (modify-syntax-entry ?_ "w")))
+
 ;; mini.ai-style lookahead for (, [ and {: when the enclosing pair opened on
 ;; an earlier line, prefer the next OPEN on the current line.
 (with-eval-after-load 'evil
