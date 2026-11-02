@@ -953,6 +953,12 @@ tab (or by the agent) would survive and keep the project's eglot server alive."
   (setq evil-want-integration t)
   (evil-collection-init))
 
+;; Dired: refresh on revisit and live when files change outside Emacs.
+;; `+' makes a directory (evil-collection); `gn' makes an empty file.
+(setq dired-auto-revert-buffer t
+      global-auto-revert-non-file-buffers t)
+(global-auto-revert-mode 1)
+
 (with-eval-after-load 'evil-collection-org-agenda
   (evil-collection-define-key 'normal 'org-agenda-mode-map
     "vt" #'org-agenda-fortnight-view))
