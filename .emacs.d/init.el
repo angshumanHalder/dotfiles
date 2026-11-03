@@ -959,6 +959,10 @@ tab (or by the agent) would survive and keep the project's eglot server alive."
       global-auto-revert-non-file-buffers t)
 (global-auto-revert-mode 1)
 
+;; special-mode-map's ZZ/ZQ (readonly bindings) shadow magit's Z worktree menu.
+(with-eval-after-load 'evil-collection-magit
+  (evil-collection-define-key 'normal 'magit-mode-map "Z" #'magit-worktree))
+
 (with-eval-after-load 'evil-collection-org-agenda
   (evil-collection-define-key 'normal 'org-agenda-mode-map
     "vt" #'org-agenda-fortnight-view))
