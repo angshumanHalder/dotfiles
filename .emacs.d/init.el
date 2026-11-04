@@ -643,6 +643,9 @@ tab (or by the agent) would survive and keep the project's eglot server alive."
   :config
   (remove-hook 'magit-status-headers-hook #'magit-insert-tags-header))
 
+;; Keep ediff's control panel in the current frame, not a separate one.
+(setq ediff-window-setup-function #'ediff-setup-windows-plain)
+
 (use-package diff-hl
   :custom
   (diff-hl-update-async t)
