@@ -236,6 +236,14 @@
   (evil-define-key 'normal 'global (kbd "<leader>ff") #'projectile-find-file)
   (evil-define-key 'normal 'global (kbd "<leader>e") #'my/treemacs-toggle-current-project)
 
+  ;; org
+  (evil-define-key 'normal 'global (kbd "<leader>of")
+    (lambda () (interactive)
+      (let ((default-directory (file-name-as-directory org-directory)))
+        (call-interactively #'find-file))))
+  (evil-define-key 'normal 'global (kbd "<leader>oa") #'org-agenda)
+  (evil-define-key 'normal 'global (kbd "<leader>oc") #'org-capture)
+
   ;; lsp
   (evil-define-key 'normal 'global (kbd "]d") #'flymake-goto-next-error)
   (evil-define-key 'normal 'global (kbd "[d") #'flymake-goto-prev-error)
