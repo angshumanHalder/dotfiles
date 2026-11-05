@@ -961,7 +961,6 @@ tab (or by the agent) would survive and keep the project's eglot server alive."
 (use-package evil-collection
   :after evil
   :config
-  (setq evil-want-integration t)
   (evil-collection-init))
 
 ;; Dired: refresh on revisit and live when files change outside Emacs.
@@ -976,7 +975,17 @@ tab (or by the agent) would survive and keep the project's eglot server alive."
 
 (with-eval-after-load 'evil-collection-org-agenda
   (evil-collection-define-key 'normal 'org-agenda-mode-map
-    "vt" #'org-agenda-fortnight-view))
+    "vt" #'org-agenda-fortnight-view
+    ;; SPC was org-agenda-show; free it for the leader (RET opens the entry).
+    (kbd "SPC") nil))
+
+;; Vim editing for org structure: heading-aware o/O, << >> promote/demote,
+;; M-hjkl move/promote subtrees (over move-lines in org), ae/aR text objects,
+;; gh/gj/gk/gl element navigation. Its agenda bindings would clash with
+;; evil-collection's, so evil-org-agenda stays off.
+(use-package evil-org
+  :after (evil org)
+  :hook (org-mode . evil-org-mode))
 
 (with-eval-after-load 'evil-collection-eglot
   (evil-define-key 'normal 'eglot-mode-map
@@ -1010,9 +1019,6 @@ tab (or by the agent) would survive and keep the project's eglot server alive."
   :config
   (define-key evil-inner-text-objects-map "a" #'evil-inner-arg)
   (define-key evil-outer-text-objects-map "a" #'evil-outer-arg))
-
-;; Like Vim's iskeyword: _ is part of a word, so dw/ciw take all of hello_world.
-(add-hook 'after-change-major-mode-hook (lambda () (modify-syntax-entry ?_ "w")))
 
 ;; mini.ai-style lookahead for (, [ and {: when the enclosing pair opened on
 ;; an earlier line, prefer the next OPEN on the current line.
