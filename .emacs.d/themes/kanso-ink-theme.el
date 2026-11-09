@@ -215,6 +215,8 @@
    `(org-level-7 ((t (:inherit outline-3 :height 1.06))))
    `(org-level-8 ((t (:inherit outline-4 :height 1.02))))
    `(org-block ((t (:background ,panel))))
+   ;; org-modern also draws the table rules in this colour.
+   `(org-table ((t (:foreground ,fg))))
    `(org-code ((t (:foreground ,string))))
    `(org-verbatim ((t (:foreground ,string))))
    `(org-todo ((t (:foreground ,yellow :weight bold))))

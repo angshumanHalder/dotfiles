@@ -76,6 +76,34 @@
 (with-eval-after-load 'org-agenda
   (setq org-agenda-window-setup 'other-window))
 
+;; Notes table: #+BEGIN: notes :tag "TAG" :props ("PROP" ...) then C-c C-c.
+(defun org-dblock-write:notes (params)
+  "#+BEGIN: notes :tag \"TAG\" :props (\"PROP\" ...)"
+  (let ((props (plist-get params :props)))
+    (insert "| Note | Author | Tags |" (mapconcat (lambda (p) (format " %s |" p)) props "") "\n|-\n")
+    (dolist (f (directory-files-recursively (expand-file-name "notes" org-directory) "\\`[^.].*\\.org\\'")) ; skip .#lock files
+      (insert
+       (with-temp-buffer
+         (insert-file-contents f)
+         (delay-mode-hooks (org-mode))
+         (let* ((kw (org-collect-keywords '("FILETAGS" "AUTHOR")))
+                (tags (split-string (or (cadr (assoc "FILETAGS" kw)) "") ":" t)))
+           (if (not (member (plist-get params :tag) tags)) ""
+             (format "| [[file:%s][%s]] | %s | %s |%s\n" (file-relative-name f) (file-name-base f)
+                     (or (cadr (assoc "AUTHOR" kw)) "") (string-join tags " ")
+                     (mapconcat (lambda (p) (format " %s |" (or (org-entry-get 1 p) ""))) props "")))))))
+    (org-table-align)))
+
+(use-package org-modern
+  :hook ((org-mode . org-modern-mode)
+         (org-agenda-finalize . org-modern-agenda))
+  :custom
+  (org-modern-fold-stars '(("▶" . "▼") ("▷" . "▽") ("▸" . "▾") ("▹" . "▿")))
+  (org-ellipsis " …")
+  (org-tags-column 0)
+  :custom-face
+  (org-ellipsis ((t (:underline nil)))))
+
 ;; Resolve the symlink so the theme travels with this configuration.
 (add-to-list 'custom-theme-load-path
              (expand-file-name "themes"
@@ -243,6 +271,9 @@
         (call-interactively #'find-file))))
   (evil-define-key 'normal 'global (kbd "<leader>oa") #'org-agenda)
   (evil-define-key 'normal 'global (kbd "<leader>oc") #'org-capture)
+  (evil-define-key 'normal 'global (kbd "<leader>ob")   ; backlinks to this file
+    (lambda () (interactive)
+      (consult-ripgrep org-directory (concat "file:.*" (regexp-quote (file-name-nondirectory buffer-file-name))))))
 
   ;; lsp
   (evil-define-key 'normal 'global (kbd "]d") #'flymake-goto-next-error)
@@ -737,8 +768,10 @@ tab (or by the agent) would survive and keep the project's eglot server alive."
 
 ;; Snippet expansion and placeholder navigation
 (use-package yasnippet
-  :hook (prog-mode . yas-minor-mode)
+  :hook ((prog-mode org-mode) . yas-minor-mode)
   :config
+  ;; Note templates live with the notes: templates/org-mode/<name>
+  (add-to-list 'yas-snippet-dirs (expand-file-name "templates" org-directory))
   ;; yas-global-mode did this; the minor mode alone loads no snippet dirs.
   (yas-reload-all))
 
