@@ -81,7 +81,7 @@
   "#+BEGIN: notes :tag \"TAG\" :props (\"PROP\" ...)"
   (let ((props (plist-get params :props)))
     (insert "| Note | Author | Tags |" (mapconcat (lambda (p) (format " %s |" p)) props "") "\n|-\n")
-    (dolist (f (directory-files-recursively (expand-file-name "notes" org-directory) "\\`[^.].*\\.org\\'")) ; skip .#lock files
+    (dolist (f (directory-files-recursively (expand-file-name  org-directory) "\\`[^.].*\\.org\\'")) ; skip .#lock files
       (insert
        (with-temp-buffer
          (insert-file-contents f)
@@ -464,7 +464,7 @@
 (defun my/project-todos ()
   "Search common TODO markers in the current project."
   (interactive)
-  (consult-ripgrep nil "#\\b(TODO|FIXME|HACK|NOTE|BUG)\\b"))
+  (consult-ripgrep nil "#\\b\\(TODO\\|FIXME\\|HACK\\|NOTE\\|BUG\\)\\b"))
 
 (use-package vertico
   :demand t
