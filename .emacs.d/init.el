@@ -250,6 +250,9 @@
   
   ;; leader key
   (evil-set-leader '(normal visual) (kbd "SPC"))
+  ;; C-u scrolls (evil-want-C-u-scroll); prefix args go here instead.
+  ;; Once active, universal-argument-map's own C-u adds another level.
+  (evil-define-key '(normal visual) 'global (kbd "<leader>u") #'universal-argument)
 
   ;; finders 
   (evil-define-key 'normal 'global (kbd "<leader>fg") #'consult-ripgrep)
